@@ -1,0 +1,2350 @@
+FastLSTM training error vs. epoch	
+ 1.8388e+06	
+ 7.0674e+05	
+ 1.5158e+05	
+ 1.2309e+05	
+ 7.7105e+04	
+ 7.0973e+04	
+ 4.5164e+04	
+ 4.0713e+04	
+ 4.8924e+04	
+ 3.2899e+04	
+ 3.0912e+04	
+ 2.9972e+04	
+ 2.7864e+04	
+ 2.1771e+04	
+ 1.5421e+04	
+ 1.1665e+04	
+ 1.0056e+04	
+ 1.1311e+04	
+ 8.0813e+03	
+ 5.4314e+03	
+ 4.7407e+03	
+ 5.2050e+03	
+ 4.6666e+03	
+ 3.7445e+03	
+ 2.5970e+03	
+ 2.5901e+03	
+ 2.5111e+03	
+ 2.1300e+03	
+ 1.9056e+03	
+ 1.7236e+03	
+ 1.3366e+03	
+ 9.9112e+02	
+ 1.0942e+03	
+ 6.8680e+02	
+ 6.5857e+02	
+ 5.1563e+02	
+ 4.9552e+02	
+ 4.1878e+02	
+ 3.1893e+02	
+ 2.5091e+02	
+ 2.3976e+02	
+ 1.7649e+02	
+ 1.8770e+02	
+ 1.7428e+02	
+ 1.6217e+02	
+ 1.4068e+02	
+ 1.2541e+02	
+ 7.9158e+01	
+ 7.1736e+01	
+ 5.3148e+01	
+ 4.6925e+01	
+ 3.4627e+01	
+ 3.7430e+01	
+ 3.3378e+01	
+ 2.9468e+01	
+ 1.8981e+01	
+ 2.0559e+01	
+ 1.7256e+01	
+ 1.4196e+01	
+ 1.3521e+01	
+ 8.2888e+00	
+ 8.0255e+00	
+ 7.4641e+00	
+ 6.6301e+00	
+ 5.0357e+00	
+ 4.4069e+00	
+ 4.2374e+00	
+ 3.1219e+00	
+ 2.7199e+00	
+ 2.0151e+00	
+ 2.0482e+00	
+ 1.9758e+00	
+ 1.4518e+00	
+ 1.1601e+00	
+ 1.0059e+00	
+ 7.2296e-01	
+ 7.1633e-01	
+ 5.5967e-01	
+ 4.1292e-01	
+ 4.8225e-01	
+ 3.0544e-01	
+ 3.0996e-01	
+ 2.9542e-01	
+ 3.0320e-01	
+ 1.5213e-01	
+ 1.7871e-01	
+ 1.0902e-01	
+ 1.1630e-01	
+ 1.0295e-01	
+ 1.0813e-01	
+ 6.7577e-02	
+ 7.0662e-02	
+ 5.0584e-02	
+ 6.0618e-02	
+ 3.6183e-02	
+ 3.0884e-02	
+ 2.3541e-02	
+ 2.6470e-02	
+ 2.3583e-02	
+ 1.4984e-02	
+ 1.6700e-02	
+ 1.3765e-02	
+ 1.2395e-02	
+ 9.1575e-03	
+ 7.9100e-03	
+ 7.8709e-03	
+ 7.4916e-03	
+ 4.4449e-03	
+ 4.3336e-03	
+ 4.1646e-03	
+ 3.9677e-03	
+ 2.5627e-03	
+ 2.3919e-03	
+ 2.0448e-03	
+ 2.0304e-03	
+ 1.5308e-03	
+ 1.1664e-03	
+ 1.2039e-03	
+ 7.9397e-04	
+ 6.2065e-04	
+ 7.3619e-04	
+ 5.3943e-04	
+ 6.5076e-04	
+ 3.8151e-04	
+ 3.0597e-04	
+ 3.6355e-04	
+ 3.5348e-04	
+ 2.2304e-04	
+ 1.9224e-04	
+ 1.2229e-04	
+ 1.4956e-04	
+ 8.4184e-05	
+ 8.7871e-05	
+ 7.8091e-05	
+ 6.2299e-05	
+ 4.0668e-05	
+ 3.7865e-05	
+ 4.2855e-05	
+ 3.5455e-05	
+ 3.2810e-05	
+ 2.5171e-05	
+ 2.1487e-05	
+ 1.5600e-05	
+ 1.3088e-05	
+ 1.1997e-05	
+ 1.1480e-05	
+ 7.6242e-06	
+ 6.3367e-06	
+ 6.5561e-06	
+ 5.3528e-06	
+ 5.2057e-06	
+ 3.1358e-06	
+ 2.5149e-06	
+ 2.0350e-06	
+ 2.2147e-06	
+ 2.2382e-06	
+ 1.9325e-06	
+ 1.2966e-06	
+ 1.2909e-06	
+ 1.1604e-06	
+ 7.0157e-07	
+ 6.7600e-07	
+ 5.3920e-07	
+ 5.0751e-07	
+ 4.3524e-07	
+ 3.5047e-07	
+ 3.0077e-07	
+ 2.4779e-07	
+ 2.3381e-07	
+ 1.5816e-07	
+ 1.2333e-07	
+ 1.2287e-07	
+ 1.2115e-07	
+ 9.4429e-08	
+ 9.4266e-08	
+ 9.4444e-08	
+ 8.4401e-08	
+ 6.7048e-08	
+ 7.1719e-08	
+ 4.0329e-08	
+ 4.3539e-08	
+ 4.3619e-08	
+ 4.4900e-08	
+ 5.2118e-08	
+ 4.3539e-08	
+ 3.8497e-08	
+ 4.7461e-08	
+ 3.4575e-08	
+ 3.4655e-08	
+ 3.9698e-08	
+ 3.8497e-08	
+ 4.1058e-08	
+ 4.8742e-08	
+ 2.9693e-08	
+ 2.9133e-08	
+ 2.3128e-08	
+ 2.5932e-08	
+ 2.7450e-08	
+ 2.6009e-08	
+ 2.5289e-08	
+ 2.8170e-08	
+ 2.1687e-08	
+ 2.6009e-08	
+ 2.6652e-08	
+ 2.8890e-08	
+ 2.7372e-08	
+ 2.9533e-08	
+ 2.3128e-08	
+ 2.2330e-08	
+ 2.2408e-08	
+ 2.3771e-08	
+ 2.5932e-08	
+ 2.0247e-08	
+ 2.4491e-08	
+ 2.3848e-08	
+ 2.3848e-08	
+ 2.2330e-08	
+ 2.4568e-08	
+ 2.9533e-08	
+ 2.0169e-08	
+ 2.1610e-08	
+ 2.0247e-08	
+ 2.6729e-08	
+ 3.1772e-08	
+ 2.0889e-08	
+ 2.7372e-08	
+ 2.8813e-08	
+ 2.4568e-08	
+ 2.6009e-08	
+ 2.5289e-08	
+ 2.3128e-08	
+ 2.2408e-08	
+ 2.6729e-08	
+ 2.7372e-08	
+ 2.2330e-08	
+ 2.6729e-08	
+ 2.5932e-08	
+ 2.3771e-08	
+ 2.6729e-08	
+ 2.3128e-08	
+ 2.5289e-08	
+ 2.6009e-08	
+ 2.3050e-08	
+ 2.1610e-08	
+ 2.6729e-08	
+ 2.7450e-08	
+ 2.0967e-08	
+ 2.6652e-08	
+ 2.0169e-08	
+ 2.6652e-08	
+ 2.7450e-08	
+ 2.4568e-08	
+ 1.9526e-08	
+ 2.4568e-08	
+ 2.9611e-08	
+ 2.5289e-08	
+ 2.8170e-08	
+ 2.5211e-08	
+ 2.7450e-08	
+ 2.6009e-08	
+ 2.5932e-08	
+ 2.0967e-08	
+ 2.6009e-08	
+ 2.7450e-08	
+ 2.6652e-08	
+ 2.4491e-08	
+ 2.9611e-08	
+ 2.5289e-08	
+ 2.8170e-08	
+ 2.8092e-08	
+ 2.8170e-08	
+ 2.6009e-08	
+ 2.1610e-08	
+ 2.6652e-08	
+ 2.2408e-08	
+ 2.4568e-08	
+ 2.7450e-08	
+ 1.8008e-08	
+ 2.6729e-08	
+ 3.1694e-08	
+ 2.1610e-08	
+ 2.9533e-08	
+ 2.5932e-08	
+ 2.5211e-08	
+ 2.9611e-08	
+ 2.5211e-08	
+ 2.8092e-08	
+ 2.1610e-08	
+ 2.5211e-08	
+ 2.4491e-08	
+ 2.8092e-08	
+ 3.1694e-08	
+ 2.5211e-08	
+ 2.8092e-08	
+ 1.9449e-08	
+ 1.9526e-08	
+ 2.3050e-08	
+ 2.1610e-08	
+ 2.4491e-08	
+ 2.7372e-08	
+ 1.7288e-08	
+ 2.6652e-08	
+ 1.8008e-08	
+ 2.1687e-08	
+ 2.6652e-08	
+ 2.6652e-08	
+ 2.8813e-08	
+ 2.3050e-08	
+ 2.5932e-08	
+ 2.4491e-08	
+ 2.6652e-08	
+ 2.5932e-08	
+ 3.2414e-08	
+ 2.3050e-08	
+ 2.6652e-08	
+ 2.3771e-08	
+ 2.8813e-08	
+ 2.7372e-08	
+ 2.3771e-08	
+ 2.8092e-08	
+ 2.6652e-08	
+ 2.6652e-08	
+ 2.3050e-08	
+ 2.4491e-08	
+ 2.4491e-08	
+ 2.1610e-08	
+ 2.8813e-08	
+ 2.9533e-08	
+ 2.5211e-08	
+ 2.5211e-08	
+ 2.0889e-08	
+ 2.7372e-08	
+ 2.8813e-08	
+ 2.4491e-08	
+ 2.3050e-08	
+ 1.9449e-08	
+ 1.6567e-08	
+ 3.2414e-08	
+ 2.8092e-08	
+ 2.4491e-08	
+ 3.3855e-08	
+ 2.7372e-08	
+ 2.7372e-08	
+ 2.7372e-08	
+ 2.3771e-08	
+ 2.7372e-08	
+ 2.3050e-08	
+ 2.7372e-08	
+ 3.2414e-08	
+ 1.9449e-08	
+ 2.5211e-08	
+ 2.2330e-08	
+ 2.3050e-08	
+ 2.2330e-08	
+ 2.9533e-08	
+ 2.7372e-08	
+ 2.8092e-08	
+ 2.2330e-08	
+ 2.0889e-08	
+ 2.3771e-08	
+ 2.5932e-08	
+ 2.5211e-08	
+ 2.8813e-08	
+ 2.6652e-08	
+ 2.5211e-08	
+ 2.3050e-08	
+ 2.8813e-08	
+ 2.4491e-08	
+ 2.5932e-08	
+ 1.9449e-08	
+ 1.9449e-08	
+ 2.3050e-08	
+ 2.7372e-08	
+ 3.1694e-08	
+ 2.5211e-08	
+ 2.6652e-08	
+ 2.2330e-08	
+ 2.8813e-08	
+ 2.2330e-08	
+ 2.3050e-08	
+ 2.6652e-08	
+ 2.2330e-08	
+ 2.3050e-08	
+ 2.5211e-08	
+ 2.5211e-08	
+ 3.3135e-08	
+ 2.4491e-08	
+ 2.7372e-08	
+ 2.3050e-08	
+ 2.4491e-08	
+ 2.1610e-08	
+ 2.1610e-08	
+ 2.7372e-08	
+ 2.3050e-08	
+ 2.3771e-08	
+ 2.5932e-08	
+ 2.7372e-08	
+ 2.5211e-08	
+ 3.0253e-08	
+ 1.6567e-08	
+ 1.9449e-08	
+ 3.1694e-08	
+ 2.4491e-08	
+ 2.8813e-08	
+ 1.8728e-08	
+ 2.2330e-08	
+ 2.5932e-08	
+ 2.3771e-08	
+ 2.7372e-08	
+ 2.5932e-08	
+ 2.2330e-08	
+ 2.7372e-08	
+ 2.3050e-08	
+ 2.3050e-08	
+ 2.0889e-08	
+ 2.4491e-08	
+ 2.8813e-08	
+ 2.2330e-08	
+ 2.5932e-08	
+ 2.8092e-08	
+ 2.0889e-08	
+ 2.0169e-08	
+ 2.3050e-08	
+ 2.2330e-08	
+ 2.0889e-08	
+ 2.1610e-08	
+ 3.0974e-08	
+ 2.3771e-08	
+ 2.5932e-08	
+ 1.7288e-08	
+ 2.4491e-08	
+ 2.9533e-08	
+ 2.3771e-08	
+ 1.9449e-08	
+ 2.3050e-08	
+ 3.1694e-08	
+ 2.8813e-08	
+ 2.2330e-08	
+ 2.5211e-08	
+ 2.5211e-08	
+ 2.4491e-08	
+ 2.6652e-08	
+ 2.1610e-08	
+ 3.0974e-08	
+ 2.4491e-08	
+ 3.2414e-08	
+ 2.7372e-08	
+ 3.0253e-08	
+ 2.7372e-08	
+ 2.0169e-08	
+ 2.5211e-08	
+ 2.3050e-08	
+ 2.2330e-08	
+ 2.9533e-08	
+ 2.0889e-08	
+ 2.3771e-08	
+ 2.7372e-08	
+ 2.8813e-08	
+ 2.7372e-08	
+ 2.7372e-08	
+ 2.5932e-08	
+ 2.3771e-08	
+ 2.3050e-08	
+ 1.7288e-08	
+ 2.5211e-08	
+ 3.6736e-08	
+ 1.8328e-08	
+ 1.5687e-08	
+ 1.1845e-08	
+ 1.1845e-08	
+ 1.0885e-08	
+ 1.2486e-08	
+ 9.9244e-09	
+ 9.2841e-09	
+ 1.1205e-08	
+ 1.0245e-08	
+ 1.1845e-08	
+ 1.2806e-08	
+ 1.4086e-08	
+ 1.3126e-08	
+ 1.1205e-08	
+ 1.1205e-08	
+ 9.9244e-09	
+ 1.2486e-08	
+ 9.9244e-09	
+ 1.3126e-08	
+ 1.3446e-08	
+ 1.3446e-08	
+ 1.0245e-08	
+ 9.9244e-09	
+ 1.2165e-08	
+ 1.0245e-08	
+ 1.1845e-08	
+ 8.6438e-09	
+ 1.1845e-08	
+ 8.3237e-09	
+ 1.3766e-08	
+ 1.1845e-08	
+ 1.2486e-08	
+ 1.2165e-08	
+ 9.9244e-09	
+ 8.9640e-09	
+ 1.4727e-08	
+ 1.2165e-08	
+ 8.9640e-09	
+ 1.2486e-08	
+ 1.1205e-08	
+ 9.9244e-09	
+ 9.9244e-09	
+ 1.2165e-08	
+ 1.1525e-08	
+ 1.2486e-08	
+ 1.1205e-08	
+ 1.1845e-08	
+ 1.1525e-08	
+ 1.0245e-08	
+ 1.1525e-08	
+ 9.9244e-09	
+ 1.1525e-08	
+ 9.6043e-09	
+ 9.2841e-09	
+ 1.3126e-08	
+ 1.0885e-08	
+ 1.0565e-08	
+ 1.1205e-08	
+ 1.2165e-08	
+ 8.9640e-09	
+ 9.9244e-09	
+ 1.3126e-08	
+ 1.0565e-08	
+ 1.2486e-08	
+ 1.1845e-08	
+ 1.1845e-08	
+ 1.2486e-08	
+ 1.2486e-08	
+ 1.0245e-08	
+ 1.2806e-08	
+ 1.1205e-08	
+ 1.1845e-08	
+ 1.3126e-08	
+ 1.1845e-08	
+ 9.2841e-09	
+ 9.9244e-09	
+ 1.0885e-08	
+ 8.9640e-09	
+ 1.3126e-08	
+ 1.0885e-08	
+ 1.1525e-08	
+ 1.1525e-08	
+ 1.1525e-08	
+ 1.0885e-08	
+ 1.2486e-08	
+ 9.9244e-09	
+ 1.0885e-08	
+ 1.3126e-08	
+ 9.9244e-09	
+ 1.1845e-08	
+ 9.9244e-09	
+ 9.2841e-09	
+ 9.2841e-09	
+ 1.1845e-08	
+ 1.1845e-08	
+ 1.0885e-08	
+ 1.3766e-08	
+ 1.0885e-08	
+ 1.0245e-08	
+ 1.0885e-08	
+ 1.1205e-08	
+ 1.2486e-08	
+ 9.9244e-09	
+ 1.4406e-08	
+ 1.5047e-08	
+ 1.3446e-08	
+ 9.9244e-09	
+ 1.0885e-08	
+ 1.0565e-08	
+ 9.6043e-09	
+ 1.1205e-08	
+ 1.1525e-08	
+ 1.2486e-08	
+ 1.0245e-08	
+ 1.2486e-08	
+ 1.2486e-08	
+ 1.4727e-08	
+ 9.9244e-09	
+ 1.3766e-08	
+ 9.9244e-09	
+ 9.6043e-09	
+ 1.1205e-08	
+ 8.9640e-09	
+ 1.2806e-08	
+ 1.1205e-08	
+ 8.9640e-09	
+ 1.0565e-08	
+ 1.3126e-08	
+ 1.1845e-08	
+ 1.2165e-08	
+ 1.2486e-08	
+ 8.9640e-09	
+ 1.4086e-08	
+ 1.2486e-08	
+ 1.3126e-08	
+ 7.3633e-09	
+ 1.0245e-08	
+ 1.0245e-08	
+ 8.6438e-09	
+ 1.4086e-08	
+ 1.1205e-08	
+ 1.2806e-08	
+ 1.0885e-08	
+ 1.2486e-08	
+ 8.3237e-09	
+ 1.0885e-08	
+ 1.2486e-08	
+ 9.6043e-09	
+ 1.1845e-08	
+ 1.1525e-08	
+ 1.1525e-08	
+ 9.9244e-09	
+ 1.2165e-08	
+ 1.1525e-08	
+ 8.9640e-09	
+ 1.3126e-08	
+ 1.2165e-08	
+ 1.1525e-08	
+ 1.1525e-08	
+ 1.2165e-08	
+ 1.1845e-08	
+ 1.4406e-08	
+ 1.3446e-08	
+ 1.1205e-08	
+ 8.6438e-09	
+ 9.6043e-09	
+ 1.0565e-08	
+ 1.2486e-08	
+ 9.6043e-09	
+ 1.3446e-08	
+ 1.0245e-08	
+ 1.0885e-08	
+ 1.1205e-08	
+ 1.2165e-08	
+ 9.9244e-09	
+ 1.3446e-08	
+ 1.1525e-08	
+ 1.2486e-08	
+ 9.6043e-09	
+ 1.0565e-08	
+ 1.1205e-08	
+ 1.0885e-08	
+ 9.9244e-09	
+ 1.0885e-08	
+ 1.0245e-08	
+ 1.2165e-08	
+ 1.2165e-08	
+ 1.0885e-08	
+ 1.1205e-08	
+ 8.0036e-09	
+ 1.3446e-08	
+ 1.0885e-08	
+ 1.3126e-08	
+ 1.0565e-08	
+ 9.9244e-09	
+ 8.9640e-09	
+ 1.1845e-08	
+ 1.2165e-08	
+ 1.1845e-08	
+ 1.0245e-08	
+ 1.3126e-08	
+ 1.0245e-08	
+ 1.0565e-08	
+ 1.1205e-08	
+ 8.0036e-09	
+ 1.2806e-08	
+ 1.2486e-08	
+ 1.1845e-08	
+ 1.1525e-08	
+ 9.9244e-09	
+ 1.3126e-08	
+ 1.1525e-08	
+ 1.3126e-08	
+ 1.0245e-08	
+ 1.1205e-08	
+ 1.0245e-08	
+ 8.3237e-09	
+ 1.5687e-08	
+ 1.1845e-08	
+ 1.1205e-08	
+ 1.0885e-08	
+ 8.0036e-09	
+ 1.1205e-08	
+ 1.1525e-08	
+ 1.0885e-08	
+ 1.1845e-08	
+ 1.2806e-08	
+ 9.9244e-09	
+ 1.0245e-08	
+ 1.0245e-08	
+ 1.1525e-08	
+ 9.2841e-09	
+ 9.9244e-09	
+ 9.6043e-09	
+ 1.2486e-08	
+ 9.9244e-09	
+ 1.2165e-08	
+ 8.9640e-09	
+ 1.1845e-08	
+ 1.2165e-08	
+ 1.0885e-08	
+ 1.0885e-08	
+ 1.4727e-08	
+ 1.0885e-08	
+ 1.2806e-08	
+ 1.1525e-08	
+ 9.2841e-09	
+ 9.9244e-09	
+ 8.3237e-09	
+ 9.9244e-09	
+ 1.1525e-08	
+ 9.9244e-09	
+ 1.2806e-08	
+ 7.6834e-09	
+ 1.0565e-08	
+ 1.3446e-08	
+ 1.0885e-08	
+ 1.1205e-08	
+ 1.0565e-08	
+ 1.2486e-08	
+ 1.0245e-08	
+ 1.2486e-08	
+ 1.0245e-08	
+ 1.0565e-08	
+ 1.0245e-08	
+ 8.9640e-09	
+ 1.0245e-08	
+ 9.2841e-09	
+ 1.2486e-08	
+ 8.6438e-09	
+ 1.1525e-08	
+ 1.1845e-08	
+ 7.3633e-09	
+ 1.2486e-08	
+ 1.0245e-08	
+ 1.2165e-08	
+ 1.1845e-08	
+ 9.9244e-09	
+ 1.3766e-08	
+ 9.6043e-09	
+ 1.1205e-08	
+ 9.6043e-09	
+ 9.9244e-09	
+ 9.6043e-09	
+ 1.2165e-08	
+ 1.1845e-08	
+ 1.3446e-08	
+ 1.2165e-08	
+ 1.2486e-08	
+ 1.0245e-08	
+ 1.0885e-08	
+ 8.3237e-09	
+ 1.1205e-08	
+ 1.1525e-08	
+ 9.2841e-09	
+ 1.1845e-08	
+ 1.2486e-08	
+ 1.0565e-08	
+ 1.1845e-08	
+ 1.1205e-08	
+ 1.0565e-08	
+ 1.1845e-08	
+ 1.0245e-08	
+ 1.2165e-08	
+ 1.4086e-08	
+ 9.9244e-09	
+ 1.2806e-08	
+ 9.9244e-09	
+ 1.4727e-08	
+ 1.0565e-08	
+ 1.2806e-08	
+ 1.3766e-08	
+ 1.1845e-08	
+ 9.9244e-09	
+ 1.0885e-08	
+ 1.1845e-08	
+ 8.9640e-09	
+ 1.0245e-08	
+ 1.3446e-08	
+ 1.0565e-08	
+ 8.3237e-09	
+ 1.3126e-08	
+ 1.2806e-08	
+ 9.6043e-09	
+ 1.1845e-08	
+ 1.1845e-08	
+ 1.2486e-08	
+ 1.4406e-08	
+ 1.1525e-08	
+ 1.0245e-08	
+ 1.1205e-08	
+ 9.9244e-09	
+ 1.0245e-08	
+ 1.1205e-08	
+ 1.0565e-08	
+ 1.0565e-08	
+ 1.2486e-08	
+ 1.1525e-08	
+ 9.9244e-09	
+ 1.0245e-08	
+ 1.1525e-08	
+ 1.1845e-08	
+ 1.2165e-08	
+ 1.2165e-08	
+ 1.1845e-08	
+ 9.2841e-09	
+ 1.1525e-08	
+ 1.3126e-08	
+ 1.0885e-08	
+ 8.0036e-09	
+ 8.9640e-09	
+ 1.3446e-08	
+ 1.2165e-08	
+ 1.0565e-08	
+ 1.1525e-08	
+ 1.1845e-08	
+ 1.0245e-08	
+ 1.3126e-08	
+ 1.0565e-08	
+ 8.3237e-09	
+ 1.0565e-08	
+ 1.0245e-08	
+ 9.6043e-09	
+ 1.2806e-08	
+ 1.3126e-08	
+ 9.9244e-09	
+ 9.6043e-09	
+ 1.1525e-08	
+ 1.1205e-08	
+ 1.3126e-08	
+ 1.2806e-08	
+ 1.1525e-08	
+ 1.0245e-08	
+ 1.2486e-08	
+ 8.9640e-09	
+ 1.0565e-08	
+ 1.3126e-08	
+ 1.1205e-08	
+ 1.5047e-08	
+ 1.1845e-08	
+ 9.9244e-09	
+ 1.2486e-08	
+ 1.1205e-08	
+ 8.3237e-09	
+ 1.2486e-08	
+ 1.0565e-08	
+ 7.6834e-09	
+ 1.0885e-08	
+ 1.1205e-08	
+ 1.2165e-08	
+ 1.0885e-08	
+ 1.2486e-08	
+ 8.3237e-09	
+ 1.0885e-08	
+ 1.1205e-08	
+ 8.3237e-09	
+ 1.0885e-08	
+ 1.2486e-08	
+ 1.1205e-08	
+ 9.9244e-09	
+ 1.0245e-08	
+ 1.0885e-08	
+ 1.3126e-08	
+ 1.4406e-08	
+ 1.1845e-08	
+ 1.3446e-08	
+ 1.1845e-08	
+ 9.9244e-09	
+ 1.1205e-08	
+ 9.9244e-09	
+ 1.3126e-08	
+ 1.3126e-08	
+ 1.1845e-08	
+ 1.0565e-08	
+ 9.9244e-09	
+ 1.3126e-08	
+ 1.4086e-08	
+ 1.3766e-08	
+ 1.2486e-08	
+ 9.9244e-09	
+ 1.0245e-08	
+ 9.6043e-09	
+ 1.1525e-08	
+ 9.2841e-09	
+ 1.1845e-08	
+ 1.2486e-08	
+ 1.2486e-08	
+ 9.2841e-09	
+ 1.0245e-08	
+ 1.2806e-08	
+ 1.2165e-08	
+ 1.3126e-08	
+ 1.3446e-08	
+ 1.0565e-08	
+ 8.0036e-09	
+ 8.0036e-09	
+ 1.4406e-08	
+ 1.0565e-08	
+ 9.2841e-09	
+ 1.1525e-08	
+ 9.9244e-09	
+ 1.2165e-08	
+ 9.2841e-09	
+ 8.6438e-09	
+ 1.1205e-08	
+ 1.1205e-08	
+ 1.1845e-08	
+ 9.6043e-09	
+ 1.0245e-08	
+ 1.1525e-08	
+ 1.3446e-08	
+ 1.2486e-08	
+ 1.0245e-08	
+ 1.4727e-08	
+ 1.1205e-08	
+ 1.0885e-08	
+ 1.2165e-08	
+ 1.3446e-08	
+ 9.6043e-09	
+ 1.4086e-08	
+ 1.0885e-08	
+ 1.2486e-08	
+ 8.0036e-09	
+ 1.0885e-08	
+ 1.0565e-08	
+ 1.1205e-08	
+ 9.2841e-09	
+ 1.1205e-08	
+ 1.1845e-08	
+ 8.3237e-09	
+ 9.9244e-09	
+ 1.0245e-08	
+ 1.1205e-08	
+ 1.1525e-08	
+ 9.6043e-09	
+ 1.1205e-08	
+ 1.1845e-08	
+ 1.1525e-08	
+ 1.0565e-08	
+ 9.2841e-09	
+ 8.6438e-09	
+ 1.3766e-08	
+ 1.3446e-08	
+ 1.0245e-08	
+ 1.3126e-08	
+ 1.1205e-08	
+ 1.2806e-08	
+ 1.1525e-08	
+ 1.1525e-08	
+ 1.0885e-08	
+ 1.0565e-08	
+ 9.6043e-09	
+ 1.1525e-08	
+ 9.6043e-09	
+ 1.0885e-08	
+ 1.2486e-08	
+ 1.1205e-08	
+ 1.2165e-08	
+ 9.9244e-09	
+ 1.1525e-08	
+ 1.2165e-08	
+ 8.0036e-09	
+ 1.0245e-08	
+ 1.0565e-08	
+ 1.1845e-08	
+ 1.1525e-08	
+ 1.0245e-08	
+ 1.1845e-08	
+ 9.2841e-09	
+ 1.4406e-08	
+ 1.0885e-08	
+ 9.9244e-09	
+ 1.1845e-08	
+ 1.1205e-08	
+ 1.1525e-08	
+ 1.6968e-08	
+ 1.3446e-08	
+ 1.1205e-08	
+ 1.2165e-08	
+ 1.1845e-08	
+ 1.1205e-08	
+ 8.3237e-09	
+ 1.0245e-08	
+ 1.1525e-08	
+ 1.2806e-08	
+ 1.0245e-08	
+ 1.2486e-08	
+ 1.1525e-08	
+ 1.5047e-08	
+ 9.9244e-09	
+ 1.3446e-08	
+ 1.1525e-08	
+ 1.1845e-08	
+ 9.9244e-09	
+ 1.2806e-08	
+ 1.1205e-08	
+ 1.1525e-08	
+ 1.3126e-08	
+ 9.6043e-09	
+ 1.2806e-08	
+ 1.3766e-08	
+ 1.3126e-08	
+ 1.0885e-08	
+ 1.0885e-08	
+ 1.0885e-08	
+ 1.2806e-08	
+ 1.3766e-08	
+ 1.2165e-08	
+ 1.0885e-08	
+ 1.1205e-08	
+ 1.2165e-08	
+ 1.3446e-08	
+ 1.1205e-08	
+ 1.0565e-08	
+ 8.9640e-09	
+ 1.2165e-08	
+ 9.9244e-09	
+ 1.4086e-08	
+ 9.2841e-09	
+ 1.2486e-08	
+ 1.1205e-08	
+ 1.0565e-08	
+ 1.1525e-08	
+ 1.0885e-08	
+ 1.1525e-08	
+ 1.3446e-08	
+ 9.9244e-09	
+ 1.1205e-08	
+ 1.2165e-08	
+ 9.2841e-09	
+ 1.1845e-08	
+ 1.1205e-08	
+ 1.2806e-08	
+ 9.6043e-09	
+ 8.6438e-09	
+ 1.1525e-08	
+ 1.1845e-08	
+ 8.0036e-09	
+ 1.1205e-08	
+ 1.1205e-08	
+ 9.9244e-09	
+ 1.3126e-08	
+ 8.3237e-09	
+ 9.9244e-09	
+ 1.0885e-08	
+ 1.0565e-08	
+ 1.1525e-08	
+ 1.0565e-08	
+ 1.2806e-08	
+ 1.2486e-08	
+ 1.0885e-08	
+ 1.3446e-08	
+ 1.1205e-08	
+ 1.0245e-08	
+ 1.0245e-08	
+ 1.0565e-08	
+ 1.1205e-08	
+ 9.6043e-09	
+ 1.2165e-08	
+ 1.2165e-08	
+ 1.2165e-08	
+ 1.1525e-08	
+ 1.2165e-08	
+ 1.3446e-08	
+ 9.6043e-09	
+ 1.3126e-08	
+ 9.9244e-09	
+ 9.2841e-09	
+ 1.2165e-08	
+ 7.3633e-09	
+ 1.0565e-08	
+ 9.6043e-09	
+ 1.2806e-08	
+ 1.0565e-08	
+ 9.2841e-09	
+ 8.0036e-09	
+ 9.2841e-09	
+ 1.0885e-08	
+ 1.5687e-08	
+ 1.4727e-08	
+ 1.1205e-08	
+ 1.2486e-08	
+ 1.1205e-08	
+ 1.3126e-08	
+ 1.0245e-08	
+ 1.0245e-08	
+ 1.4406e-08	
+ 1.3766e-08	
+ 1.0245e-08	
+ 9.9244e-09	
+ 8.9640e-09	
+ 1.1525e-08	
+ 9.6043e-09	
+ 1.0245e-08	
+ 1.0565e-08	
+ 1.1205e-08	
+ 1.3446e-08	
+ 1.1845e-08	
+ 9.9244e-09	
+ 1.1205e-08	
+ 1.0565e-08	
+ 8.3237e-09	
+ 1.6968e-08	
+ 1.0245e-08	
+ 1.3446e-08	
+ 1.1205e-08	
+ 1.0245e-08	
+ 1.2486e-08	
+ 1.1845e-08	
+ 1.3766e-08	
+ 8.3237e-09	
+ 9.2841e-09	
+ 1.1205e-08	
+ 1.2806e-08	
+ 8.6438e-09	
+ 1.0885e-08	
+ 1.2165e-08	
+ 1.1845e-08	
+ 1.2486e-08	
+ 1.2165e-08	
+ 1.0885e-08	
+ 1.0565e-08	
+ 8.9640e-09	
+ 1.1205e-08	
+ 8.9640e-09	
+ 1.0565e-08	
+ 8.3237e-09	
+ 9.9244e-09	
+ 1.0885e-08	
+ 1.0245e-08	
+ 1.0565e-08	
+ 1.3446e-08	
+ 1.1205e-08	
+ 1.2806e-08	
+ 1.0565e-08	
+ 9.9244e-09	
+ 8.3237e-09	
+ 1.1525e-08	
+ 1.1845e-08	
+ 9.6043e-09	
+ 8.9640e-09	
+ 1.1205e-08	
+ 9.9244e-09	
+ 1.1525e-08	
+ 1.0245e-08	
+ 1.3126e-08	
+ 9.9244e-09	
+ 1.1845e-08	
+fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 10,  Loss = 8.28884771  
+2017-01-30 16:16:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 11,  Loss = 8.02552586  
+2017-01-30 16:16:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 12,  Loss = 7.46411915  
+2017-01-30 16:16:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 13,  Loss = 6.63005250  
+2017-01-30 16:16:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 14,  Loss = 5.03572741  
+2017-01-30 16:16:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 15,  Loss = 4.40687896  
+2017-01-30 16:16:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 16,  Loss = 4.23736014  
+2017-01-30 16:16:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 17,  Loss = 3.12190400  
+2017-01-30 16:16:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 18,  Loss = 2.71986063  
+2017-01-30 16:16:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 19,  Loss = 2.01512831  
+2017-01-30 16:16:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 20,  Loss = 2.04819687  
+2017-01-30 16:16:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 21,  Loss = 1.97575867  
+2017-01-30 16:16:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 22,  Loss = 1.45179994  
+2017-01-30 16:16:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 23,  Loss = 1.16009101  
+2017-01-30 16:16:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 24,  Loss = 1.00588125  
+2017-01-30 16:16:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 25,  Loss = 0.72295522  
+2017-01-30 16:16:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 26,  Loss = 0.71633291  
+2017-01-30 16:16:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 27,  Loss = 0.55966816  
+2017-01-30 16:16:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 28,  Loss = 0.41292482  
+2017-01-30 16:16:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 29,  Loss = 0.48224683  
+2017-01-30 16:16:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 30,  Loss = 0.30544189  
+2017-01-30 16:16:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 31,  Loss = 0.30996244  
+2017-01-30 16:16:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 32,  Loss = 0.29542350  
+2017-01-30 16:16:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 33,  Loss = 0.30319686  
+2017-01-30 16:16:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 34,  Loss = 0.15213189  
+2017-01-30 16:16:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 35,  Loss = 0.17870589  
+2017-01-30 16:16:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 36,  Loss = 0.10901888  
+2017-01-30 16:16:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 37,  Loss = 0.11629963  
+2017-01-30 16:16:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 38,  Loss = 0.10294646  
+2017-01-30 16:16:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 39,  Loss = 0.10813404  
+2017-01-30 16:16:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 40,  Loss = 0.06757682  
+2017-01-30 16:16:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 41,  Loss = 0.07066158  
+2017-01-30 16:16:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 42,  Loss = 0.05058436  
+2017-01-30 16:16:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 43,  Loss = 0.06061789  
+2017-01-30 16:16:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 44,  Loss = 0.03618271  
+2017-01-30 16:16:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 45,  Loss = 0.03088406  
+2017-01-30 16:16:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 46,  Loss = 0.02354098  
+2017-01-30 16:16:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 47,  Loss = 0.02647015  
+2017-01-30 16:16:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 48,  Loss = 0.02358345  
+2017-01-30 16:16:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 2,iter = 49,  Loss = 0.01498373  
+2017-01-30 16:16:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.12604801190019ms 
+2017-01-30 16:16:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:16:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:16:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 3 [batchSize = 100]
+ 
+2017-01-30 16:16:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 0,  Loss = 0.01670028  
+2017-01-30 16:16:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 1,  Loss = 0.01376546  
+2017-01-30 16:16:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 2,  Loss = 0.01239545  
+2017-01-30 16:16:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 3,  Loss = 0.00915752  
+2017-01-30 16:16:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 4,  Loss = 0.00790997  
+2017-01-30 16:16:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 5,  Loss = 0.00787089  
+2017-01-30 16:16:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 6,  Loss = 0.00749159  
+2017-01-30 16:16:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 7,  Loss = 0.00444491  
+2017-01-30 16:16:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 8,  Loss = 0.00433363  
+2017-01-30 16:16:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 9,  Loss = 0.00416456  
+2017-01-30 16:16:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 10,  Loss = 0.00396773  
+2017-01-30 16:16:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 11,  Loss = 0.00256273  
+2017-01-30 16:16:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 12,  Loss = 0.00239193  
+2017-01-30 16:16:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 13,  Loss = 0.00204485  
+2017-01-30 16:16:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 14,  Loss = 0.00203044  
+2017-01-30 16:16:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 15,  Loss = 0.00153077  
+2017-01-30 16:16:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 16,  Loss = 0.00116644  
+2017-01-30 16:16:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 17,  Loss = 0.00120387  
+2017-01-30 16:16:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 18,  Loss = 0.00079397  
+2017-01-30 16:16:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 19,  Loss = 0.00062065  
+2017-01-30 16:16:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 20,  Loss = 0.00073619  
+2017-01-30 16:16:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 21,  Loss = 0.00053943  
+2017-01-30 16:16:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 22,  Loss = 0.00065076  
+2017-01-30 16:16:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 23,  Loss = 0.00038151  
+2017-01-30 16:16:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 24,  Loss = 0.00030597  
+2017-01-30 16:16:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 25,  Loss = 0.00036355  
+2017-01-30 16:16:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 26,  Loss = 0.00035348  
+2017-01-30 16:16:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 27,  Loss = 0.00022304  
+2017-01-30 16:16:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 28,  Loss = 0.00019224  
+2017-01-30 16:16:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 29,  Loss = 0.00012229  
+2017-01-30 16:16:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 30,  Loss = 0.00014956  
+2017-01-30 16:16:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 31,  Loss = 0.00008418  
+2017-01-30 16:16:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 32,  Loss = 0.00008787  
+2017-01-30 16:16:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 33,  Loss = 0.00007809  
+2017-01-30 16:16:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 34,  Loss = 0.00006230  
+2017-01-30 16:16:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 35,  Loss = 0.00004067  
+2017-01-30 16:17:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 36,  Loss = 0.00003786  
+2017-01-30 16:17:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 37,  Loss = 0.00004286  
+2017-01-30 16:17:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 38,  Loss = 0.00003545  
+2017-01-30 16:17:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 39,  Loss = 0.00003281  
+2017-01-30 16:17:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 40,  Loss = 0.00002517  
+2017-01-30 16:17:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 41,  Loss = 0.00002149  
+2017-01-30 16:17:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 42,  Loss = 0.00001560  
+2017-01-30 16:17:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 43,  Loss = 0.00001309  
+2017-01-30 16:17:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 44,  Loss = 0.00001200  
+2017-01-30 16:17:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 45,  Loss = 0.00001148  
+2017-01-30 16:17:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 46,  Loss = 0.00000762  
+2017-01-30 16:17:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 47,  Loss = 0.00000634  
+2017-01-30 16:17:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 48,  Loss = 0.00000656  
+2017-01-30 16:17:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 3,iter = 49,  Loss = 0.00000535  
+2017-01-30 16:17:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.13315262655569ms 
+2017-01-30 16:17:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:17:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 4 [batchSize = 100]
+ 
+2017-01-30 16:17:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 0,  Loss = 0.00000521  
+2017-01-30 16:17:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 1,  Loss = 0.00000314  
+2017-01-30 16:17:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 2,  Loss = 0.00000251  
+2017-01-30 16:17:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 3,  Loss = 0.00000203  
+2017-01-30 16:17:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 4,  Loss = 0.00000221  
+2017-01-30 16:17:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 5,  Loss = 0.00000224  
+2017-01-30 16:17:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 6,  Loss = 0.00000193  
+2017-01-30 16:17:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 7,  Loss = 0.00000130  
+2017-01-30 16:17:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 8,  Loss = 0.00000129  
+2017-01-30 16:17:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 9,  Loss = 0.00000116  
+2017-01-30 16:17:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 10,  Loss = 0.00000070  
+2017-01-30 16:17:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 11,  Loss = 0.00000068  
+2017-01-30 16:17:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 12,  Loss = 0.00000054  
+2017-01-30 16:17:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 13,  Loss = 0.00000051  
+2017-01-30 16:17:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 14,  Loss = 0.00000044  
+2017-01-30 16:17:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 15,  Loss = 0.00000035  
+2017-01-30 16:17:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 16,  Loss = 0.00000030  
+2017-01-30 16:17:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 17,  Loss = 0.00000025  
+2017-01-30 16:17:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 18,  Loss = 0.00000023  
+2017-01-30 16:17:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 19,  Loss = 0.00000016  
+2017-01-30 16:17:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 20,  Loss = 0.00000012  
+2017-01-30 16:17:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 21,  Loss = 0.00000012  
+2017-01-30 16:17:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 22,  Loss = 0.00000012  
+2017-01-30 16:17:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 23,  Loss = 0.00000009  
+2017-01-30 16:17:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 24,  Loss = 0.00000009  
+2017-01-30 16:17:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 25,  Loss = 0.00000009  
+2017-01-30 16:17:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 26,  Loss = 0.00000008  
+2017-01-30 16:17:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 27,  Loss = 0.00000007  
+2017-01-30 16:17:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 28,  Loss = 0.00000007  
+2017-01-30 16:17:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 29,  Loss = 0.00000004  
+2017-01-30 16:17:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 30,  Loss = 0.00000004  
+2017-01-30 16:17:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 31,  Loss = 0.00000004  
+2017-01-30 16:17:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 32,  Loss = 0.00000004  
+2017-01-30 16:17:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 33,  Loss = 0.00000005  
+2017-01-30 16:17:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 34,  Loss = 0.00000004  
+2017-01-30 16:17:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 35,  Loss = 0.00000004  
+2017-01-30 16:17:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 36,  Loss = 0.00000005  
+2017-01-30 16:17:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 37,  Loss = 0.00000003  
+2017-01-30 16:17:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 38,  Loss = 0.00000003  
+2017-01-30 16:17:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 39,  Loss = 0.00000004  
+2017-01-30 16:17:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 40,  Loss = 0.00000004  
+2017-01-30 16:17:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 41,  Loss = 0.00000004  
+2017-01-30 16:17:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 42,  Loss = 0.00000005  
+2017-01-30 16:17:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 43,  Loss = 0.00000003  
+2017-01-30 16:17:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 44,  Loss = 0.00000003  
+2017-01-30 16:17:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 45,  Loss = 0.00000002  
+2017-01-30 16:17:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 46,  Loss = 0.00000003  
+2017-01-30 16:17:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 47,  Loss = 0.00000003  
+2017-01-30 16:17:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 48,  Loss = 0.00000003  
+2017-01-30 16:17:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 4,iter = 49,  Loss = 0.00000003  
+2017-01-30 16:17:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.1352130601871ms 
+2017-01-30 16:17:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:17:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:17:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 5 [batchSize = 100]
+ 
+2017-01-30 16:17:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 0,  Loss = 0.00000003  
+2017-01-30 16:17:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 1,  Loss = 0.00000002  
+2017-01-30 16:17:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 2,  Loss = 0.00000003  
+2017-01-30 16:17:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 3,  Loss = 0.00000003  
+2017-01-30 16:17:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 4,  Loss = 0.00000003  
+2017-01-30 16:17:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 5,  Loss = 0.00000003  
+2017-01-30 16:17:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 6,  Loss = 0.00000003  
+2017-01-30 16:17:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 7,  Loss = 0.00000002  
+2017-01-30 16:17:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 8,  Loss = 0.00000002  
+2017-01-30 16:17:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 9,  Loss = 0.00000002  
+2017-01-30 16:17:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 10,  Loss = 0.00000002  
+2017-01-30 16:17:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 11,  Loss = 0.00000003  
+2017-01-30 16:17:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 12,  Loss = 0.00000002  
+2017-01-30 16:17:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 13,  Loss = 0.00000002  
+2017-01-30 16:17:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 14,  Loss = 0.00000002  
+2017-01-30 16:17:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 15,  Loss = 0.00000002  
+2017-01-30 16:17:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 16,  Loss = 0.00000002  
+2017-01-30 16:17:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 17,  Loss = 0.00000002  
+2017-01-30 16:18:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 18,  Loss = 0.00000003  
+2017-01-30 16:18:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 19,  Loss = 0.00000002  
+2017-01-30 16:18:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 20,  Loss = 0.00000002  
+2017-01-30 16:18:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 21,  Loss = 0.00000002  
+2017-01-30 16:18:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 22,  Loss = 0.00000003  
+2017-01-30 16:18:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 23,  Loss = 0.00000003  
+2017-01-30 16:18:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 24,  Loss = 0.00000002  
+2017-01-30 16:18:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 25,  Loss = 0.00000003  
+2017-01-30 16:18:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 26,  Loss = 0.00000003  
+2017-01-30 16:18:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 27,  Loss = 0.00000002  
+2017-01-30 16:18:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 28,  Loss = 0.00000003  
+2017-01-30 16:18:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 29,  Loss = 0.00000003  
+2017-01-30 16:18:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 30,  Loss = 0.00000002  
+2017-01-30 16:18:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 31,  Loss = 0.00000002  
+2017-01-30 16:18:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 32,  Loss = 0.00000003  
+2017-01-30 16:18:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 33,  Loss = 0.00000003  
+2017-01-30 16:18:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 34,  Loss = 0.00000002  
+2017-01-30 16:18:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 35,  Loss = 0.00000003  
+2017-01-30 16:18:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 36,  Loss = 0.00000003  
+2017-01-30 16:18:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 37,  Loss = 0.00000002  
+2017-01-30 16:18:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 38,  Loss = 0.00000003  
+2017-01-30 16:18:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 39,  Loss = 0.00000002  
+2017-01-30 16:18:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 40,  Loss = 0.00000003  
+2017-01-30 16:18:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 41,  Loss = 0.00000003  
+2017-01-30 16:18:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 42,  Loss = 0.00000002  
+2017-01-30 16:18:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 43,  Loss = 0.00000002  
+2017-01-30 16:18:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 44,  Loss = 0.00000003  
+2017-01-30 16:18:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 45,  Loss = 0.00000003  
+2017-01-30 16:18:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 46,  Loss = 0.00000002  
+2017-01-30 16:18:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 47,  Loss = 0.00000003  
+2017-01-30 16:18:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 48,  Loss = 0.00000002  
+2017-01-30 16:18:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 5,iter = 49,  Loss = 0.00000003  
+2017-01-30 16:18:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.14041455644957ms 
+2017-01-30 16:18:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:18:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 6 [batchSize = 100]
+ 
+2017-01-30 16:18:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 0,  Loss = 0.00000003  
+2017-01-30 16:18:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 1,  Loss = 0.00000002  
+2017-01-30 16:18:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 2,  Loss = 0.00000002  
+2017-01-30 16:18:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 3,  Loss = 0.00000002  
+2017-01-30 16:18:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 4,  Loss = 0.00000003  
+2017-01-30 16:18:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 5,  Loss = 0.00000003  
+2017-01-30 16:18:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 6,  Loss = 0.00000003  
+2017-01-30 16:18:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 7,  Loss = 0.00000003  
+2017-01-30 16:18:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 8,  Loss = 0.00000003  
+2017-01-30 16:18:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 9,  Loss = 0.00000003  
+2017-01-30 16:18:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 10,  Loss = 0.00000003  
+2017-01-30 16:18:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 11,  Loss = 0.00000002  
+2017-01-30 16:18:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 12,  Loss = 0.00000003  
+2017-01-30 16:18:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 13,  Loss = 0.00000003  
+2017-01-30 16:18:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 14,  Loss = 0.00000003  
+2017-01-30 16:18:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 15,  Loss = 0.00000002  
+2017-01-30 16:18:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 16,  Loss = 0.00000003  
+2017-01-30 16:18:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 17,  Loss = 0.00000003  
+2017-01-30 16:18:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 18,  Loss = 0.00000003  
+2017-01-30 16:18:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 19,  Loss = 0.00000003  
+2017-01-30 16:18:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 20,  Loss = 0.00000003  
+2017-01-30 16:18:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 21,  Loss = 0.00000003  
+2017-01-30 16:18:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 22,  Loss = 0.00000002  
+2017-01-30 16:18:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 23,  Loss = 0.00000003  
+2017-01-30 16:18:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 24,  Loss = 0.00000002  
+2017-01-30 16:18:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 25,  Loss = 0.00000002  
+2017-01-30 16:18:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 26,  Loss = 0.00000003  
+2017-01-30 16:18:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 27,  Loss = 0.00000002  
+2017-01-30 16:18:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 28,  Loss = 0.00000003  
+2017-01-30 16:18:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 29,  Loss = 0.00000003  
+2017-01-30 16:18:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 30,  Loss = 0.00000002  
+2017-01-30 16:18:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 31,  Loss = 0.00000003  
+2017-01-30 16:18:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 32,  Loss = 0.00000003  
+2017-01-30 16:18:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 33,  Loss = 0.00000003  
+2017-01-30 16:18:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 34,  Loss = 0.00000003  
+2017-01-30 16:18:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 35,  Loss = 0.00000003  
+2017-01-30 16:18:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 36,  Loss = 0.00000003  
+2017-01-30 16:18:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 37,  Loss = 0.00000002  
+2017-01-30 16:18:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 38,  Loss = 0.00000003  
+2017-01-30 16:18:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 39,  Loss = 0.00000002  
+2017-01-30 16:18:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 40,  Loss = 0.00000003  
+2017-01-30 16:18:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 41,  Loss = 0.00000003  
+2017-01-30 16:18:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 42,  Loss = 0.00000003  
+2017-01-30 16:18:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 43,  Loss = 0.00000003  
+2017-01-30 16:18:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 44,  Loss = 0.00000002  
+2017-01-30 16:18:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 45,  Loss = 0.00000002  
+2017-01-30 16:18:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 46,  Loss = 0.00000002  
+2017-01-30 16:18:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 47,  Loss = 0.00000002  
+2017-01-30 16:19:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 48,  Loss = 0.00000002  
+2017-01-30 16:19:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 6,iter = 49,  Loss = 0.00000003  
+2017-01-30 16:19:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.14593188595775ms 
+2017-01-30 16:19:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:19:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:19:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 7 [batchSize = 100]
+ 
+2017-01-30 16:19:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 0,  Loss = 0.00000002  
+2017-01-30 16:19:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 1,  Loss = 0.00000003  
+2017-01-30 16:19:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 2,  Loss = 0.00000002  
+2017-01-30 16:19:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 3,  Loss = 0.00000002  
+2017-01-30 16:19:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 4,  Loss = 0.00000003  
+2017-01-30 16:19:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 5,  Loss = 0.00000003  
+2017-01-30 16:19:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 6,  Loss = 0.00000003  
+2017-01-30 16:19:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 7,  Loss = 0.00000002  
+2017-01-30 16:19:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 8,  Loss = 0.00000003  
+2017-01-30 16:19:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 9,  Loss = 0.00000002  
+2017-01-30 16:19:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 10,  Loss = 0.00000003  
+2017-01-30 16:19:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 11,  Loss = 0.00000003  
+2017-01-30 16:19:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 12,  Loss = 0.00000003  
+2017-01-30 16:19:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 13,  Loss = 0.00000002  
+2017-01-30 16:19:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 14,  Loss = 0.00000003  
+2017-01-30 16:19:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 15,  Loss = 0.00000002  
+2017-01-30 16:19:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 16,  Loss = 0.00000003  
+2017-01-30 16:19:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 17,  Loss = 0.00000003  
+2017-01-30 16:19:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 18,  Loss = 0.00000002  
+2017-01-30 16:19:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 19,  Loss = 0.00000003  
+2017-01-30 16:19:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 20,  Loss = 0.00000003  
+2017-01-30 16:19:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 21,  Loss = 0.00000003  
+2017-01-30 16:19:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 22,  Loss = 0.00000002  
+2017-01-30 16:19:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 23,  Loss = 0.00000002  
+2017-01-30 16:19:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 24,  Loss = 0.00000002  
+2017-01-30 16:19:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 25,  Loss = 0.00000002  
+2017-01-30 16:19:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 26,  Loss = 0.00000003  
+2017-01-30 16:19:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 27,  Loss = 0.00000003  
+2017-01-30 16:19:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 28,  Loss = 0.00000003  
+2017-01-30 16:19:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 29,  Loss = 0.00000003  
+2017-01-30 16:19:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 30,  Loss = 0.00000002  
+2017-01-30 16:19:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 31,  Loss = 0.00000003  
+2017-01-30 16:19:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 32,  Loss = 0.00000003  
+2017-01-30 16:19:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 33,  Loss = 0.00000002  
+2017-01-30 16:19:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 34,  Loss = 0.00000002  
+2017-01-30 16:19:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 35,  Loss = 0.00000002  
+2017-01-30 16:19:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 36,  Loss = 0.00000002  
+2017-01-30 16:19:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 37,  Loss = 0.00000003  
+2017-01-30 16:19:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 38,  Loss = 0.00000003  
+2017-01-30 16:19:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 39,  Loss = 0.00000002  
+2017-01-30 16:19:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 40,  Loss = 0.00000003  
+2017-01-30 16:19:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 41,  Loss = 0.00000003  
+2017-01-30 16:19:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 42,  Loss = 0.00000003  
+2017-01-30 16:19:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 43,  Loss = 0.00000003  
+2017-01-30 16:19:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 44,  Loss = 0.00000002  
+2017-01-30 16:19:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 45,  Loss = 0.00000003  
+2017-01-30 16:19:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 46,  Loss = 0.00000002  
+2017-01-30 16:19:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 47,  Loss = 0.00000003  
+2017-01-30 16:19:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 48,  Loss = 0.00000003  
+2017-01-30 16:19:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 7,iter = 49,  Loss = 0.00000002  
+2017-01-30 16:19:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.14892165450132ms 
+2017-01-30 16:19:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:19:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 8 [batchSize = 100]
+ 
+2017-01-30 16:19:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 0,  Loss = 0.00000003  
+2017-01-30 16:19:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 1,  Loss = 0.00000002  
+2017-01-30 16:19:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 2,  Loss = 0.00000002  
+2017-01-30 16:19:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 3,  Loss = 0.00000002  
+2017-01-30 16:19:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 4,  Loss = 0.00000003  
+2017-01-30 16:19:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 5,  Loss = 0.00000003  
+2017-01-30 16:19:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 6,  Loss = 0.00000003  
+2017-01-30 16:19:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 7,  Loss = 0.00000002  
+2017-01-30 16:19:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 8,  Loss = 0.00000002  
+2017-01-30 16:19:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 9,  Loss = 0.00000002  
+2017-01-30 16:19:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 10,  Loss = 0.00000003  
+2017-01-30 16:19:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 11,  Loss = 0.00000003  
+2017-01-30 16:19:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 12,  Loss = 0.00000003  
+2017-01-30 16:19:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 13,  Loss = 0.00000003  
+2017-01-30 16:19:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 14,  Loss = 0.00000003  
+2017-01-30 16:19:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 15,  Loss = 0.00000002  
+2017-01-30 16:19:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 16,  Loss = 0.00000003  
+2017-01-30 16:19:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 17,  Loss = 0.00000002  
+2017-01-30 16:19:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 18,  Loss = 0.00000003  
+2017-01-30 16:19:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 19,  Loss = 0.00000002  
+2017-01-30 16:19:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 20,  Loss = 0.00000002  
+2017-01-30 16:19:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 21,  Loss = 0.00000002  
+2017-01-30 16:19:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 22,  Loss = 0.00000003  
+2017-01-30 16:20:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 23,  Loss = 0.00000003  
+2017-01-30 16:20:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 24,  Loss = 0.00000003  
+2017-01-30 16:20:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 25,  Loss = 0.00000003  
+2017-01-30 16:20:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 26,  Loss = 0.00000002  
+2017-01-30 16:20:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 27,  Loss = 0.00000003  
+2017-01-30 16:20:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 28,  Loss = 0.00000002  
+2017-01-30 16:20:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 29,  Loss = 0.00000002  
+2017-01-30 16:20:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 30,  Loss = 0.00000003  
+2017-01-30 16:20:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 31,  Loss = 0.00000002  
+2017-01-30 16:20:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 32,  Loss = 0.00000002  
+2017-01-30 16:20:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 33,  Loss = 0.00000003  
+2017-01-30 16:20:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 34,  Loss = 0.00000003  
+2017-01-30 16:20:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 35,  Loss = 0.00000003  
+2017-01-30 16:20:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 36,  Loss = 0.00000002  
+2017-01-30 16:20:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 37,  Loss = 0.00000003  
+2017-01-30 16:20:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 38,  Loss = 0.00000002  
+2017-01-30 16:20:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 39,  Loss = 0.00000002  
+2017-01-30 16:20:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 40,  Loss = 0.00000002  
+2017-01-30 16:20:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 41,  Loss = 0.00000002  
+2017-01-30 16:20:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 42,  Loss = 0.00000003  
+2017-01-30 16:20:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 43,  Loss = 0.00000002  
+2017-01-30 16:20:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 44,  Loss = 0.00000002  
+2017-01-30 16:20:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 45,  Loss = 0.00000003  
+2017-01-30 16:20:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 46,  Loss = 0.00000003  
+2017-01-30 16:20:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 47,  Loss = 0.00000003  
+2017-01-30 16:20:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 48,  Loss = 0.00000003  
+2017-01-30 16:20:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 8,iter = 49,  Loss = 0.00000002  
+2017-01-30 16:20:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.14902716939416ms 
+2017-01-30 16:20:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:20:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:20:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 9 [batchSize = 100]
+ 
+2017-01-30 16:20:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 0,  Loss = 0.00000002  
+2017-01-30 16:20:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 1,  Loss = 0.00000003  
+2017-01-30 16:20:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 2,  Loss = 0.00000002  
+2017-01-30 16:20:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 3,  Loss = 0.00000003  
+2017-01-30 16:20:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 4,  Loss = 0.00000002  
+2017-01-30 16:20:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 5,  Loss = 0.00000002  
+2017-01-30 16:20:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 6,  Loss = 0.00000003  
+2017-01-30 16:20:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 7,  Loss = 0.00000002  
+2017-01-30 16:20:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 8,  Loss = 0.00000003  
+2017-01-30 16:20:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 9,  Loss = 0.00000003  
+2017-01-30 16:20:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 10,  Loss = 0.00000002  
+2017-01-30 16:20:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 11,  Loss = 0.00000003  
+2017-01-30 16:20:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 12,  Loss = 0.00000002  
+2017-01-30 16:20:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 13,  Loss = 0.00000002  
+2017-01-30 16:20:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 14,  Loss = 0.00000002  
+2017-01-30 16:20:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 15,  Loss = 0.00000002  
+2017-01-30 16:20:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 16,  Loss = 0.00000003  
+2017-01-30 16:20:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 17,  Loss = 0.00000002  
+2017-01-30 16:20:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 18,  Loss = 0.00000003  
+2017-01-30 16:20:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 19,  Loss = 0.00000003  
+2017-01-30 16:20:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 20,  Loss = 0.00000002  
+2017-01-30 16:20:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 21,  Loss = 0.00000002  
+2017-01-30 16:20:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 22,  Loss = 0.00000002  
+2017-01-30 16:20:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 23,  Loss = 0.00000002  
+2017-01-30 16:20:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 24,  Loss = 0.00000002  
+2017-01-30 16:20:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 25,  Loss = 0.00000002  
+2017-01-30 16:20:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 26,  Loss = 0.00000003  
+2017-01-30 16:20:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 27,  Loss = 0.00000002  
+2017-01-30 16:20:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 28,  Loss = 0.00000003  
+2017-01-30 16:20:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 29,  Loss = 0.00000002  
+2017-01-30 16:20:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 30,  Loss = 0.00000002  
+2017-01-30 16:20:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 31,  Loss = 0.00000003  
+2017-01-30 16:20:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 32,  Loss = 0.00000002  
+2017-01-30 16:20:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 33,  Loss = 0.00000002  
+2017-01-30 16:20:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 34,  Loss = 0.00000002  
+2017-01-30 16:20:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 35,  Loss = 0.00000003  
+2017-01-30 16:20:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 36,  Loss = 0.00000003  
+2017-01-30 16:20:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 37,  Loss = 0.00000002  
+2017-01-30 16:20:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 38,  Loss = 0.00000003  
+2017-01-30 16:20:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 39,  Loss = 0.00000003  
+2017-01-30 16:20:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 40,  Loss = 0.00000002  
+2017-01-30 16:20:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 41,  Loss = 0.00000003  
+2017-01-30 16:20:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 42,  Loss = 0.00000002  
+2017-01-30 16:20:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 43,  Loss = 0.00000003  
+2017-01-30 16:20:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 44,  Loss = 0.00000002  
+2017-01-30 16:21:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 45,  Loss = 0.00000003  
+2017-01-30 16:21:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 46,  Loss = 0.00000003  
+2017-01-30 16:21:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 47,  Loss = 0.00000003  
+2017-01-30 16:21:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 48,  Loss = 0.00000003  
+2017-01-30 16:21:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 9,iter = 49,  Loss = 0.00000002  
+2017-01-30 16:21:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.15551170596769ms 
+2017-01-30 16:21:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:21:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 10 [batchSize = 100]
+ 
+2017-01-30 16:21:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 0,  Loss = 0.00000003  
+2017-01-30 16:21:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 1,  Loss = 0.00000002  
+2017-01-30 16:21:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 2,  Loss = 0.00000002  
+2017-01-30 16:21:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 3,  Loss = 0.00000003  
+2017-01-30 16:21:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 4,  Loss = 0.00000002  
+2017-01-30 16:21:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 5,  Loss = 0.00000002  
+2017-01-30 16:21:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 6,  Loss = 0.00000003  
+2017-01-30 16:21:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 7,  Loss = 0.00000003  
+2017-01-30 16:21:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 8,  Loss = 0.00000003  
+2017-01-30 16:21:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 9,  Loss = 0.00000003  
+2017-01-30 16:21:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 10,  Loss = 0.00000003  
+2017-01-30 16:21:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 11,  Loss = 0.00000002  
+2017-01-30 16:21:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 12,  Loss = 0.00000002  
+2017-01-30 16:21:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 13,  Loss = 0.00000002  
+2017-01-30 16:21:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 14,  Loss = 0.00000003  
+2017-01-30 16:21:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 15,  Loss = 0.00000004  
+2017-01-30 16:21:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 16,  Loss = 0.00000002  
+2017-01-30 16:21:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 17,  Loss = 0.00000002  
+2017-01-30 16:21:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:21:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:21:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:21:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:21:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:21:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:21:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:21:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:21:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:21:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:21:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:21:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:21:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:21:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:21:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:21:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:21:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:21:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:21:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:21:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:21:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:21:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:21:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:21:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:21:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:21:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:21:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:21:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:21:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:21:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:21:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:21:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 10,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:21:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.16084657624748ms 
+2017-01-30 16:21:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:21:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:21:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 11 [batchSize = 100]
+ 
+2017-01-30 16:21:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:21:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:21:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:21:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:21:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:21:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:21:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:21:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:21:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:21:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:21:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:21:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:21:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:21:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:21:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:22:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:22:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:22:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:22:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:22:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:22:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:22:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:22:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:22:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:22:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:22:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:22:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:22:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:22:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:22:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:22:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:22:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:22:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:22:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:22:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:22:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:22:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:22:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:22:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:22:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:22:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:22:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:22:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:22:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:22:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:22:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:22:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:22:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:22:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:22:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 11,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:22:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.15960547668163ms 
+2017-01-30 16:22:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:22:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 12 [batchSize = 100]
+ 
+2017-01-30 16:22:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:22:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:22:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:22:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:22:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:22:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:22:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:22:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:22:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:22:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:22:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:22:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:22:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:22:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:22:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:22:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:22:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:22:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:22:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:22:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:22:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:22:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 21,  Loss = 0.00000002  
+2017-01-30 16:22:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:22:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:22:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:22:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:22:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:22:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:22:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:22:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:22:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:22:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:22:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:22:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:22:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:22:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:22:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:23:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:23:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:23:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:23:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:23:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:23:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:23:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:23:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:23:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:23:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:23:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:23:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:23:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 12,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:23:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.16178614702482ms 
+2017-01-30 16:23:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:23:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:23:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 13 [batchSize = 100]
+ 
+2017-01-30 16:23:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:23:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:23:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:23:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:23:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:23:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:23:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:23:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:23:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:23:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:23:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:23:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:23:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:23:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:23:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:23:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:23:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:23:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:23:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:23:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:23:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:23:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:23:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:23:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:23:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:23:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:23:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:23:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:23:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:23:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:23:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:23:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:23:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:23:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:23:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:23:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:23:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:23:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:23:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:23:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:23:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:23:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:23:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:23:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:23:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:23:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:23:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:23:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:23:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:23:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 13,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:23:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.16878801123822ms 
+2017-01-30 16:23:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:23:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 14 [batchSize = 100]
+ 
+2017-01-30 16:23:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:23:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:23:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:24:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:24:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:24:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:24:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:24:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:24:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:24:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:24:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:24:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:24:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:24:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:24:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:24:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:24:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:24:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:24:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:24:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:24:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:24:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:24:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:24:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:24:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:24:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:24:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:24:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:24:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:24:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:24:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:24:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:24:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:24:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:24:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 34,  Loss = 0.00000002  
+2017-01-30 16:24:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:24:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:24:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:24:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:24:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:24:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:24:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:24:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:24:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:24:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:24:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:24:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:24:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:24:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:24:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 14,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:24:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.17213858763639ms 
+2017-01-30 16:24:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:24:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:24:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 15 [batchSize = 100]
+ 
+2017-01-30 16:24:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:24:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:24:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:24:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:24:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:24:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:24:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:24:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:24:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:24:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:24:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:24:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:24:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:24:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:24:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:24:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:24:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:24:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:25:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:25:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:25:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:25:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:25:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:25:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:25:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:25:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:25:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:25:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:25:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:25:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:25:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:25:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:25:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:25:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:25:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:25:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:25:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:25:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:25:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:25:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:25:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:25:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:25:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:25:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:25:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:25:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:25:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:25:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:25:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:25:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 15,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:25:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.17467366750518ms 
+2017-01-30 16:25:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:25:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 16 [batchSize = 100]
+ 
+2017-01-30 16:25:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:25:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:25:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:25:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:25:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:25:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:25:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:25:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:25:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:25:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:25:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:25:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:25:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:25:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:25:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:25:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:25:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:25:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:25:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:25:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:25:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:25:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:25:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:25:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:25:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:25:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:25:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:25:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:25:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:25:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:25:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:25:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:25:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:26:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:26:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:26:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:26:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:26:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:26:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:26:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:26:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:26:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:26:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:26:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:26:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:26:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:26:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:26:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:26:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:26:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 16,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:26:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.17475483660092ms 
+2017-01-30 16:26:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:26:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:26:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 17 [batchSize = 100]
+ 
+2017-01-30 16:26:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:26:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:26:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:26:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:26:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:26:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:26:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:26:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:26:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:26:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:26:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:26:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:26:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:26:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:26:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:26:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:26:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:26:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:26:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:26:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:26:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:26:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:26:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:26:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:26:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:26:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:26:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:26:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:26:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:26:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:26:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:26:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:26:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:26:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:26:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:26:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:26:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:26:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:26:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:26:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:26:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:26:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:26:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:26:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:26:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:26:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 45,  Loss = 0.00000002  
+2017-01-30 16:27:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:27:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:27:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:27:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 17,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:27:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.17888770141556ms 
+2017-01-30 16:27:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:27:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 18 [batchSize = 100]
+ 
+2017-01-30 16:27:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:27:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:27:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:27:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:27:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:27:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:27:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:27:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:27:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:27:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:27:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:27:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:27:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:27:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:27:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:27:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:27:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:27:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:27:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:27:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:27:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:27:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:27:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:27:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:27:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:27:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:27:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:27:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:27:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:27:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:27:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:27:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:27:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:27:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:27:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:27:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:27:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:27:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:27:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:27:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:27:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:27:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:27:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:27:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:27:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:27:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:27:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:27:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:27:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:27:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 18,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:27:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.1805349304853ms 
+2017-01-30 16:27:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:27:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:27:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 19 [batchSize = 100]
+ 
+2017-01-30 16:27:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:27:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:27:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:27:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:27:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:27:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:27:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:27:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:28:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:28:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:28:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:28:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:28:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:28:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:28:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:28:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:28:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:28:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:28:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:28:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:28:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:28:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:28:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:28:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:28:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:28:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:28:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:28:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:28:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:28:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:28:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:28:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:28:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:28:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:28:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:28:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:28:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:28:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:28:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:28:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:28:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:28:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:28:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:28:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:28:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:28:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:28:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:28:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:28:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:28:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 19,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:28:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.18534763739128ms 
+2017-01-30 16:28:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:28:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 20 [batchSize = 100]
+ 
+2017-01-30 16:28:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:28:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:28:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:28:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:28:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:28:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:28:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:28:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:28:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:28:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:28:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:28:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:28:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:28:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:28:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:28:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:28:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:28:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:28:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:29:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:29:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:29:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:29:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:29:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:29:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:29:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:29:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:29:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:29:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:29:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:29:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:29:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:29:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 32,  Loss = 0.00000002  
+2017-01-30 16:29:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:29:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:29:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:29:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:29:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:29:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:29:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:29:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:29:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:29:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:29:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:29:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:29:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 45,  Loss = 0.00000002  
+2017-01-30 16:29:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:29:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:29:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:29:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 20,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:29:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.19058240934822ms 
+2017-01-30 16:29:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:29:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:29:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 21 [batchSize = 100]
+ 
+2017-01-30 16:29:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:29:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:29:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:29:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:29:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:29:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:29:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:29:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:29:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:29:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:29:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:29:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:29:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:29:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:29:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:29:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:29:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:29:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:29:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:29:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:29:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:29:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:29:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:29:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:29:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:29:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:29:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:30:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:30:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:30:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:30:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:30:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:30:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:30:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:30:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:30:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:30:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:30:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:30:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:30:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:30:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:30:14[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:30:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:30:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:30:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:30:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:30:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:30:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:30:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:30:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 21,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:30:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.19304020149412ms 
+2017-01-30 16:30:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:30:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 22 [batchSize = 100]
+ 
+2017-01-30 16:30:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:30:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:30:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:30:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:30:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:30:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:30:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:30:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:30:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:30:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 9,  Loss = 0.00000001  
+2017-01-30 16:30:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:30:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:30:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:30:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:30:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:30:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:30:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:30:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:30:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:30:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:30:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:30:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:30:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:30:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:30:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:30:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:30:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:30:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:30:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:30:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:30:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:30:54[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:30:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:30:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:30:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:30:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 35,  Loss = 0.00000002  
+2017-01-30 16:31:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:31:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:31:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:31:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:31:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:31:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:31:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:31:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:31:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:31:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:31:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:31:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:31:12[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:31:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 22,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:31:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.19508920105772ms 
+2017-01-30 16:31:13[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> saving network model to /home/robotec/catkin_ws/src/RAL2017/farnn/src/network/data_fastlstm-net.t7 
+2017-01-30 16:31:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:31:15[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 23 [batchSize = 100]
+ 
+2017-01-30 16:31:16[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:31:17[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:31:18[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:31:19[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:31:20[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 4,  Loss = 0.00000001  
+2017-01-30 16:31:21[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 5,  Loss = 0.00000001  
+2017-01-30 16:31:22[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 6,  Loss = 0.00000001  
+2017-01-30 16:31:23[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 7,  Loss = 0.00000001  
+2017-01-30 16:31:24[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 8,  Loss = 0.00000001  
+2017-01-30 16:31:25[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 9,  Loss = 0.00000002  
+2017-01-30 16:31:26[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 10,  Loss = 0.00000001  
+2017-01-30 16:31:27[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 11,  Loss = 0.00000001  
+2017-01-30 16:31:28[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 12,  Loss = 0.00000001  
+2017-01-30 16:31:29[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 13,  Loss = 0.00000001  
+2017-01-30 16:31:30[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 14,  Loss = 0.00000001  
+2017-01-30 16:31:31[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 15,  Loss = 0.00000001  
+2017-01-30 16:31:32[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 16,  Loss = 0.00000001  
+2017-01-30 16:31:33[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 17,  Loss = 0.00000001  
+2017-01-30 16:31:34[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 18,  Loss = 0.00000001  
+2017-01-30 16:31:35[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 19,  Loss = 0.00000001  
+2017-01-30 16:31:36[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 20,  Loss = 0.00000001  
+2017-01-30 16:31:37[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 21,  Loss = 0.00000001  
+2017-01-30 16:31:38[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 22,  Loss = 0.00000001  
+2017-01-30 16:31:39[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 23,  Loss = 0.00000001  
+2017-01-30 16:31:40[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 24,  Loss = 0.00000001  
+2017-01-30 16:31:41[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 25,  Loss = 0.00000001  
+2017-01-30 16:31:42[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 26,  Loss = 0.00000001  
+2017-01-30 16:31:43[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 27,  Loss = 0.00000001  
+2017-01-30 16:31:44[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 28,  Loss = 0.00000001  
+2017-01-30 16:31:45[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 29,  Loss = 0.00000001  
+2017-01-30 16:31:46[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 30,  Loss = 0.00000001  
+2017-01-30 16:31:47[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 31,  Loss = 0.00000001  
+2017-01-30 16:31:48[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 32,  Loss = 0.00000001  
+2017-01-30 16:31:49[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 33,  Loss = 0.00000001  
+2017-01-30 16:31:50[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 34,  Loss = 0.00000001  
+2017-01-30 16:31:51[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 35,  Loss = 0.00000001  
+2017-01-30 16:31:52[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 36,  Loss = 0.00000001  
+2017-01-30 16:31:53[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 37,  Loss = 0.00000001  
+2017-01-30 16:31:55[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 38,  Loss = 0.00000001  
+2017-01-30 16:31:56[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 39,  Loss = 0.00000001  
+2017-01-30 16:31:57[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 40,  Loss = 0.00000001  
+2017-01-30 16:31:58[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 41,  Loss = 0.00000001  
+2017-01-30 16:31:59[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 42,  Loss = 0.00000001  
+2017-01-30 16:32:00[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 43,  Loss = 0.00000001  
+2017-01-30 16:32:01[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 44,  Loss = 0.00000001  
+2017-01-30 16:32:02[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 45,  Loss = 0.00000001  
+2017-01-30 16:32:03[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 46,  Loss = 0.00000001  
+2017-01-30 16:32:04[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 47,  Loss = 0.00000001  
+2017-01-30 16:32:05[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 48,  Loss = 0.00000001  
+2017-01-30 16:32:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 23,iter = 49,  Loss = 0.00000001  
+2017-01-30 16:32:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> time to learn 1 sample = 0.1957800096256ms 
+2017-01-30 16:32:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> on training set:  
+2017-01-30 16:32:06[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  <trainer> online epoch # 24 [batchSize = 100]
+ 
+2017-01-30 16:32:07[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 24,iter = 0,  Loss = 0.00000001  
+2017-01-30 16:32:08[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 24,iter = 1,  Loss = 0.00000001  
+2017-01-30 16:32:09[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 24,iter = 2,  Loss = 0.00000001  
+2017-01-30 16:32:10[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 24,iter = 3,  Loss = 0.00000001  
+2017-01-30 16:32:11[outputs/fastlstm,backend=cunn,silent=f Deep Head Motion Control]:  Epoch 24,iter = 4,  Loss = 0.00000001  

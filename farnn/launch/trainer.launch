@@ -1,0 +1,9 @@
+<launch>
+
+	<param name="train_dir" command="$(find farnn)/src" />
+	<!-- This node launches the neural net trainer -->
+	<node pkg="farnn" name="farnn_trainer" type="$(find farnn)/src/train_net.sh" >
+		<!-- <param name="train_dir" command="th $(find farnn)/src/main.lua" /> -->
+	</node>
+
+</launch>

@@ -1,0 +1,2 @@
+rostopic pub /vicon/headtwist -r 30 geometry_msgs/Twist '{linear: {x: 12, y: 14, z: 16}, angular: {x: 12, y: 14, z: 16} }'
+

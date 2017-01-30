@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>ral2017</name>
+  <version>0.0.0</version>
+  <description>
+    The ral metapackage
+  </description>
+
+  <maintainer email="olalekan.ogunmolu@utdallas.edu">Olalekan Ogunmolu</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>farnn</run_depend>
+  <run_depend>ensenso</run_depend>
+  <run_depend>nn_controller</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
