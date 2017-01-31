@@ -124,43 +124,51 @@ function batchNorm(x, N)
   return x
 end
 
-function get_datapair(args, stage)	
+function get_datapair(opt, stage)	
 	local inputs, targets = {}, {}
 	local test_inputs, test_targets = {}, {}
 
 	local splitData = {}
-	splitData = split_data(args)	
+	splitData = split_data(opt)	
 	local testHeight = splitData.test_out[1]:size(1)
-	if (args.data=='data') then  
+	if (opt.data=='data') then  
 		 -- 1. create a sequence of rho time-steps
+		 --input is a sequence of past outputs  delayed by a 5 steps
+		 --and current input
 		train_inputs 		= {
-						splitData.train_input[1]:narrow(1, stage, opt.batchSize),    															  		-- >  u(t)
-						splitData.train_input[2]:narrow(1, stage, opt.batchSize), 
-						splitData.train_input[3]:narrow(1, stage, opt.batchSize),   		-- }
-					   	splitData.train_input[4]:narrow(1, stage, opt.batchSize), 
-					   	splitData.train_input[5]:narrow(1, stage, opt.batchSize),   		-- }  -->y_{t-1}
-					   	splitData.train_input[6]:narrow(1, stage, opt.batchSize) 		-- }
+						splitData.train_input[1]:narrow(1, stage+5, opt.batchSize),    															  		-- >  u(t)
+						splitData.train_input[2]:narrow(1, stage+5, opt.batchSize), 
+						splitData.train_input[3]:narrow(1, stage+5, opt.batchSize),   		-- }
+					   	splitData.train_input[4]:narrow(1, stage+5, opt.batchSize), 
+					   	splitData.train_input[5]:narrow(1, stage+5, opt.batchSize),   		-- }  -->y_{t-1}
+					   	splitData.train_input[6]:narrow(1, stage+5, opt.batchSize),		-- }
+					   	splitData.train_out[1]:narrow(1, stage, opt.batchSize), 
+						splitData.train_out[2]:narrow(1, stage, opt.batchSize), 				--}	
+		                splitData.train_out[3]:narrow(1, stage, opt.batchSize)
 					  } 
 		-- batch of train targets
 		train_targets 	 = {  
-						  splitData.train_out[1]:narrow(1, stage, opt.batchSize), 
-						  splitData.train_out[2]:narrow(1, stage+1, opt.batchSize), 				--}	
-		                  splitData.train_out[3]:narrow(1, stage, opt.batchSize)
+						  splitData.train_out[1]:narrow(1, stage+5, opt.batchSize), 
+						  splitData.train_out[2]:narrow(1, stage+5, opt.batchSize), 				--}	
+		                  splitData.train_out[3]:narrow(1, stage+5, opt.batchSize)
 		                }
 		-- test inputs
 		test_inputs = {
-						splitData.test_input[1]:narrow(1, stage, opt.batchSize), 																  		-- u(t)
-						splitData.test_input[2]:narrow(1, stage, opt.batchSize), 
-						splitData.test_input[3]:narrow(1, stage, opt.batchSize),	  		-- 
-						splitData.test_input[4]:narrow(1, stage, opt.batchSize), 
-						splitData.test_input[5]:narrow(1, stage, opt.batchSize),     		-- } y_{t-1}
-						splitData.test_input[6]:narrow(1, stage, opt.batchSize)
+						splitData.test_input[1]:narrow(1, stage+5, opt.batchSize), 																  		-- u(t)
+						splitData.test_input[2]:narrow(1, stage+5, opt.batchSize), 
+						splitData.test_input[3]:narrow(1, stage+5, opt.batchSize),	  		-- 
+						splitData.test_input[4]:narrow(1, stage+5, opt.batchSize), 
+						splitData.test_input[5]:narrow(1, stage+5, opt.batchSize),     		-- } y_{t-1}
+						splitData.test_input[6]:narrow(1, stage+5, opt.batchSize),
+						 splitData.test_out[1]:narrow(1, stage, opt.batchSize), 
+						 splitData.test_out[2]:narrow(1, stage, opt.batchSize),		--}
+		                 splitData.test_out[3]:narrow(1, stage, opt.batchSize)
 					  }		
 		--test targets
 		test_targets = {
-						 splitData.test_out[1]:narrow(1, stage, opt.batchSize), 
-						 splitData.test_out[2]:narrow(1, stage+1, opt.batchSize),		--}
-		                 splitData.test_out[3]:narrow(1, stage, opt.batchSize)
+						 splitData.test_out[1]:narrow(1, stage+5, opt.batchSize), 
+						 splitData.test_out[2]:narrow(1, stage+5, opt.batchSize),		--}
+		                 splitData.test_out[3]:narrow(1, stage+5, opt.batchSize)
 		             	}
 
 		--pre-whiten the inputs and outputs in the mini-batch
@@ -171,9 +179,9 @@ function get_datapair(args, stage)
 		test_inputs = batchNorm(test_inputs, N)
 		test_targets = batchNorm(test_targets, N-3)
 
-	elseif (args.data == 'glassfurnace') then   --MIMO Dataset
-		offsets = torch.LongTensor(args.batchSize):random(1,height)  
-		test_offsets = torch.LongTensor(args.batchSize):random(1,testHeight) 
+	elseif (opt.data == 'glassfurnace') then   --MIMO Dataset
+		offsets = torch.LongTensor(opt.batchSize):random(1,height)  
+		test_offsets = torch.LongTensor(opt.batchSize):random(1,testHeight) 
 		
 		-- print('train_inputs', splitData.train_input)
 		--recurse inputs and targets into one long sequence

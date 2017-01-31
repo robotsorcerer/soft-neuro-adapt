@@ -6,22 +6,24 @@
 require 'torch'
 require 'data.dataparser'
 require 'rnn'
+require 'nngraph'
+nn.LSTM.usenngraph = true -- faster
 
 -- local optnet = require 'optnet'
 torch.setdefaulttensortype('torch.FloatTensor')
 
 --options and general settings -----------------------------------------------------
 opt = {
-  batchSize = 20,
+  batchSize = 5,
   data = 'data',
   gpu = 0,
   noutputs = 1,
   display = 1,
   verbose = false,
-  maxIter = 100,
-  hiddenSize = {2, 5, 10},
-  backend    = 'cudnn',
-  checkpoint = 'network/data_lstm-net.t7'
+  maxIter = 20,
+  hiddenSize = {6, 3, 5},
+  backend    = 'cunn',  --cudnn or cunn
+  checkpoint = 'network/data_2_fastlstm-net.t7'
 }
 
 for k,v in pairs(opt) do opt[k] = tonumber(os.getenv(k)) or os.getenv(k) or opt[k] end
@@ -32,13 +34,13 @@ if opt.display==0 then opt.display = false end
 local function init()
 
   --GPU Settings -----------------------------------------------------------------------
-  local use_cuda = false
+  use_cuda = false
 
   local msg
-  if opt.gpu >= 0  and opt.backend == 'cudnn' then
-    require 'cunn'
+  if opt.gpu >= 0 then
     require 'cutorch'
-    require 'cudnn'
+    require 'cunn'
+    if opt.backend == 'cudnn' then require 'cudnn' end
     use_cuda = true
     cutorch.setDevice(opt.gpu + 1)
     msg = string.format('Code deployed on GPU %d with cudnn backend', opt.gpu+1)
@@ -52,6 +54,9 @@ local function init()
   ---Net Loader---------------------------------------------------------------------------
   local model
   model = torch.load(opt.checkpoint)
+
+  require 'rnn'
+  cost = nn.SequencerCriterion(nn.MSECriterion()):cuda()
 
   assert(model ~='', 'must provide a trained model')
 
@@ -86,6 +91,7 @@ local function test(opt, model)
  splitData = split_data(opt)
  local time = sys.clock()
  local testHeight = splitData.test_input[1]:size(1)
+
  -- averaged param use?
  if average then
     cachedparams = parameters:clone()
@@ -100,49 +106,29 @@ local function test(opt, model)
   -- create mini batch        
   local inputs, targets = {}, {}      
 
-  for t = 1, math.min(opt.maxIter, testHeight) do    
-    if(t >= opt.maxIter) then t = 1 end  --wrap around
-     inputs, targets = get_datapair(opt, t)
-    if opt.noutputs  == 1 then 
-      --concat tensors 1 and 4 (in and pitch along 2nd dimension)
-      inputs = torch.cat({inputs[1], inputs[4]}, 2) 
-      -- target would be expected to be a tensor rather than a table since we are using sequencer
-      targets = targets[3]
-    else
-      inputs = torch.cat({inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6], inputs[7]}, 2)  
-      targets = transfer_data( torch.cat({targets[1], targets[2], targets[3], targets[4], targets[5], targets[6]}, 2) )
-    end
+  for t = 1, math.min(opt.maxIter, testHeight), 5 do    
+    if(t >= math.min(opt.maxIter, testHeight)) then t = 1 end  --wrap around
 
-    if opt.gpu >= 0 then inputs:cuda(); targets:cuda() end
-    inputs= inputs:cuda(); targets = targets:cuda()
-
+    _, _, inputs, targets = get_datapair(opt, t)
+    inputs = torch.cat({inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6]}, 2)  
+    targets = torch.cat({targets[1], targets[2], targets[3]}, 2) 
     -- test samples
-    model:forget()  --forget all past time steps
+    -- model:forget()  --forget all past time steps
     local preds = model:forward(inputs)
-
-    -- not necessary[[
-    require 'rnn'
-    local cost = nn.SequencerCriterion(nn.MSECriterion()):cuda()
     local loss = cost:forward(preds, targets) 
 
-    if iter % 10  == 0 then collectgarbage() end
+    local  gradOutputs  = cost:backward(preds, targets)
+    -- local gradInputs    = model:backward(inputs, gradOutputs) 
+    model:updateParameters(5e-3)
 
-    --]]
+    if iter % 2  == 0 then collectgarbage() end
      
     -- timing
     time = sys.clock() - time
     time = time / testHeight
+    -- print(string.format("iter = %d,  Loss = %.12f ", iter, loss))
+    print('preds: \n', preds, '\ntargets: \n', targets)
 
-    -- if  (iter*opt.batchSize >= math.min(opt.maxIter, testHeight))  then 
-      print("<trainer> time to test 1 sample = " .. (time*1000) .. 'ms')  
-      -- if not (opt.data=='glassfurnace') then print("avg. prediction errors on test data", normedPreds) 
-
-        print(inputs)
-        print(string.format('actual %s preds: %s', tostring(targets), tostring(preds)))
-        -- sys.sleep(3)
-        print(string.format("iter = %d,  Loss = %f ",  iter, loss))
-      -- else print("avg. prediction errors on test data", avg/normedPreds) end
-    -- end 
     iter = iter + 1
   end  
 end
@@ -157,7 +143,7 @@ end
 
 local function main()  
   local model = init()
-  for i=1,50 do
+  for i=1,20 do
     test(opt, model)
   end
 end

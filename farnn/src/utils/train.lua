@@ -68,10 +68,7 @@ function train_lstm(opt)
         if opt.plot then logger:plot()   end
       end
     end
-    --reset counters
-    -- loss = 0; iter = 0 ;
     collectgarbage()
-    -- end    
     iter = iter +1 
   end  
 end

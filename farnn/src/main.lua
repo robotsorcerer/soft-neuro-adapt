@@ -81,7 +81,7 @@ cmd:option('-optimizer', 'mse', 'mse|sgd')
 cmd:option('-coefL1',   0.1, 'L1 penalty on the weights')
 cmd:option('-coefL2',  0.2, 'L2 penalty on the weights')
 cmd:option('-plot', true, 'true|false')
-cmd:option('-maxIter', 50, 'max. number of iterations; must be a multiple of batchSize')
+cmd:option('-maxIter', 20, 'max. number of iterations; must be a multiple of batchSize')
 
 -- RNN/LSTM Settings 
 cmd:option('-rho', 5, 'length of sequence to go back in time')
@@ -291,7 +291,7 @@ local function train(data)
     time = time / height
     print("<trainer> time to learn 1 sample = " .. (time*1000) .. 'ms')
 
-    if epoch % 10 == 0 then
+    if epoch % 2 == 0 then
       saveNet()
     end
 
@@ -379,19 +379,19 @@ function saveNet(epoch)
   end
   -- save/log current net
   if opt.model == 'rnn' then
-    netname = opt.data .. '_' epoch .. '_rnn-net.t7'
+    netname = opt.data .. '_' .. epoch .. '_rnn-net.t7'
   elseif opt.model == 'mlp' then
-    netname = opt.data .. '_' epoch .. '_mlp-net.t7'
+    netname = opt.data .. '_' .. epoch .. '_mlp-net.t7'
   elseif opt.model == 'lstm' then
     if opt.gru then
       netname = opt.data .. '_gru-net.t7'
     elseif opt.fastlstm then
-      netname = opt.data .. '_' epoch .. '_fastlstm-net.t7'
+      netname = opt.data .. '_'.. epoch .. '_fastlstm-net.t7'
     else
-      netname = opt.data .. '_' epoch .. '_lstm-net.t7'
+      netname = opt.data .. '_' .. epoch .. '_lstm-net.t7'
     end
   else
-    netname = opt.data .. '_' epoch .. '_neunet.t7'
+    netname = opt.data .. '_' .. epoch .. '_neunet.t7'
   end  
   
   local filename = paths.concat(opt.netdir, netname)
@@ -411,7 +411,7 @@ local function main()
   local start = sys.clock() --os.execute('date');
 
   -- if (ros.ok()) then
-    for i = 1, 50 do
+    for i = 1, 20 do
       train(trainData)
     end
   -- end
