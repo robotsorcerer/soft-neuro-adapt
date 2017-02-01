@@ -10,20 +10,9 @@ transfer    =  nn.ReLU()
 --[[Set up the network, add layers in place as we add more abstraction]]
 function contruct_net()
   local bias = true
-  if opt.model  == 'mlp' then
-      neunet          = nn.Sequential()     
-    if opt.data=='glassfurnace' then    
-      neunet:add(nn.Linear(3, nhiddens, bias))
-    else          
-      neunet:add(nn.Linear(ninputs, nhiddens, bias))
-    end
-    neunet:add(nn.ReLU())                         
-    neunet:add(nn.Linear(nhiddens, noutputs)) 
-    cost      = nn.MSECriterion()      
-
   -------------------------------------------------------
   --  Recurrent Neural Net Initializations 
-  elseif opt.model == 'rnn' then    
+  if opt.model == 'rnn' then    
     require 'rnn'
     cost    = nn.SequencerCriterion(nn.MSECriterion())
     ------------------------------------------------------

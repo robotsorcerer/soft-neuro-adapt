@@ -67,7 +67,7 @@ cmd:option('-sigma', 0.01, 'initialize weights with this std. dev from a normall
 
 --Gpu settings
 cmd:option('-gpu', 0, 'which gpu to use. -1 = use CPU; >=0 use gpu')
-cmd:option('-backend', 'cudnn', 'nn|cudnn')
+cmd:option('-backend', 'cunn', 'nn|cudnn')
 
 -- Neural Network settings
 cmd:option('-learningRate',1e-3, 'learning rate for the neural network')
@@ -80,8 +80,8 @@ cmd:option('-netdir', 'network', 'directory to save the network')
 cmd:option('-optimizer', 'mse', 'mse|sgd')
 cmd:option('-coefL1',   0.1, 'L1 penalty on the weights')
 cmd:option('-coefL2',  0.2, 'L2 penalty on the weights')
-cmd:option('-plot', true, 'true|false')
-cmd:option('-maxIter', 20, 'max. number of iterations; must be a multiple of batchSize')
+cmd:option('-plot', false, 'true|false')
+cmd:option('-maxIter', 50, 'max. number of iterations; must be a multiple of batchSize')
 
 -- RNN/LSTM Settings 
 cmd:option('-rho', 5, 'length of sequence to go back in time')
@@ -90,7 +90,7 @@ cmd:option('-dropoutProb', 0.35, 'probability of zeroing a neuron (dropout proba
 cmd:option('-rnnlearningRate',1e-3, 'learning rate for the reurrent neural network')
 cmd:option('-decay', 0, 'rnn learning rate decay for rnn')
 cmd:option('-batchNorm', false, 'apply szegedy and Ioffe\'s batch norm?')
-cmd:option('-ninputs', 6, 'size of input layer being fed from system')
+cmd:option('-ninputs', 9, 'size of input layer being fed from system')
 cmd:option('-noutputs', 3, 'size of linear output layer after rnn')
 cmd:option('-batchSize', 100, 'Batch Size for mini-batch training')
 
@@ -139,7 +139,7 @@ if paths.dirp(opt.rundir) then
   os.execute('rm -r ' .. opt.rundir)
 end
 os.execute('mkdir -p ' .. opt.rundir)
-cmd:addTime(tostring(opt.rundir) .. ' Deep Head Motion Control', '%F %T')
+-- cmd:addTime(tostring(opt.rundir) .. ' Deep Head Motion Control', '%F %T')
 cmd:text()
 cmd:log(opt.rundir .. '/log.txt', opt)
 
@@ -193,7 +193,7 @@ paths.dofile('utils/model.lua')
 cost, neunet          = contruct_net()
 
 print(neunet)
-print('\tv\n\t|\n\t|\n\t \n\tNetwork Table\n'); 
+print('\t\n\t|\n\t|\n\tv \n\tNetwork Table\n'); 
 
 -- retrieve parameters and gradients
 parameters, gradParameters = neunet:getParameters()
@@ -272,7 +272,7 @@ end
 
 print '==> defining training procedure'
 -------------------------------------------------------------------------------
-
+logger:setNames{'loss'}
 local function train(data)    
   --time we started training
   local time = sys.clock()
@@ -280,16 +280,12 @@ local function train(data)
   epoch = epoch or 1
   iter = iter or 0
 
-  --do one epoch
-  print('<trainer> on training set: ')
-  print("<trainer> online epoch # " .. epoch .. ' [batchSize = ' .. opt.batchSize .. ']\n')
-
   if opt.model == 'rnn' then 
     train_rnn(opt) 
     -- time taken for one epoch
     time = sys.clock() - time
     time = time / height
-    print("<trainer> time to learn 1 sample = " .. (time*1000) .. 'ms')
+    -- print("<trainer> time to learn 1 sample = " .. (time*1000) .. 'ms')
 
     if epoch % 2 == 0 then
       saveNet()
@@ -315,7 +311,7 @@ local function train(data)
     -- time taken for one epoch
     time = sys.clock() - time
     time = time / height
-    print("<trainer> time to learn 1 sample = " .. (time*1000) .. 'ms')
+    -- print("<trainer> time to learn 1 sample = " .. (time*1000) .. 'ms')
     
     if epoch % 2 == 0 then
       saveNet(epoch)
@@ -401,7 +397,7 @@ function saveNet(epoch)
     end  
     os.execute('mkdir -p ' .. sys.dirname(filename))
   else    
-    print('<trainer> saving network model to '..filename)
+    -- print('<trainer> saving network model to '..filename)
     torch.save(filename, neunet)
   end
 end
@@ -411,7 +407,7 @@ local function main()
   local start = sys.clock() --os.execute('date');
 
   -- if (ros.ok()) then
-    for i = 1, 20 do
+    for i = 1, 50 do
       train(trainData)
     end
   -- end
@@ -424,9 +420,9 @@ local function main()
   print('Experiment Ended at: ', finish)
   print('Total Time Taken = ', (finish - start), 'secs')
 
-  transform_subscriber:shutdown()
-  twist_subscriber:shutdown()
-  ros.shutdown()
+  -- transform_subscriber:shutdown()
+  -- twist_subscriber:shutdown()
+  -- ros.shutdown()
 end
 
 main()

@@ -8,6 +8,7 @@ require 'data.dataparser'
 require 'rnn'
 require 'nngraph'
 nn.LSTM.usenngraph = true -- faster
+require 'optim'
 
 -- local optnet = require 'optnet'
 torch.setdefaulttensortype('torch.FloatTensor')
@@ -21,6 +22,7 @@ opt = {
   display = 1,
   verbose = false,
   maxIter = 20,
+  silent = false,
   hiddenSize = {6, 3, 5},
   backend    = 'cunn',  --cudnn or cunn
   checkpoint = 'network/data_2_fastlstm-net.t7'
@@ -30,6 +32,11 @@ for k,v in pairs(opt) do opt[k] = tonumber(os.getenv(k)) or os.getenv(k) or opt[
 print(opt)
 
 if opt.display==0 then opt.display = false end
+
+local filename = paths.concat('outputs' .. '/testlog.txt')
+if paths.filep(filename) 
+  then os.execute('mv ' .. filename .. ' ' .. filename ..'.old') end
+testlogger = optim.Logger(paths.concat('outputs' .. '/testlog.txt'))
 
 local function init()
 
@@ -83,6 +90,7 @@ local function transfer_data(x)
   return x
 end
 
+testlogger:setNames{'iter', 'loss'}
 
 --test function-----------------------------------------------------------------
 local function test(opt, model)
@@ -98,7 +106,7 @@ local function test(opt, model)
     parameters:copy(average)
  end
  -- test over given dataset
- print('<trainer> on testing Set:')
+ -- print('<trainer> on testing Set:')
 
   local preds;
   local iter = 0;  
@@ -106,14 +114,15 @@ local function test(opt, model)
   -- create mini batch        
   local inputs, targets = {}, {}      
 
-  for t = 1, math.min(opt.maxIter, testHeight), 5 do    
+  for t = 1, math.min(opt.maxIter, testHeight) do    
     if(t >= math.min(opt.maxIter, testHeight)) then t = 1 end  --wrap around
 
     _, _, inputs, targets = get_datapair(opt, t)
-    inputs = torch.cat({inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6]}, 2)  
+    inputs = torch.cat({inputs[1], inputs[2], inputs[3], inputs[4], inputs[5],
+                        inputs[6], inputs[7], inputs[8], inputs[9]}, 2)  
     targets = torch.cat({targets[1], targets[2], targets[3]}, 2) 
     -- test samples
-    -- model:forget()  --forget all past time steps
+    model:forget()  --forget all past time steps
     local preds = model:forward(inputs)
     local loss = cost:forward(preds, targets) 
 
@@ -126,8 +135,13 @@ local function test(opt, model)
     -- timing
     time = sys.clock() - time
     time = time / testHeight
-    -- print(string.format("iter = %d,  Loss = %.12f ", iter, loss))
-    print('preds: \n', preds, '\ntargets: \n', targets)
+
+    testlogger:add{t, loss}
+    if (not opt.silent) then
+      print('loss'), print(loss)
+      print('preds:'); print(preds); print('targets: '); print(targets)
+      sys.sleep('1')
+    end
 
     iter = iter + 1
   end  

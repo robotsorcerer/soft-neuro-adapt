@@ -124,17 +124,25 @@ function batchNorm(x, N)
   return x
 end
 
+local optlocal = {
+data = 'data',
+ninputs = 9,
+noutputs = 3,
+hiddenSize = {9, 3, 5}
+}
+
+splitData = {}
+splitData = split_data(optlocal)	
+
 function get_datapair(opt, stage)	
 	local inputs, targets = {}, {}
 	local test_inputs, test_targets = {}, {}
 
-	local splitData = {}
-	splitData = split_data(opt)	
 	local testHeight = splitData.test_out[1]:size(1)
 	if (opt.data=='data') then  
-		 -- 1. create a sequence of rho time-steps
-		 --input is a sequence of past outputs  delayed by a 5 steps
-		 --and current input
+	 -- 1. create a sequence of rho time-steps
+	 --input is a sequence of past outputs  delayed by a 5 steps
+	 --and current input
 		train_inputs 		= {
 						splitData.train_input[1]:narrow(1, stage+5, opt.batchSize),    															  		-- >  u(t)
 						splitData.train_input[2]:narrow(1, stage+5, opt.batchSize), 
@@ -172,12 +180,12 @@ function get_datapair(opt, stage)
 		             	}
 
 		--pre-whiten the inputs and outputs in the mini-batch
-		local N = 6
+		local N = 1
 		train_inputs 	= batchNorm(train_inputs, N)
-		train_targets = batchNorm(train_targets, N-3)
+		train_targets = batchNorm(train_targets, N)
 
 		test_inputs = batchNorm(test_inputs, N)
-		test_targets = batchNorm(test_targets, N-3)
+		test_targets = batchNorm(test_targets, N)
 
 	elseif (opt.data == 'glassfurnace') then   --MIMO Dataset
 		offsets = torch.LongTensor(opt.batchSize):random(1,height)  
