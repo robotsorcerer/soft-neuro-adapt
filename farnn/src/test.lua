@@ -138,7 +138,7 @@ local function test(opt, model)
 
     testlogger:add{t, loss}
     if (not opt.silent) then
-      print('loss'), print(loss)
+      print('loss'); print(loss)
       print('preds:'); print(preds); print('targets: '); print(targets)
       sys.sleep('1')
     end

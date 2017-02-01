@@ -112,7 +112,7 @@ if not opt.silent then
    print(opt)
 end
 
-opt.hiddenSize = {opt.ninputs, 3, 5}
+opt.hiddenSize = {opt.ninputs, 5, 3}
 
 if (opt.model == 'rnn') then  
   rundir = cmd:string('rnn', opt, {dir=true})
