@@ -48,7 +48,7 @@ void Controller::pose_subscriber(const ensenso::HeadPose& headPose)
 
 	getPoseInfo(headPose, pose_info);
 	
-	OUT("pose_info: " << pose_info);
+	OUT("\npose_info: \n" << pose_info);
 
 	ControllerParams();
 }
