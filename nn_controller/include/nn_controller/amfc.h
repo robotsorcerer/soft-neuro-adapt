@@ -13,7 +13,8 @@
 namespace amfc_control {
 	enum ActuatorType {    
 	    base_bladder = 0,
-	    neck_bladder = 1,
-	    total_bladders = 2
+	    left_bladder = 1,
+	    right_bladder = 2,
+	    total_bladders = 3
 	};
 }
