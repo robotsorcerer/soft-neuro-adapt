@@ -11,9 +11,10 @@ using namespace amfc_control;
 
 //constructor
 Controller::Controller(ros::NodeHandle nc, const Eigen::VectorXd& ref)
-: n_(nc), ref_(ref), updatePoseInfo(false), print(false)
+: n_(nc), ref_(ref), updatePoseInfo(false), print(false), counter(0)
 {	 		 
 	initMatrices();
+	pred_pub_ = n_.advertise<nn_controller::predictor>("/osa_pred", 100);
 }
 
 //copy constructor
@@ -38,6 +39,11 @@ double Controller::get_update_delay()
 
 void Controller::reset(ros::Time update_time)
 {
+}
+
+ros::Time Controller::getTime()
+{
+	return ros::Time::now();
 }
 
 void Controller::pose_subscriber(const ensenso::HeadPose& headPose)
@@ -65,24 +71,42 @@ void Controller::getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd 
 	ControllerParams(std::move(pose_info));
 }
 
+//no loner used
 void Controller::NetPredictorInput(Eigen::VectorXd&& pose_info)
 {
 	Eigen::VectorXd pose_delayed;
 	// pose_info.resize(6);		//CRITICAL OR SEGFAULT
 	pose_queue.push(pose_info);
 
-	Eigen::VectorXd predictor_input_u = ref_ - pose_info;
+	pred_ut = ref_ - pose_info;
 
-	if(pose_queue.size() % 3 == 0)
+	if(pose_queue.size() % 2 == 0)
 	{
 	    pose_delayed = pose_queue.front();
-		pose_queue.pop();  //remove the element at back()
-		// OUT("\npose_delayed: " << pose_delayed.transpose());
-		pose_queue = {};  	//clear the queue
+		//concatenate {u(t), y(t-1)} and broadcast tuple to lua predictor
+		pred_.header.stamp 	= getTime();
+		pred_.header.seq	= ++counter;
+		pred_.header.frame_id	= "osa_pred";
+		pred_.u1 		= pred_ut(0);
+		pred_.u2    	= pred_ut(1);
+		pred_.u3    	= pred_ut(2);
+		pred_.u4    	= pred_ut(3);
+		pred_.u5    	= pred_ut(4);
+		pred_.u6    	= pred_ut(5);
+		pred_.z_d    	= pose_delayed(2); 	//z
+		pred_.pitch_d   = pose_delayed(4);	//pitch
+		pred_.yaw_d    	= pose_delayed(5);	//yaw
+
+		//clear the queue
+		pose_queue = {};  	
 	}
-	OUT("\npose_delayed: " << pose_delayed.transpose());
-	OUT("pose_info: " << pose_info.transpose());
-	OUT("pred_input_u: " << predictor_input_u.transpose());
+	if(print)
+	{		
+		OUT("\npose_delayed: " << pose_delayed.transpose());
+		OUT("pose_info: " << pose_info.transpose());
+		OUT("pred_input_u: " << pred_ut.transpose());
+	}
+	pred_pub_.publish(pred_);
 }
 
 void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
@@ -90,15 +114,39 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	// Eigen::VectorXd pose_info;
 	// pose_info.resize(6);
 	tracking_error.resize(6);
-	if(print){
-		OUT("Params pose: " << pose_info.transpose());
-	}
-	NetPredictorInput(std::move(pose_info));
 
-	Ky_hat = -1* Gamma_y * pose_info * tracking_error * P * B;
-	Kr_hat = -1* Gamma_r * ref_      * tracking_error * P * B;
-	// OUT("Ky_hat: " << Ky_hat.transpose().eval());
-	// OUT("Kr_hat: " << Kr_hat.transpose().eval());
+	// NetPredictorInput(std::move(pose_info));
+
+
+	expAmk *= std::exp(-1334./1705*counter);
+	ym = Bm * ref_ * expAmk;
+
+	//compute tracking error, e = y - y_m
+	tracking_error = pose_info - ym;
+	Ky_hat = -1* Gamma_y * pose_info * tracking_error.transpose().eval() * P * B;
+	Kr_hat = -1* Gamma_r * ref_      * tracking_error.transpose().eval() * P * B;
+
+	//compute control law
+	u_control = (Ky_hat * pose_info) + (Kr_hat * ref_); // + pred;
+
+	OUT("\nKy_hat: \n" << Ky_hat);
+	OUT("\nKr_hat: \n" << Kr_hat);
+	OUT("\npose_info: " << pose_info.transpose());
+	OUT("ref_: " << ref_.transpose());
+	OUT("u: " << u_control.transpose());
+
+	if(print)
+	{
+		OUT("\nexpAmk: \n" << expAmk);
+		OUT("\nym: \n" << ym);
+		OUT("\npose_info: " << pose_info.transpose());
+		OUT("\ne=(y-y_m): " << tracking_error.transpose());
+
+		ROS_INFO("Kr_hat size: %ld, ref_ size: %ld, Ky_hat size: %ld, pose_info size: %ld", 
+				  Kr_hat.size(), ref_.size(), Ky_hat.size(), pose_info.size());
+
+	}
+	++counter;
 }
 
 bool Controller::configure_controller(

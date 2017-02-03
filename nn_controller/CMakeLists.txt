@@ -18,12 +18,11 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  predictor.msg
+)
 
 ## Generate services in the 'srv' folder
  add_service_files(
@@ -42,6 +41,7 @@ find_package(catkin REQUIRED COMPONENTS
  generate_messages(
    DEPENDENCIES
    geometry_msgs
+   std_msgs
  )
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder

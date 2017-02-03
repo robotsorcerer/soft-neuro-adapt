@@ -31,6 +31,7 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 
 #include "nn_controller/amfc.h"
 #include "nn_controller/options.h"
+#include "nn_controller/predictor.h"
 
 #define OUT(__o__) std::cout<< __o__ << std::endl;
 
@@ -51,14 +52,19 @@ namespace amfc_control
         Eigen::VectorXd tracking_error;
         std::chrono::time_point<std::chrono::high_resolution_clock> start, now;
         ros::NodeHandle n_;
-        ros::Publisher pub;
+        ros::Publisher pub, pred_pub_;
         size_t k;
         int m, n;
+        unsigned counter;
         /* @brief P is symmetric positive definite matrix obtained from the lyapunov functiuon Q
         *
         *  B is the matrix that maps the controls into the state space
+        *
+        *  Am is the state-mapping matrix of the reference model
+        *
+        *  Bm is the input-mapping matrix of the reference model
         */
-        Eigen::MatrixXd P, B; 
+        Eigen::MatrixXd P, B, Am, Bm; 
         /*
         * p = # states of A matrix
         * Gammas are in R^{px p} diagonal, positive definite 
@@ -66,28 +72,37 @@ namespace amfc_control
         */
         Eigen::MatrixXd Gamma_y, Gamma_r;
         Eigen::VectorXd ref_;
-        Eigen::VectorXd Ky_hat, Kr_hat;
+        Eigen::MatrixXd Ky_hat, Kr_hat;
         Eigen::VectorXd pose_info;  //from sensor
+        Eigen::MatrixXd expAmk, ym;         //reference model 
 
         /*Lambda is an unknown pos def symmetric matrix in R^{m x m}
         * matrix of
         */
         Eigen::MatrixXd Lambda;
+        //adaptive control vector
+        Eigen::VectorXd u_control;
         std::thread threads, gainsThread;
         //queue to delay the incoming pose message in order to pick delayed y(t-1)
         std::queue<Eigen::VectorXd> pose_queue;
+        Eigen::VectorXd pred_ut;
+        // trained net predictor input tuple
+        nn_controller::predictor pred_;
 
         void initMatrices()
         {   
             m = 6; n = 6;
+            Am.setIdentity(n, n);
+            Bm.setIdentity(n, m);
             B.setIdentity(n, m);        //R^{n x m}
             Gamma_y.setIdentity(n, n); //will be 3 X 3 matrix
             Gamma_r.setIdentity(n, n); //will be 3 X 3 matrix
-            Lambda.setIdentity(n, n);
-            
-            double p_elem = -1705./2668; //-0.639055472264; //
+            Lambda.setIdentity(n, n);            
             P.setIdentity(n, n); // R ^{n x n}
-            P *= p_elem;
+            expAmk.setIdentity(n, n);
+
+            P *= -1705./2668; //-0.639055472264; //
+            Am *= -1334./1705;
 
             pose_info.resize(6);
 
@@ -118,6 +133,7 @@ namespace amfc_control
             nn_controller::amfcError::Request  &req,
             nn_controller::amfcError::Response  &res);
         void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
+        ros::Time getTime();
         // Set update delay on the controller.
         virtual void set_update_delay(double new_step_length);
         // Get update delay on the controller.
