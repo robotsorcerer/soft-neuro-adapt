@@ -11,6 +11,9 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 #include <chrono>
 #include <vector>
 #include <queue>
+#include <cmath>
+#include <mutex>
+#include <thread>
 /* ______________________________________________________________________
     *
     *   This code is part of the superchick project. 
@@ -42,8 +45,10 @@ namespace amfc_control
     private:
         //these from /vicon/headtwist topic
         geometry_msgs::Vector3 linear, angular;
+        std::mutex mutex;
+        bool updatePoseInfo, print;
         //these are ref model params
-        double error;
+        Eigen::VectorXd tracking_error;
         std::chrono::time_point<std::chrono::high_resolution_clock> start, now;
         ros::NodeHandle n_;
         ros::Publisher pub;
@@ -60,13 +65,17 @@ namespace amfc_control
         * matrices of adaptive gains
         */
         Eigen::MatrixXd Gamma_y, Gamma_r;
-        Eigen::Vector3d ref_;
-        Eigen::VectorXd Ky, Kr;
+        Eigen::VectorXd ref_;
+        Eigen::VectorXd Ky_hat, Kr_hat;
+        Eigen::VectorXd pose_info;  //from sensor
 
         /*Lambda is an unknown pos def symmetric matrix in R^{m x m}
         * matrix of
         */
         Eigen::MatrixXd Lambda;
+        std::thread threads, gainsThread;
+        //queue to delay the incoming pose message in order to pick delayed y(t-1)
+        std::queue<Eigen::VectorXd> pose_queue;
 
         void initMatrices()
         {   
@@ -76,25 +85,23 @@ namespace amfc_control
             Gamma_r.setIdentity(n, n); //will be 3 X 3 matrix
             Lambda.setIdentity(n, n);
             
-            double p_elem = -0.639055472264; //-1705/2668; 
+            double p_elem = -1705./2668; //-0.639055472264; //
             P.setIdentity(n, n); // R ^{n x n}
-            for(int i = 0; i < n; ++i)
-            {
-                P(i, i) = p_elem;
-            }
+            P *= p_elem;
+
+            pose_info.resize(6);
 
             OUT("P Matrix: \n " << P);
             OUT("\nB Matrix: \n" << B);
             OUT("\nGamma_y Matrix: \n" << Gamma_y);
             OUT("\nGamma_r Matrix: \n" << Gamma_r);
             OUT("\nref_ : \n" << ref_);
-            OUT("\np_elem : \n" << p_elem);
         }
 
     public:
         // Constructor.
         Controller(ros::NodeHandle nc, 
-                    const Eigen::Vector3d& ref);
+                    const Eigen::VectorXd& ref);
         Controller();
         // Destructor.
         virtual ~Controller();
@@ -105,12 +112,12 @@ namespace amfc_control
         //pose callback
         void getRefTraj();
         void pose_subscriber(const ensenso::HeadPose& headPose);
-        void ControllerParams( );
+        void ControllerParams(Eigen::VectorXd&& pose_info);
+        void NetPredictorInput(Eigen::VectorXd&& pose_info);
         bool configure_controller(
             nn_controller::amfcError::Request  &req,
             nn_controller::amfcError::Response  &res);
-        void getPoseInfo(const ensenso::HeadPose& headPose, 
-                                    Eigen::VectorXd pose_info);
+        void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
         // Set update delay on the controller.
         virtual void set_update_delay(double new_step_length);
         // Get update delay on the controller.

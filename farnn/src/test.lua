@@ -10,7 +10,7 @@ require 'nngraph'
 nn.LSTM.usenngraph = true -- faster
 require 'optim'
 
--- local optnet = require 'optnet'
+local optnet = require 'optnet'
 torch.setdefaulttensortype('torch.FloatTensor')
 
 --options and general settings -----------------------------------------------------
@@ -25,7 +25,7 @@ opt = {
   silent = false,
   hiddenSize = {6, 3, 5},
   backend    = 'cunn',  --cudnn or cunn
-  checkpoint = 'network/data_2_fastlstm-net.t7'
+  checkpoint = 'network/data_4_fastlstm-net.t7'
 }
 
 for k,v in pairs(opt) do opt[k] = tonumber(os.getenv(k)) or os.getenv(k) or opt[k] end
@@ -114,7 +114,7 @@ local function test(opt, model)
   -- create mini batch        
   local inputs, targets = {}, {}      
 
-  for t = 1, math.min(opt.maxIter, testHeight) do    
+  for t = 1, math.min(opt.maxIter, testHeight) do 
     if(t >= math.min(opt.maxIter, testHeight)) then t = 1 end  --wrap around
 
     _, _, inputs, targets = get_datapair(opt, t)

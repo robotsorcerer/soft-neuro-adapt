@@ -144,39 +144,39 @@ function get_datapair(opt, stage)
 	 --input is a sequence of past outputs  delayed by a 5 steps
 	 --and current input
 		train_inputs 		= {
-						splitData.train_input[1]:narrow(1, stage+5, opt.batchSize),    															  		-- >  u(t)
-						splitData.train_input[2]:narrow(1, stage+5, opt.batchSize), 
-						splitData.train_input[3]:narrow(1, stage+5, opt.batchSize),   		-- }
-					   	splitData.train_input[4]:narrow(1, stage+5, opt.batchSize), 
-					   	splitData.train_input[5]:narrow(1, stage+5, opt.batchSize),   		-- }  -->y_{t-1}
-					   	splitData.train_input[6]:narrow(1, stage+5, opt.batchSize),		-- }
+						splitData.train_input[1]:narrow(1, stage+1, opt.batchSize),    															  		-- >  u(t)
+						splitData.train_input[2]:narrow(1, stage+1, opt.batchSize), 
+						splitData.train_input[3]:narrow(1, stage+1, opt.batchSize),   		-- }
+					   	splitData.train_input[4]:narrow(1, stage+1, opt.batchSize), 
+					   	splitData.train_input[5]:narrow(1, stage+1, opt.batchSize),   		-- }  -->y_{t-1}
+					   	splitData.train_input[6]:narrow(1, stage+1, opt.batchSize),		-- }
 					   	splitData.train_out[1]:narrow(1, stage, opt.batchSize), 
 						splitData.train_out[2]:narrow(1, stage, opt.batchSize), 				--}	
 		                splitData.train_out[3]:narrow(1, stage, opt.batchSize)
 					  } 
 		-- batch of train targets
 		train_targets 	 = {  
-						  splitData.train_out[1]:narrow(1, stage+5, opt.batchSize), 
-						  splitData.train_out[2]:narrow(1, stage+5, opt.batchSize), 				--}	
-		                  splitData.train_out[3]:narrow(1, stage+5, opt.batchSize)
+						  splitData.train_out[1]:narrow(1, stage+1, opt.batchSize), 
+						  splitData.train_out[2]:narrow(1, stage+1, opt.batchSize), 				--}	
+		                  splitData.train_out[3]:narrow(1, stage+1, opt.batchSize)
 		                }
 		-- test inputs
 		test_inputs = {
-						splitData.test_input[1]:narrow(1, stage+5, opt.batchSize), 																  		-- u(t)
-						splitData.test_input[2]:narrow(1, stage+5, opt.batchSize), 
-						splitData.test_input[3]:narrow(1, stage+5, opt.batchSize),	  		-- 
-						splitData.test_input[4]:narrow(1, stage+5, opt.batchSize), 
-						splitData.test_input[5]:narrow(1, stage+5, opt.batchSize),     		-- } y_{t-1}
-						splitData.test_input[6]:narrow(1, stage+5, opt.batchSize),
+						splitData.test_input[1]:narrow(1, stage+1, opt.batchSize), 																  		-- u(t)
+						splitData.test_input[2]:narrow(1, stage+1, opt.batchSize), 
+						splitData.test_input[3]:narrow(1, stage+1, opt.batchSize),	  		-- 
+						splitData.test_input[4]:narrow(1, stage+1, opt.batchSize), 
+						splitData.test_input[5]:narrow(1, stage+1, opt.batchSize),     		-- } y_{t-1}
+						splitData.test_input[6]:narrow(1, stage+1, opt.batchSize),
 						 splitData.test_out[1]:narrow(1, stage, opt.batchSize), 
 						 splitData.test_out[2]:narrow(1, stage, opt.batchSize),		--}
 		                 splitData.test_out[3]:narrow(1, stage, opt.batchSize)
 					  }		
 		--test targets
 		test_targets = {
-						 splitData.test_out[1]:narrow(1, stage+5, opt.batchSize), 
-						 splitData.test_out[2]:narrow(1, stage+5, opt.batchSize),		--}
-		                 splitData.test_out[3]:narrow(1, stage+5, opt.batchSize)
+						 splitData.test_out[1]:narrow(1, stage+1, opt.batchSize), 
+						 splitData.test_out[2]:narrow(1, stage+1, opt.batchSize),		--}
+		                 splitData.test_out[3]:narrow(1, stage+1, opt.batchSize)
 		             	}
 
 		--pre-whiten the inputs and outputs in the mini-batch

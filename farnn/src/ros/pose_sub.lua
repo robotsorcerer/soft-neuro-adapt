@@ -15,7 +15,7 @@ local opt = {
 
 local ros = require 'ros'
 
-ros.init('vicon_sub')
+ros.init('ensenso_sub')
 
 spinner = ros.AsyncSpinner()
 spinner:start()

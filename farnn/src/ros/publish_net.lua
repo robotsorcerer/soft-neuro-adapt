@@ -5,7 +5,7 @@ The topic can be retrieved in labview using ROS for LabVIEW
 Author: Olalekan Ogunmolu
 		October 2016
 ]]
---[[
+
 ros = require 'ros'
 
 --init ros engine---------------------------------------------------------------
@@ -34,7 +34,6 @@ function tensorToMsg(tensor)
   return msg
 end
 
-]]
 
 --init ros engine---------------------------------------------------------------
 
