@@ -28,6 +28,7 @@ add_message_files(
  add_service_files(
    FILES
    amfcError.srv
+   controller.srv
  )
 
 ## Generate actions in the 'action' folder

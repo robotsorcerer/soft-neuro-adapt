@@ -2,16 +2,16 @@
 #include <string>
 #include <exception>
 #include <std_msgs/String.h>
-#include <std_msgs/Float64MultiArray.h>
 #include <ensenso/HeadPose.h>
-#include "nn_controller/amfcError.h"
+#include <std_msgs/Float64MultiArray.h>
 #include "nn_controller/nn_controller.h"
 
 using namespace amfc_control;
 
 //constructor
 Controller::Controller(ros::NodeHandle nc, const Eigen::VectorXd& ref)
-: n_(nc), ref_(ref), updatePoseInfo(false), print(false), counter(0)
+: n_(nc), ref_(ref), updatePoseInfo(false), updateController(false),
+	print(false), counter(0)
 {	 		 
 	initMatrices();
 	pred_pub_ = n_.advertise<nn_controller::predictor>("/osa_pred", 100);
@@ -61,12 +61,9 @@ void Controller::pose_subscriber(const ensenso::HeadPose& headPose)
 void Controller::getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info)
 {
 	pose_info << headPose.x, headPose.y,
-				 headPose.z, 0,  		//roll to zero
+				 headPose.z, 1,  		//roll to zero
 				 headPose.pitch, headPose.yaw;   //setting roll to zero
 	//set ref's non-controlled states to measurement
-	// ref_(0) = headPose.x;
-	// ref_(1) = headPose.y;
-	// OUT("pose_info: " << pose_info.transpose());
 
 	ControllerParams(std::move(pose_info));
 }
@@ -111,12 +108,9 @@ void Controller::NetPredictorInput(Eigen::VectorXd&& pose_info)
 
 void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
-	// Eigen::VectorXd pose_info;
-	// pose_info.resize(6);
 	tracking_error.resize(6);
 
 	// NetPredictorInput(std::move(pose_info));
-
 
 	expAmk *= std::exp(-1334./1705*counter);
 	ym = Bm * ref_ * expAmk;
@@ -127,13 +121,11 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	Kr_hat = -1* Gamma_r * ref_      * tracking_error.transpose().eval() * P * B;
 
 	//compute control law
-	u_control = (Ky_hat * pose_info) + (Kr_hat * ref_); // + pred;
-
-	OUT("\nKy_hat: \n" << Ky_hat);
-	OUT("\nKr_hat: \n" << Kr_hat);
-	OUT("\npose_info: " << pose_info.transpose());
-	OUT("ref_: " << ref_.transpose());
-	OUT("u: " << u_control.transpose());
+	std::lock_guard<std::mutex> lock(mutex);
+	{
+		u_control = (Ky_hat * pose_info) + (Kr_hat * ref_); // + pred;
+		updateController = true;
+	}
 
 	if(print)
 	{
@@ -145,11 +137,38 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		ROS_INFO("Kr_hat size: %ld, ref_ size: %ld, Ky_hat size: %ld, pose_info size: %ld", 
 				  Kr_hat.size(), ref_.size(), Ky_hat.size(), pose_info.size());
 
+		OUT("\nKy_hat: \n" << Ky_hat);
+		OUT("\nKr_hat: \n" << Kr_hat);
+		OUT("\npose_info: " << pose_info.transpose());
+		OUT("ref_: " << ref_.transpose());
+		OUT("u:    " << u_control.transpose());
 	}
 	++counter;
 }
 
 bool Controller::configure_controller(
+	nn_controller::controller::Request  &req,
+	nn_controller::controller::Response  &res)
+{
+	Eigen::VectorXd u_control_local;
+	if(updateController)
+	{
+		u_control_local = this->u_control;
+		updateController = false;
+	}
+
+	res.left_in 	=	u_control_local(0);
+	res.left_out 	=	u_control_local(1);
+	res.right_in	=	u_control_local(2);
+	res.right_out	=	u_control_local(3);
+	res.base_in		=	u_control_local(4);
+	res.base_out	=	u_control_local(5);
+	res.right_in	=	u_control_local(5);
+
+	return true;
+}
+
+bool Controller::configure_error(
 	nn_controller::amfcError::Request  &req,
 	nn_controller::amfcError::Response  &res)
 {
@@ -157,8 +176,8 @@ bool Controller::configure_controller(
 	// k_m = 1.25;  
 	// a_m = -0.782404601/k;   
 	// y_0 = 0;  //assume zero initial response
- //    now = std::chrono::high_resolution_clock::now();
- //    double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() / 1000.0;
+ 	// now = std::chrono::high_resolution_clock::now();
+ 	// double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() / 1000.0;
 	// y_m = k_m * ref * exp(-a_m *k*T);
 
 	// ROS_INFO_STREAM(" ym: " << y_m);
@@ -193,7 +212,6 @@ void Controller::ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr&
 					*iter << " "; 
 	}  	
 	Eigen::VectorXf modelParamVector;
-
 }
 
 void help()
@@ -235,7 +253,9 @@ int main(int argc, char** argv)
     ros::Subscriber sub = n.subscribe("/saved_net", 1000, &Controller::ref_model_subscriber, &c );
     ros::Subscriber sub_multi = n.subscribe("/multi_net", 1000, &Controller::ref_model_multisub, &c );
 	ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
-	ros::ServiceServer service = n.advertiseService("/error_srv", &Controller::configure_controller, &c);
+	// ros::ServiceServer service = n.advertiseService("/error_srv", &Controller::configure_controller, &c);	
+	ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", 
+										&Controller::configure_controller, &c);
 
 	ros::spin();
 

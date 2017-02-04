@@ -4,16 +4,18 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 #pragma once
 
 // Headers.
-#include <boost/scoped_ptr.hpp>
-#include <geometry_msgs/Vector3.h>
-#include <ros/ros.h>
-#include <time.h>
-#include <chrono>
-#include <vector>
 #include <queue>
 #include <cmath>
 #include <mutex>
 #include <thread>
+#include <time.h>
+#include <chrono>
+#include <vector>
+#include <ros/ros.h>
+#include <boost/scoped_ptr.hpp>
+#include <geometry_msgs/Vector3.h>
+#include "nn_controller/amfcError.h"
+#include "nn_controller/controller.h"
 /* ______________________________________________________________________
     *
     *   This code is part of the superchick project. 
@@ -47,13 +49,13 @@ namespace amfc_control
         //these from /vicon/headtwist topic
         geometry_msgs::Vector3 linear, angular;
         std::mutex mutex;
-        bool updatePoseInfo, print;
+        bool updatePoseInfo, print, updateController;
         //these are ref model params
         Eigen::VectorXd tracking_error;
         std::chrono::time_point<std::chrono::high_resolution_clock> start, now;
         ros::NodeHandle n_;
-        ros::Publisher pub, pred_pub_;
-        size_t k;
+        ros::Publisher pub, pred_pub_, control_pub_;
+        double k;
         int m, n;
         unsigned counter;
         /* @brief P is symmetric positive definite matrix obtained from the lyapunov functiuon Q
@@ -106,6 +108,12 @@ namespace amfc_control
 
             pose_info.resize(6);
 
+            //gamma scaling factor for adaptive gains
+            k = 1e-6;
+
+            Gamma_y *= k;
+            Gamma_r *= k;
+
             OUT("P Matrix: \n " << P);
             OUT("\nB Matrix: \n" << B);
             OUT("\nGamma_y Matrix: \n" << Gamma_y);
@@ -129,7 +137,12 @@ namespace amfc_control
         void pose_subscriber(const ensenso::HeadPose& headPose);
         void ControllerParams(Eigen::VectorXd&& pose_info);
         void NetPredictorInput(Eigen::VectorXd&& pose_info);
+        //controller service
         bool configure_controller(
+            nn_controller::controller::Request  &req,
+            nn_controller::controller::Response  &res);
+        //error service
+        bool configure_error(
             nn_controller::amfcError::Request  &req,
             nn_controller::amfcError::Response  &res);
         void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);

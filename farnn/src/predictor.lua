@@ -15,7 +15,7 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 --options and general settings -----------------------------------------------------
 opt = {
-  batchSize = 5,
+  batchSize = 1,
   data = 'data',
   gpu = 0,
   ros = true,
@@ -26,7 +26,7 @@ opt = {
   silent = false,
   hiddenSize = {6, 3, 5},
   backend    = 'cunn',  --cudnn or cunn
-  checkpoint = 'network/data_4_fastlstm-net.t7'
+  checkpoint = 'network/data_fastlstm-net.t7'
 }
 
 for k,v in pairs(opt) do opt[k] = tonumber(os.getenv(k)) or os.getenv(k) or opt[k] end
@@ -136,11 +136,18 @@ local function predict(opt, model)
 
   -- create mini batch        
   local inputs, targets = {}, {}      
-  --[[ _, _, inputs, targets = get_datapair(opt, t)
-  inputs = torch.cat({inputs[1], inputs[2], inputs[3], inputs[4], inputs[5],
+  if(iter == 0) then
+    inputs = {  0.5, 0.5,0.5, 0.5, 162,162, --dakota and then pvq valves
+                pose_info.z, pose_info.pitch, 
+                pose_info.yaw}
+    --[[
+    _, _, inputs, targets = get_datapair(opt, 1)
+    inputs = torch.cat({inputs[1], inputs[2], inputs[3], inputs[4], inputs[5],
                       inputs[6], inputs[7], inputs[8], inputs[9]}, 2)  
-  targets = torch.cat({targets[1], targets[2], targets[3]}, 2) 
-  ]]
+    targets = torch.cat({targets[1], targets[2], targets[3]}, 2) 
+    ]]
+  end
+  
   inputs = {pose_info.x, pose_info.y, pose_info.z, 
               pose_info.pitch, pose_info.yaw}
 

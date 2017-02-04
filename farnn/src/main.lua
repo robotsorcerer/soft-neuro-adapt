@@ -382,7 +382,7 @@ function saveNet(epoch)
     if opt.gru then
       netname = opt.data .. '_gru-net.t7'
     elseif opt.fastlstm then
-      netname = opt.data .. '_'.. epoch .. '_fastlstm-net.t7'
+      netname = opt.data .. --[['_'.. epoch ..]] '_fastlstm-net.t7'
     else
       netname = opt.data .. '_' .. epoch .. '_lstm-net.t7'
     end

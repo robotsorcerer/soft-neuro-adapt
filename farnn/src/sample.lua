@@ -8,20 +8,20 @@ local ros = require 'ros'
 
 --Gpu settings
 cmd:option('-gpu', 0, 'which gpu to use. -1 = use CPU; >=0 use gpu')
-cmd:option('-checkpoint', 'sr-net/softRobot_lstm-net.t7', 'load the trained network e.g. <lstm-net.t7| rnn-net.t7|mlp-net.t7>')
-cmd:option('-backend', 'cudnn', 'nn|cudnn')
+cmd:option('-checkpoint', 'network/data_fastlstm-net.t7', 'load the trained network e.g. <lstm-net.t7| rnn-net.t7|mlp-net.t7>')
+cmd:option('-backend', 'cunn', 'nn|cudnn')
 cmd:option('-ros', true, 'use ros?')
-cmd:option('-floatarray', false, 'use float multiarray instead of string?')
+cmd:option('-floatarray', true, 'use float multiarray instead of string?')
 cmd:option('-verbose', false)
 
 local opt = cmd:parse(arg)
 torch.setnumthreads(8)
 
 local use_cuda, msg = false
-if opt.gpu >= 0  and opt.backend == 'cudnn' then
+if opt.gpu >= 0 then
 	require 'cunn'
 	require 'cutorch'
-	require 'cudnn'
+	if opt.backend == 'cudnn'then require 'cudnn' end
 	use_cuda = true
 	cutorch.setDevice(opt.gpu + 1)
 	out = string.format('Code deployed on GPU %d with cudnn backend', opt.gpu+1)

@@ -111,7 +111,7 @@ loss
  3.8891e+02	
  3.8435e+02	
  3.9437e+02	
- 3.table: 0x414c53c0 
+ 3.table: 0x407f1f68 
 loss 
 14.411707162857 
 preds: 
@@ -7312,6 +7312,6 @@ targets:
  227.3397  -29.4728   25.3687
 [torch.CudaTensor of size 5x3]
  
-Experiment started at:  1486081404.3981 
-Experiment Ended at:  1486083796.4754 
-Total Time Taken =  2392.0772948265 secs 
+Experiment started at:  1486168965.3099 
+Experiment Ended at:  1486171317.525 
+Total Time Taken =  2352.2151048183 secs 
