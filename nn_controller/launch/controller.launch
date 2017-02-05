@@ -1,0 +1,19 @@
+<launch>
+	<arg name="z"    	value="195.1345689"  />
+	<arg name="pitch"    value="-29.0963156" />	
+	<arg name="yaw"         value="27.5006214"  />
+
+
+	<!-- launch farnn network broadcaster -->
+	<node pkg="farnn" type="sample.sh" name="farnn" output="screen"/>
+	
+	<!-- launch bridge -->
+	<!-- <node pkg="ensenso" type="ensenso_bridge" name="ensenso_bridge" output="screen"/> -->
+	<!-- launch enseso seg -->	
+	<!-- <node pkg="ensenso" type="ensenso_seg" name="ensenso_seg" output="screen" respawn="true"/> -->
+	<!-- then launch nn_controller -->
+	<!-- <node pkg="nn_controller" type="nn_controller" name="nn_controller" output="screen" args="$(arg z) $(arg pitch)" respawn="false"/> -->
+
+
+
+</launch>

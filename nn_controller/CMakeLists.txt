@@ -17,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
   ensenso
 )
 
+find_package(Boost COMPONENTS filesystem system serialization
+thread REQUIRED)
 
 # Generate messages in the 'msg' folder
 add_message_files(
@@ -61,10 +63,9 @@ add_message_files(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs ensenso
-#  DEPENDS system_lib
-	message_runtime 
-	roscpp 
+  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs ensenso message_runtime roscpp 
+  DEPENDS Boost
+  LIBRARIES pathfinder
 )
 
 ###########
@@ -99,7 +100,7 @@ add_dependencies(nn_controller ${PROJECT_NAME}_gencpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(nn_controller
-  ${catkin_LIBRARIES}
+  ${catkin_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} -ldl
  )
 
 #############
@@ -124,11 +125,11 @@ add_dependencies(nn_controller ${PROJECT_NAME}_gencpp)
 # )
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES

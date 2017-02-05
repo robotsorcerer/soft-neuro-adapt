@@ -11,7 +11,7 @@ using namespace amfc_control;
 //constructor
 Controller::Controller(ros::NodeHandle nc, const Eigen::VectorXd& ref)
 : n_(nc), ref_(ref), updatePoseInfo(false), updateController(false),
-	print(false), counter(0)
+ updateWeights(false), print(false), counter(0)
 {	 		 
 	initMatrices();
 	pred_pub_ = n_.advertise<nn_controller::predictor>("/osa_pred", 100);
@@ -110,8 +110,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
 	tracking_error.resize(6);
 
-	// NetPredictorInput(std::move(pose_info));
-
 	expAmk *= std::exp(-1334./1705*counter);
 	ym = Bm * ref_ * expAmk;
 
@@ -120,30 +118,62 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	Ky_hat = -1* Gamma_y * pose_info * tracking_error.transpose().eval() * P * B;
 	Kr_hat = -1* Gamma_r * ref_      * tracking_error.transpose().eval() * P * B;
 
+	//retrieve the pre-trained weights and biases 
+	Eigen::Matrix<double, 3, 3> modelWeights;
+	Eigen::Vector3d modelBiases;
+
+	if(updateWeights)
+	{			
+		std::lock_guard<std::mutex> weights_lock(weights_mutex);
+		modelBiases		= this->modelBiases;
+		modelWeights	= this->modelWeights;
+		updateWeights 	= false;
+	}
+
 	//compute control law
-	std::lock_guard<std::mutex> lock(mutex);
+	Eigen::VectorXd u_control;
+	u_control = (Ky_hat * pose_info) + (Kr_hat * ref_); // + pred;
 	{
-		u_control = (Ky_hat * pose_info) + (Kr_hat * ref_); // + pred;
+		std::lock_guard<std::mutex> lock(mutex);
+		this->u_control = u_control;
 		updateController = true;
 	}
 
-	if(print)
-	{
-		OUT("\nexpAmk: \n" << expAmk);
-		OUT("\nym: \n" << ym);
-		OUT("\npose_info: " << pose_info.transpose());
-		OUT("\ne=(y-y_m): " << tracking_error.transpose());
+	OUT("\nmodelWeights: \n" << modelWeights);
+	OUT("\nmodelBiases: \n" << modelBiases.transpose());
+	OUT("\nControl Law: \n" << u_control.transpose());
 
-		ROS_INFO("Kr_hat size: %ld, ref_ size: %ld, Ky_hat size: %ld, pose_info size: %ld", 
-				  Kr_hat.size(), ref_.size(), Ky_hat.size(), pose_info.size());
-
-		OUT("\nKy_hat: \n" << Ky_hat);
-		OUT("\nKr_hat: \n" << Kr_hat);
-		OUT("\npose_info: " << pose_info.transpose());
-		OUT("ref_: " << ref_.transpose());
-		OUT("u:    " << u_control.transpose());
-	}
 	++counter;
+}
+
+void Controller::ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params)
+{
+	std::vector<double> model_params = ref_model_params->data;
+
+	//retrieve the pre-trained weights and biases 
+	Eigen::Matrix<double, 3, 3> modelWeights;
+	Eigen::Vector3d modelBiases;
+	std::lock_guard<std::mutex> weights_lock(weights_mutex);
+	{	
+		modelWeights(0,0) = model_params[0];
+		modelWeights(0,1) = model_params[1];
+		modelWeights(0,2) = model_params[2];
+		modelWeights(1,0) = model_params[4];
+		modelWeights(1,1) = model_params[5];
+		modelWeights(1,2) = model_params[6];
+		modelWeights(2,0) = model_params[8];
+		modelWeights(2,1) = model_params[9];
+		modelWeights(2,2) = model_params[10];
+
+		modelBiases(0)	  = model_params[3];
+		modelBiases(1)	  = model_params[7];
+		modelBiases(2)	  = model_params[11];
+
+		this->modelWeights = modelWeights;
+		this->modelBiases  = modelBiases;
+
+		updateWeights = true;
+	}
 }
 
 bool Controller::configure_controller(
@@ -199,19 +229,6 @@ void Controller::ref_model_subscriber(const std_msgs::String::ConstPtr& ref_mode
 {
 	std::string model_params = ref_model_params->data.c_str();
 	ROS_INFO_STREAM("Model Parameters: " << model_params); 
-}
-
-void Controller::ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params)
-{
-	// float model_params[10]
-	std::vector<double> model_params = ref_model_params->data;
-	std::vector<double>::iterator iter;
-	for(iter = model_params.begin(); iter!=model_params.end(); ++iter)
-	{
-		std::cout << "\nmodel parameters are: \n" <<
-					*iter << " "; 
-	}  	
-	Eigen::VectorXf modelParamVector;
 }
 
 void help()

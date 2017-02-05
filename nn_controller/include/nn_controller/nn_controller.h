@@ -30,12 +30,38 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 #include <ros/time.h>
 #include <ros/ros.h>
 #include <Eigen/Dense>
+    #include <stdlib.h> /*system, NULL, ..*/
 
 #include "nn_controller/amfc.h"
 #include "nn_controller/options.h"
 #include "nn_controller/predictor.h"
+#define BOOST_NO_CXX11_SCOPED_ENUMS     
+#include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
+#include <boost/tuple/tuple.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #define OUT(__o__) std::cout<< __o__ << std::endl;
+
+//forward declaration to use pathfinder function
+namespace pathfinder
+{
+  bool getROSPackagePath(const std::string pkgName, 
+                                boost::filesystem::path & pkgPath);
+
+  static bool copyDirectory(const boost::filesystem::path srcPath,
+                             const boost::filesystem::path dstPath);  
+
+  bool cloudsAndImagesPath(boost::filesystem::path & imagesPath, \
+                            boost::filesystem::path & cloudsPath, 
+                            const std::string& pkgName = "ensenso");
+
+  std::tuple<boost::filesystem::path, const std::string&, const std::string&,
+            const std::string&, const std::string&, const std::string&, 
+            const std::string&> getCurrentPath();
+
+  bool getDataDirectory(boost::filesystem::path data_dir);
+}
 
 namespace amfc_control
 {
@@ -48,8 +74,8 @@ namespace amfc_control
     private:
         //these from /vicon/headtwist topic
         geometry_msgs::Vector3 linear, angular;
-        std::mutex mutex;
-        bool updatePoseInfo, print, updateController;
+        std::mutex mutex, weights_mutex;
+        bool updatePoseInfo, print, updateController, updateWeights;
         //these are ref model params
         Eigen::VectorXd tracking_error;
         std::chrono::time_point<std::chrono::high_resolution_clock> start, now;
@@ -90,6 +116,9 @@ namespace amfc_control
         Eigen::VectorXd pred_ut;
         // trained net predictor input tuple
         nn_controller::predictor pred_;
+        //neural net  pre-trained weights
+        Eigen::Matrix<double, 3, 3> modelWeights;
+        Eigen::Vector3d modelBiases;
 
         void initMatrices()
         {   

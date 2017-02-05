@@ -12,6 +12,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>farnn</run_depend>
+  <!-- <run_depend>scripts</run_depend> -->
   <run_depend>nn_controller</run_depend>
 
   <export>

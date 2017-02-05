@@ -16,6 +16,8 @@ cmd:option('-verbose', false)
 
 local opt = cmd:parse(arg)
 torch.setnumthreads(8)
+opt.checkpoint = 'data_fastlstm-net.t7'
+-- local opt.checkpoint = os.getenv('checkpoint')
 
 local use_cuda, msg = false
 if opt.gpu >= 0 then
@@ -47,7 +49,7 @@ netmods = model.modules;
 
 weights,biases = {}, {};
 netparams= {}
-local broadcast_weights = {}
+local broadcast_weights, broadcast_biases = {}, {}
 
 ros.init('advertise_neunet')
 local nh = ros.NodeHandle()
@@ -78,9 +80,14 @@ function tensorToMsg(tensor)
   return msg
 end
 
-
-if #netmods == 1 then   		--recurrent modules
+--recurrent modules, lstm, fastlstm and rnns have a length of 1
+if #netmods == 1 then   
+	--		this gives the recurrent modules within the saved net
 	local modules 	= netmods[1].recurrentModule.modules
+	--[[e.g. modules[1] will be nn.FastLSTM(9 -> 9)
+			modules[2] will be nn.Dropout(0.3,busy)
+			etc
+		]]
 	local length 	= #modules
 	for i = 1, length do
 		netparams[i] 	= {['weight']=modules[i].weight, ['bias']=modules[i].bias}
@@ -90,6 +97,7 @@ if #netmods == 1 then   		--recurrent modules
 	for k, v in pairs(netparams) do 
 		if netparams[k].weight then 
 		   broadcast_weights = netparams[k].weight
+		   broadcast_biases  = netparams[k].bias
 		end
 	end
 
@@ -106,12 +114,22 @@ elseif #netmods > 1 then   --mlp modules
 	end
 end
 
+br_weights = broadcast_weights:double()
+br_biases  = broadcast_biases:double()
+
+--[[concatenate the weights and biases before publishing
+--For recurrent modules,note that the first three columns 
+will be the weights while the last one 
+column will be the bias]]
+local netmsg = torch.cat({br_weights, br_biases}, 2)
+
 if opt.verbose then 
 	print('\nbroadcast_weights\n:'); 
 	print(broadcast_weights)
+	print('\nbroadcast_biases\n:'); 
+	print(broadcast_biases)
+	print(netmsg)
 end
-
-br_weights = broadcast_weights:double()
 
 while(ros.ok())	do
  	if publisher:getNumSubscribers() == 0  then
@@ -119,11 +137,11 @@ while(ros.ok())	do
   	else
     	if opt.floatarray then 
     		--publish multiarray
-    		params = tensorToMsg(br_weights)
+    		params = tensorToMsg(netmsg)
     		publisher:publish(params)
     	else    		 --publish string
     		params 	  = ros.Message(string_spec)
-    		params.data = tostring(br_weights)   
+    		params.data = tostring(netmsg)   
     		publisher:publish(params)
     	end
   	end
