@@ -76,8 +76,12 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(include)
 include_directories(
+  ${EIGEN3_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
+
+add_definitions(${EIGEN_DEFINITIONS})
 
 ## Declare a C++ library
 #add_library(nn_controller
@@ -93,6 +97,7 @@ include_directories(
 ## Declare a C++ executable
  add_executable(nn_controller src/nn_controller.cpp)
 add_dependencies(nn_controller ${PROJECT_NAME}_gencpp)
+add_dependencies(nn_controller ${catkin_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -100,7 +105,7 @@ add_dependencies(nn_controller ${PROJECT_NAME}_gencpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(nn_controller
-  ${catkin_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} -ldl
+  ${catkin_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} -ldl /home/robotec/catkin_ws/devel/lib/libboostsender.so
  )
 
 #############
@@ -130,6 +135,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE
 )
+
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES

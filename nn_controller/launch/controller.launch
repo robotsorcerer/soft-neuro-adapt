@@ -8,11 +8,11 @@
 	<node pkg="farnn" type="sample.sh" name="farnn" output="screen"/>
 	
 	<!-- launch bridge -->
-	<!-- <node pkg="ensenso" type="ensenso_bridge" name="ensenso_bridge" output="screen"/> -->
+	<node pkg="ensenso" type="ensenso_bridge" name="ensenso_bridge" output="screen"/>
 	<!-- launch enseso seg -->	
 	<!-- <node pkg="ensenso" type="ensenso_seg" name="ensenso_seg" output="screen" respawn="true"/> -->
 	<!-- then launch nn_controller -->
-	<!-- <node pkg="nn_controller" type="nn_controller" name="nn_controller" output="screen" args="$(arg z) $(arg pitch)" respawn="false"/> -->
+	<node pkg="nn_controller" type="nn_controller" name="nn_controller" output="screen" args="$(arg z) $(arg pitch)" respawn="false"/>
 
 
 

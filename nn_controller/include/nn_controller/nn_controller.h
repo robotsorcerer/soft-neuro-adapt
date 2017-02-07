@@ -13,7 +13,7 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 #include <vector>
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
-#include <geometry_msgs/Vector3.h>
+#include <ensenso/boost_sender.h>
 #include "nn_controller/amfcError.h"
 #include "nn_controller/controller.h"
 /* ______________________________________________________________________
@@ -74,7 +74,7 @@ namespace amfc_control
     private:
         //these from /vicon/headtwist topic
         geometry_msgs::Vector3 linear, angular;
-        std::mutex mutex, weights_mutex;
+        std::mutex mutex, pose_mutex, weights_mutex;
         bool updatePoseInfo, print, updateController, updateWeights;
         //these are ref model params
         Eigen::VectorXd tracking_error;
@@ -99,7 +99,7 @@ namespace amfc_control
         * matrices of adaptive gains
         */
         Eigen::MatrixXd Gamma_y, Gamma_r;
-        Eigen::VectorXd ref_;
+        Eigen::Vector3d ref_;
         Eigen::MatrixXd Ky_hat, Kr_hat;
         Eigen::VectorXd pose_info;  //from sensor
         Eigen::MatrixXd expAmk, ym;         //reference model 
@@ -120,9 +120,12 @@ namespace amfc_control
         Eigen::Matrix<double, 3, 3> modelWeights;
         Eigen::Vector3d modelBiases;
 
+        boost::asio::io_service io_service;
+        const std::string multicast_address;
+
         void initMatrices()
         {   
-            m = 6; n = 6;
+            m = 6; n = 3;
             Am.setIdentity(n, n);
             Bm.setIdentity(n, m);
             B.setIdentity(n, m);        //R^{n x m}
@@ -135,7 +138,7 @@ namespace amfc_control
             P *= -1705./2668; //-0.639055472264; //
             Am *= -1334./1705;
 
-            pose_info.resize(6);
+            pose_info.resize(3);
 
             //gamma scaling factor for adaptive gains
             k = 1e-6;
@@ -153,40 +156,29 @@ namespace amfc_control
     public:
         // Constructor.
         Controller(ros::NodeHandle nc, 
-                    const Eigen::VectorXd& ref);
+                    const Eigen::Vector3d& ref);
         Controller();
         // Destructor.
         virtual ~Controller();
-        // Update the controller (take an action).
-        // virtual void update(RobotPlugin *plugin, ros::Time current_time, boost::scoped_ptr<Sample>& sample, Eigen::VectorXd &torques) = 0;
-        // Configure the controller.
-
         //pose callback
         void getRefTraj();
-        void pose_subscriber(const ensenso::HeadPose& headPose);
         void ControllerParams(Eigen::VectorXd&& pose_info);
-        void NetPredictorInput(Eigen::VectorXd&& pose_info);
+        //transform eigenPose to ensenso::HeadPose format
+        void vectorToHeadPose(Eigen::VectorXd&& pose_info, 
+                                          ensenso::HeadPose& eig2Pose);
         //controller service
-        bool configure_controller(
+        virtual bool configure_controller(
             nn_controller::controller::Request  &req,
             nn_controller::controller::Response  &res);
         //error service
-        bool configure_error(
+        virtual bool configure_error(
             nn_controller::amfcError::Request  &req,
             nn_controller::amfcError::Response  &res);
         void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
         ros::Time getTime();
-        // Set update delay on the controller.
-        virtual void set_update_delay(double new_step_length);
-        // Get update delay on the controller.
-        virtual double get_update_delay();
-        // Check if controller is finished with its current task.
-        // virtual bool is_finished() const = 0;
-        // Reset the controller -- this is typically called when the controller is turned on.
-        virtual void reset(ros::Time update_time);
         //subscribe to the reference model parameters
         virtual void ref_model_subscriber(const std_msgs::String::ConstPtr& ref_model_params);
-        virtual void ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params);
-        // virtual void head_twist_subscriber(const geometry_msgs::Twist::ConstPtr& headPose);
+        virtual void ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params);        
+        virtual void pose_subscriber(const ensenso::HeadPose& headPose);
     };
 }
