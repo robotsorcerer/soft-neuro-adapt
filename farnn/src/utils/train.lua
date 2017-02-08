@@ -25,6 +25,7 @@ function train_lstm(opt)
     inputs = torch.cat({inputs[1], inputs[2], inputs[3], inputs[4], 
                         inputs[5], inputs[6], inputs[7], inputs[8],
                         inputs[9]}, 2)
+    -- print('inputs: \n', inputs)
     targets = torch.cat({targets[1], targets[2], targets[3]}, 2)
 
     --2. Forward sequence through rnn

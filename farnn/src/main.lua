@@ -212,7 +212,7 @@ local function weights_init(m)
    end
 end
 
-neunet:apply(weights_init)
+-- neunet:apply(weights_init)
 
 print '==> configuring optimizer\n'
 

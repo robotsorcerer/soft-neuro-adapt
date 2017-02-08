@@ -13,28 +13,33 @@ local opt = {
 	publishTwist = false
 }
 
-local ros = require 'ros'
+local ros 	= require 'ros'
 
 ros.init('ensenso_sub')
 
-spinner = ros.AsyncSpinner()
+spinner 	= ros.AsyncSpinner()
 spinner:start()
 
-nodehandle = ros.NodeHandle()
-string_spec = ros.MsgSpec('ensenso/HeadPose')
+nodehandle 	= ros.NodeHandle()
+poseSpec 	= ros.MsgSpec('ensenso/HeadPose')
+controlSpec = ros.MsgSpec('geometry_msgs/Twist')
 
-local pose_subscriber = nodehandle:subscribe("/mannequine_head/pose", 'ensenso/HeadPose', 10, { 'udp', 'tcp' }, { tcp_nodelay = true })
 
-print(pose_subscriber)
+local pose_subscriber = nodehandle:subscribe("/mannequine_head/pose", poseSpec, 10, { 'udp', 'tcp' }, { tcp_nodelay = true })
+local u_sub  		  = nodehandle:subscribe("/mannequine_head/u_valves",controlSpec, 10, { 'udp', 'tcp' }, { tcp_nodelay = true })
+
 -- subscribe to vicon_receiver topic with 10 messages back-log
 -- transport_options (arguments 4 & 5) are optional - used here only for demonstration purposes
-
+poseMsg, uMsg, inputs = {}, {}, {}
 -- register a callback function that will be triggered from ros.spinOnce() when a message is available.
 pose_subscriber:registerCallback(function(msg, header)
-  print('Header:')
-  print(header)
-  print('Message:')
-  print(msg)
+  -- print('\nheadPose: \n', msg)
+  	poseMsg.z = msg.z; poseMsg.pitch = msg.pitch; poseMsg.yaw = msg.yaw;
+end)
+
+u_sub:registerCallback(function(msg, header)
+  uMsg.u1 = msg.linear.x; uMsg.u2 = msg.linear.y; uMsg.u3 = msg.linear.z; 
+  uMsg.u4 = msg.angular.x; uMsg.u5 = msg.angular.y; uMsg.u6 = msg.angular.z; 
 end)
 
 if opt.publishTwist then
@@ -43,7 +48,21 @@ if opt.publishTwist then
 		end)
 end
 
+-- function table_merge(t1, t2)
+--    for k,v in ipairs(t1) do
+--       table.insert(inputs, v)
+--    end 
+--    for k,v in ipairs(t1) do
+--       table.insert(inputs, v)
+--    end 
+ 
+--    return t1
+-- end
+
 while ros.ok() do
+  inputs = {uMsg.u1, uMsg.u2, uMsg.u3, uMsg.u4, uMsg.u5, uMsg.u6,
+			poseMsg.z, poseMsg.pitch, poseMsg.yaw}
+  print(inputs)
   ros.spinOnce()
   sys.sleep(0.1)
 end

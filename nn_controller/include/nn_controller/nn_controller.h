@@ -16,6 +16,7 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 #include <ensenso/boost_sender.h>
 #include "nn_controller/amfcError.h"
 #include "nn_controller/controller.h"
+#include "nn_controller/predictor_params.h"
 /* ______________________________________________________________________
     *
     *   This code is part of the superchick project. 
@@ -174,6 +175,10 @@ namespace amfc_control
         virtual bool configure_error(
             nn_controller::amfcError::Request  &req,
             nn_controller::amfcError::Response  &res);
+        //predictor params for pretrained model
+        virtual bool configure_predictor_params(
+                nn_controller::predictor_params::Request  &req,
+                nn_controller::predictor_params::Response  &res);
         void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
         ros::Time getTime();
         //subscribe to the reference model parameters

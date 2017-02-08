@@ -15,7 +15,7 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 --options and general settings -----------------------------------------------------
 opt = {
-  batchSize = 5,
+  batchSize = 1,
   data = 'data',
   gpu = 0,
   noutputs = 1,
@@ -123,6 +123,8 @@ local function test(opt, model)
     targets = torch.cat({targets[1], targets[2], targets[3]}, 2) 
     -- test samples
     model:forget()  --forget all past time steps
+
+    print('inputs: \n', inputs)
     local preds = model:forward(inputs)
     local loss = cost:forward(preds, targets) 
 
@@ -138,9 +140,12 @@ local function test(opt, model)
 
     testlogger:add{t, loss}
     if (not opt.silent) then
-      print('loss'); print(loss)
-      print('preds:'); print(preds); print('targets: '); print(targets)
-      sys.sleep('1')
+      -- print('loss'); print(loss)
+      print('preds:'); print(preds); 
+      print('weights');
+      print(model.modules[1].recurrentModule.modules[7].weight)
+      print('inputs: '); print(inputs)
+      sys.sleep('30')
     end
 
     iter = iter + 1

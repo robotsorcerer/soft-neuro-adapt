@@ -40,11 +40,10 @@ void Controller::pose_subscriber(const ensenso::HeadPose& headPose)
 	Eigen::VectorXd pose_info;
 	pose_info.resize(3);		//CRITICAL OR SEGFAULT
 	getPoseInfo(headPose, pose_info);
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-		this->pose_info = pose_info;
-		updatePoseInfo  = true;		
-	}
+
+	std::lock_guard<std::mutex> pose_locker(pose_mutex);
+	this->pose_info = pose_info;
+	updatePoseInfo  = true;		
 }
 
 void Controller::getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info)
@@ -59,7 +58,6 @@ void Controller::getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd 
 void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
 	tracking_error.resize(3);
-
 	expAmk *= std::exp(-1334./1705*counter);
 	ym = Bm * ref_ * expAmk;
 
@@ -67,12 +65,18 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	tracking_error = pose_info - ym;
 	Ky_hat = -1* Gamma_y * pose_info * tracking_error.transpose().eval() * P * B;
 	Kr_hat = -1* Gamma_r * ref_      * tracking_error.transpose().eval() * P * B;
-
 	//retrieve the first 6x3 block from Kr and Kx in place
 	Ky_hat = Ky_hat.topLeftCorner(6,3);
+	/*Will be 6 x 3*/
 	Kr_hat = Kr_hat.topLeftCorner(6,3);
 	//retrieve the pre-trained weights and biases 
+	//will be 3x3
 	Eigen::Matrix<double, 3, 3> modelWeights;
+	Eigen::Matrix3d modelWeightsSample;
+	modelWeightsSample <<  0.1805, -4.6023, -0.5891,
+ 						   0.1069,  0.6754,  0.3425,
+						   0.0657, -0.9437, -0.1282;
+	//will be 3x1
 	Eigen::Vector3d modelBiases;
 
 	if(updateWeights)
@@ -83,9 +87,28 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		updateWeights 	= false;
 	}
 
-	//compute control law
+	Eigen::VectorXd basis_funcs;
 	Eigen::VectorXd u_control;
-	u_control = (Ky_hat * pose_info) + (Kr_hat * ref_); // + pred;
+	pose_queue.push(pose_info);
+	pose_queue.push(u_control);
+	if(pose_queue.size() % 5 == 0)
+	{
+
+	}
+	/*
+	* create a queue of past output and inputs
+	*/
+
+	/*compute control law
+	* Ky_hat will be 6x3, 
+	* pose_info will be 3x1
+	* Kr_hat will be 6x3
+	* ref_ will be 3x1
+	* modelWights is \theta & will be 3x3
+	* phi(x) will be lagged params 3x1
+	* u_control will be 6x1
+	*/
+	u_control = (Ky_hat * pose_info) + (Kr_hat * ref_); // + modelWeights * ;
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		this->u_control = u_control;
@@ -175,7 +198,48 @@ bool Controller::configure_controller(
 	res.right_out	=	u_control_local(3);
 	res.base_in		=	u_control_local(4);
 	res.base_out	=	u_control_local(5);
-	res.right_in	=	u_control_local(5);
+
+	return true;
+}
+
+bool Controller::configure_predictor_params(
+	nn_controller::predictor_params::Request  &req,
+	nn_controller::predictor_params::Response  &res)
+{
+	Eigen::VectorXd u_control_local;
+	if(updateController)
+	{
+		u_control_local = this->u_control;
+		updateController = false;
+	}
+	
+	Eigen::Vector3d pose_info;
+	pose_info.resize(3);
+	pose_info = this->pose_info;
+
+	if(updatePoseInfo)
+	{
+		pose_info = this->pose_info;
+		updatePoseInfo = false;
+	}
+
+	// pose_info << headPose.z,// 1,  		//roll to zero
+	// 			 headPose.pitch, headPose.yaw;   //setting roll to zero
+	// res.header.seq = counter;
+	// res.header.stamp = getTime();
+	// res.header.frame_id = "net_predictor_input";
+	res.u1 		=	u_control_local(0);
+	res.u2 		=	u_control_local(1);
+	res.u3		=	u_control_local(2);
+	res.u4		=	u_control_local(3);
+	res.u5		=	u_control_local(4);
+	res.u6		=	u_control_local(5);
+	//measurements
+	res.z		=	pose_info(0);
+	res.pitch	=	pose_info(1);
+	res.yaw		=	pose_info(2);
+
+	OUT("\npose_info: " << pose_info);
 
 	return true;
 }
@@ -242,7 +306,6 @@ int main(int argc, char** argv)
 
 
 	Eigen::Vector3d refd;
-	// refd.resize(3); 
 	refd = ref.cast<double>(); 
 	Controller c(n, refd);
 
@@ -252,6 +315,9 @@ int main(int argc, char** argv)
 	// ros::ServiceServer service = n.advertiseService("/error_srv", &Controller::configure_controller, &c);	
 	ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", 
 										&Controller::configure_controller, &c);
+	//not working
+	// ros::ServiceServer pred_serv = n.advertiseService("/mannequine_head/predictor_params", 
+										// &Controller::configure_predictor_params, &c);
 
 	ros::spin();
 

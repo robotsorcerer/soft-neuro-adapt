@@ -14,9 +14,9 @@ cmd:option('-ros', true, 'use ros?')
 cmd:option('-floatarray', true, 'use float multiarray instead of string?')
 cmd:option('-verbose', false)
 
-local opt = cmd:parse(arg)
+local opt 		= cmd:parse(arg)
 torch.setnumthreads(8)
-opt.checkpoint = 'data_fastlstm-net.t7'
+opt.checkpoint 	= 'data_fastlstm-net.t7'
 -- local opt.checkpoint = os.getenv('checkpoint')
 
 local use_cuda, msg = false
@@ -24,11 +24,11 @@ if opt.gpu >= 0 then
 	require 'cunn'
 	require 'cutorch'
 	if opt.backend == 'cudnn'then require 'cudnn' end
-	use_cuda = true
+	use_cuda 	= true
 	cutorch.setDevice(opt.gpu + 1)
-	out = string.format('Code deployed on GPU %d with cudnn backend', opt.gpu+1)
+	out 		= string.format('Code deployed on GPU %d with cudnn backend', opt.gpu+1)
 else
-  out = 'Running in CPU mode'
+  out 			= 'Running in CPU mode'
   require 'nn'
 end
 if opt.verbose then print(out) end
@@ -36,37 +36,36 @@ if opt.verbose then print(out) end
 local checkpoint, model
 
 if use_cuda then
-	model = torch.load(opt.checkpoint)
+	model 		= torch.load(opt.checkpoint)
 	model:cuda()
 else
-	model = torch.load(opt.checkpoint)
+	model 		= torch.load(opt.checkpoint)
 	model:double()
 end
 
 model:evaluate()
 
-netmods = model.modules;
+netmods 		= model.modules;
 
-weights,biases = {}, {};
-netparams= {}
+weights,biases 	= {}, {};
+netparams		= {}
 local broadcast_weights, broadcast_biases = {}, {}
 
 ros.init('advertise_neunet')
-local nh = ros.NodeHandle()
+local nh 		= ros.NodeHandle()
 
-local spinner = ros.AsyncSpinner()
+local spinner 	= ros.AsyncSpinner()
 spinner:start()
 
 local string_spec, publisher, subscriber
 
 if opt.floatarray then 
-	publisher = nh:advertise("multi_net", 'std_msgs/Float64MultiArray', 10)
+	publisher 	= nh:advertise("multi_net", 'std_msgs/Float64MultiArray', 10)
 	string_spec = ros.MsgSpec('std_msgs/Float64MultiArray')
 else
 	string_spec = ros.MsgSpec('std_msgs/String')
-	publisher = nh:advertise("saved_net", string_spec, 10, false, connect_cb, disconnect_cb)
+	publisher 	= nh:advertise("saved_net", string_spec, 10, false, connect_cb, disconnect_cb)
 end
-ros.spinOnce()
 
 function tensorToMsg(tensor)
   local msg = ros.Message(string_spec)

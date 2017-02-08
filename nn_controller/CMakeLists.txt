@@ -31,6 +31,7 @@ add_message_files(
    FILES
    amfcError.srv
    controller.srv
+   predictor_params.srv
  )
 
 ## Generate actions in the 'action' folder
