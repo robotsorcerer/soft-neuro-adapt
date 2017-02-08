@@ -11,8 +11,13 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 #include <time.h>
 #include <chrono>
 #include <vector>
+//ros used
 #include <ros/ros.h>
+#include <std_msgs/Float64.h>
+#include <geometry_msgs/Point.h>
+//boost unused
 #include <boost/scoped_ptr.hpp>
+//myne factory headers
 #include <ensenso/boost_sender.h>
 #include "nn_controller/amfcError.h"
 #include "nn_controller/controller.h"
@@ -123,6 +128,10 @@ namespace amfc_control
 
         boost::asio::io_service io_service;
         const std::string multicast_address;
+        double loss;
+        Eigen::VectorXd pred;
+        std::mutex net_loss_mutex, pred_mutex;
+        bool updateNetLoss, updatePred;
 
         void initMatrices()
         {   
@@ -132,6 +141,8 @@ namespace amfc_control
             B.setIdentity(n, m);        //R^{n x m}
             Gamma_y.setIdentity(n, n); //will be 3 X 3 matrix
             Gamma_r.setIdentity(n, n); //will be 3 X 3 matrix
+            //Lambda models controlundertainties by an R^{nxn} diagonal matrix
+            //with positive elements
             Lambda.setIdentity(n, n);            
             P.setIdentity(n, n); // R ^{n x n}
             expAmk.setIdentity(n, n);
@@ -163,10 +174,24 @@ namespace amfc_control
         virtual ~Controller();
         //pose callback
         void getRefTraj();
+
+        /*compute control law
+        * Ky_hat will be 6x3, 
+        * pose_info will be 3x1
+        * Kr_hat will be 6x3
+        * ref_ will be 3x1
+        * modelWights is \theta & will be 3x3
+        * phi(x) will be lagged params 3x1
+        * u_control will be 6x1
+        */
         void ControllerParams(Eigen::VectorXd&& pose_info);
         //transform eigenPose to ensenso::HeadPose format
         void vectorToHeadPose(Eigen::VectorXd&& pose_info, 
                                           ensenso::HeadPose& eig2Pose);
+        //predictor from real-time predictor.lua 
+        void pred_subscriber(const geometry_msgs::Point& pred);
+        //loss from real-time predictor.lua 
+        void loss_subscriber(const std_msgs::Float64& net_loss);
         //controller service
         virtual bool configure_controller(
             nn_controller::controller::Request  &req,
@@ -182,7 +207,7 @@ namespace amfc_control
         void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
         ros::Time getTime();
         //subscribe to the reference model parameters
-        virtual void ref_model_subscriber(const std_msgs::String::ConstPtr& ref_model_params);
+        // virtual void ref_model_subscriber(const std_msgs::String::ConstPtr& ref_model_params);
         virtual void ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params);        
         virtual void pose_subscriber(const ensenso::HeadPose& headPose);
     };
