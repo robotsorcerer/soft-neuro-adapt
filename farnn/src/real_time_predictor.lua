@@ -20,9 +20,9 @@ opt = {
   gpu           = 0,
   noutputs      = 3,
   display       = 1,
-  verbose       = false,
+  verbose       = true,
   maxIter       = 20,
-  silent        = false,
+  silent        = true,
   model         = 'lstm',
   real_time_net = true, --use real-time network approximator
   hiddenSize    = {9, 5, 3},
@@ -96,7 +96,7 @@ local function transfer_data(x)
   return x
 end
 
-testlogger:setNames{'iter', 'loss'}
+-- testlogger:setNames{'iter', 'loss'}
 
 --[[
   Fundamental ROS Initializations
@@ -259,7 +259,7 @@ local function main()
       targets[{{}, {5}}] = 0
       targets[{{}, {6}}] = 0 
 
-      -- print('inputs: ', inputs)  
+      print('inputs: ', inputs)  
       -- print('targets: ', targets)  
 
       if opt.real_time_net then
@@ -279,12 +279,12 @@ local function main()
 
       if iter % 2  == 0 then collectgarbage() end
        
-      if (not opt.silent) then
+      if opt.verbose then
         print('preds:'); print(tensorToNice(preds)); 
         print('targets: '); print(tensorToNice(targets))
         print('loss: ', loss)
-        -- sys.sleep(0.1)
       end
+      testlogger:add{loss}
 
       --populate msgs for ros publishers
       --serialize preds msg

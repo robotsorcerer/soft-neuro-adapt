@@ -7,7 +7,11 @@
 #include <std_msgs/Float64MultiArray.h>
 #include "nn_controller/nn_controller.h"
 
+#include <boost/numeric/odeint/stepper/runge_kutta_dopri5.hpp>
+#include <boost/numeric/odeint/algebra/vector_space_algebra.hpp>
+
 using namespace amfc_control;
+using namespace boost::numeric::odeint;
 
 //constructor
 Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref)
@@ -132,34 +136,6 @@ bool Controller::configure_predictor_params(
 	return true;
 }
 
-//error service response generator ::DEPRECATED
-bool Controller::configure_error(
-	nn_controller::amfcError::Request  &req,
-	nn_controller::amfcError::Response  &res)
-{
-	// this is the reference model. it is always time-varying1
-	// k_m = 1.25;  
-	// a_m = -0.782404601/k;   
-	// y_0 = 0;  //assume zero initial response
- 	// now = std::chrono::high_resolution_clock::now();
- 	// double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() / 1000.0;
-	// y_m = k_m * ref * exp(-a_m *k*T);
-
-	// ROS_INFO_STREAM(" ym: " << y_m);
-	// //parametric error between ref. model and plant
-	// error = linear.z - y_m;
-	// res.error = error;
-	// //publish am, km, ref and y as services as well
-	// res.am 	= a_m;
-	// res.km 	= k_m;
-	// res.ref = ref;
-	// res.y  	= linear.z;
-	// ROS_INFO_STREAM("sending response: " << res);	
-	// ++k;
-
-	return true;
-}
-
 void Controller::pred_subscriber(const geometry_msgs::Point& pred)
 {
 	std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
@@ -185,12 +161,19 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	//compute tracking error, e = y - y_m
 	tracking_error = pose_info - ym;
-	Ky_hat = -1* Gamma_y * pose_info * tracking_error.transpose().eval() * P * B;
-	Kr_hat = -1* Gamma_r * ref_      * tracking_error.transpose().eval() * P * B;
-	//retrieve the first 6x3 block from Kr and Kx in place
-	Ky_hat = Ky_hat.topLeftCorner(6,3);
-	/*Will be 6 x 3*/
-	Kr_hat = Kr_hat.topLeftCorner(6,3);
+	Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B;
+	Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B;
+
+	//use boost ode solver
+	runge_kutta_dopri5<state,double,state,double,vector_space_algebra> stepper;
+	//use reference for the derivative
+	stepper.do_step([](const state& x, state & dxdt, const double t)->void{
+		dxdt = x;
+	}, Ky_hat_dot, 0.0, Ky_hat, 0.01);
+	//integrate Ky_hat_dot
+	stepper.do_step([](const state& x, state & dxdt, const double t)->void{
+		dxdt = x;
+	}, Kr_hat_dot, 0.0, Kr_hat, 0.01);
 
 	//retrieve net predictions
 	Eigen::VectorXd pred;
@@ -212,20 +195,21 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	}
 
 	//SEE HEADER FOR INFO ON SIZE OF MATRICES
-	u_control = (Ky_hat * pose_info) + (Kr_hat * ref_) + pred;
+	u_control = (Ky_hat.transpose() * pose_info) + (Kr_hat.transpose() * ref_) + (pred);
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		this->u_control = u_control;
 		updateController = true;
 	}
 
-	OUT("\n pred: \n" << pred.transpose());
-	OUT("\nControl Law: \n" << u_control.transpose());
+	OUT("\n pred: \n" 		 << pred);
+/*	OUT("\n ref_: \n" 		<< ref_.transpose());
+	OUT("\n y: \n" 			<< pose_info.transpose());*/
+	OUT("\n u^T: \n" 			<< u_control.transpose());
 
 	if(print){		
-		// OUT("\nym: \n" << ym.transpose());
-		OUT("\nKy_hat: \n" << Ky_hat);
-		OUT("\nKr_hat: \n" << Kr_hat);
+		OUT("\nKy_hat_dot: \n" << Ky_hat_dot);
+		OUT("\nKr_hat_dot: \n" << Kr_hat_dot);
 		OUT("\ntracking_error: \n" << tracking_error.transpose());
 		OUT("\nControl Law: \n" << u_control.transpose());
 	}

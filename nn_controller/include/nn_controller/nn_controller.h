@@ -83,7 +83,9 @@ namespace amfc_control
         std::mutex mutex, pose_mutex, weights_mutex;
         bool updatePoseInfo, print, updateController, updateWeights;
         //these are ref model params
-        Eigen::VectorXd tracking_error;
+        Eigen::VectorXd tracking_error, 
+                        tracking_error_delayed, 
+                        tracking_error_delta;
         std::chrono::time_point<std::chrono::high_resolution_clock> start, now;
         ros::NodeHandle n_;
         ros::Publisher pub, pred_pub_, control_pub_;
@@ -106,8 +108,16 @@ namespace amfc_control
         */
         Eigen::MatrixXd Gamma_y, Gamma_r;
         Eigen::Vector3d ref_;
-        Eigen::MatrixXd Ky_hat, Kr_hat;
-        Eigen::VectorXd pose_info;  //from sensor
+        //time-derivative of gains
+        Eigen::MatrixXd Ky_hat_dot, Kr_hat_dot; 
+        //estimates of real gains kr and ky
+        Eigen::MatrixXd Ky_hat, Kr_hat, 
+                      Ky_hat_delayed, Kr_hat_delayed, 
+                      Ky_hat_delta, Kr_hat_delta; 
+        Eigen::VectorXd pose_info, 
+                        pose_info_delayed, 
+                        pose_info_delta;  //from sensor
+
         Eigen::MatrixXd expAmk, ym;         //reference model 
 
         /*Lambda is an unknown pos def symmetric matrix in R^{m x m}
@@ -118,7 +128,8 @@ namespace amfc_control
         Eigen::VectorXd u_control;
         std::thread threads, gainsThread;
         //queue to delay the incoming pose message in order to pick delayed y(t-1)
-        std::queue<Eigen::VectorXd> pose_queue;
+        std::queue<Eigen::VectorXd> pose_queue, tracking_error_queue,
+                                    Ky_hat_queue, ref_queue, Kr_hat_queue;
         Eigen::VectorXd pred_ut;
         // trained net predictor input tuple
         nn_controller::predictor pred_;
@@ -133,23 +144,34 @@ namespace amfc_control
         std::mutex net_loss_mutex, pred_mutex;
         bool updateNetLoss, updatePred;
 
+        /* The type of container used to hold the state vector */
+        using state = Eigen::Matrix<double, 3, 6>;
+
         void initMatrices()
         {   
-            m = 6; n = 3;
+            n = 3; m = 6; 
             Am.setIdentity(n, n);
-            Bm.setIdentity(n, m);
-            B.setIdentity(n, m);        //R^{n x m}
+            Bm.setZero(n, m);
+            B.setZero(n, m);        //R^{3 x 6}
             Gamma_y.setIdentity(n, n); //will be 3 X 3 matrix
             Gamma_r.setIdentity(n, n); //will be 3 X 3 matrix
             //Lambda models controlundertainties by an R^{nxn} diagonal matrix
             //with positive elements
-            Lambda.setIdentity(n, n);            
+            Lambda.setIdentity(m, m);            
             P.setIdentity(n, n); // R ^{n x n}
             expAmk.setIdentity(n, n);
 
             P *= -1705./2668; //-0.639055472264; //
             Am *= -1334./1705;
 
+            //initialize B so that we have the difference between voltages to each IAB
+            B(0,0) = 1; B(0, 1) = -1;
+            B(1,2) = 1; B(1, 3) = -1;
+            B(2,4) = 1; B(2, 5) = -1;
+            //initialize Bm so that we have the difference between voltages to each IAB
+            Bm(0,0) = 1; Bm(0, 1) = -1;
+            Bm(1,2) = 1; Bm(1, 3) = -1;
+            Bm(2,4) = 1; Bm(2, 5) = -1;
             pose_info.resize(3);
 
             //gamma scaling factor for adaptive gains
@@ -159,8 +181,10 @@ namespace amfc_control
             Gamma_r *= k;
 
             OUT("P Matrix: \n " << P);
+            OUT("\nAm Matrix: \n" << Am);
             OUT("\nB Matrix: \n" << B);
-            OUT("\nGamma_y Matrix: \n" << Gamma_y);
+            OUT("\nBm Matrix: \n" << Bm);
+            OUT("\nGamma_y Matrix: \n" << -Gamma_y);
             OUT("\nGamma_r Matrix: \n" << Gamma_r);
             OUT("\nref_ : \n" << ref_);
         }
@@ -176,9 +200,9 @@ namespace amfc_control
         void getRefTraj();
 
         /*compute control law
-        * Ky_hat will be 6x3, 
+        * Ky_hat_dot will be 6x3, 
         * pose_info will be 3x1
-        * Kr_hat will be 6x3
+        * Kr_hat_dot will be 6x3
         * ref_ will be 3x1
         * modelWights is \theta & will be 3x3
         * phi(x) will be lagged params 3x1
@@ -196,10 +220,6 @@ namespace amfc_control
         virtual bool configure_controller(
             nn_controller::controller::Request  &req,
             nn_controller::controller::Response  &res);
-        //error service
-        virtual bool configure_error(
-            nn_controller::amfcError::Request  &req,
-            nn_controller::amfcError::Response  &res);
         //predictor params for pretrained model
         virtual bool configure_predictor_params(
                 nn_controller::predictor_params::Request  &req,
