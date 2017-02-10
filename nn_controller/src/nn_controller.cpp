@@ -14,11 +14,13 @@ using namespace amfc_control;
 using namespace boost::numeric::odeint;
 
 //constructor
-Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref)
+Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool print)
 : n_(nc), ref_(ref), updatePoseInfo(false), updateController(false),
- updateWeights(false), print(false), counter(0), multicast_address("235.255.0.1")
+ updateWeights(false), print(print), counter(0), multicast_address("235.255.0.1")
 {	 		 
-	initMatrices();
+	initMatrices();	
+	ref_aug.resize(6);
+	ref_aug << ref_(0), ref_(1), ref_(2), 0, 0, 0;
 	pred_pub_ = n_.advertise<nn_controller::predictor>("/osa_pred", 10);
 	control_pub_ = n_.advertise<geometry_msgs::Twist>("/mannequine_head/u_valves", 100);
 }
@@ -157,7 +159,17 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
 	tracking_error.resize(3);
 	expAmk *= std::exp(-1334./1705*counter);
+	//we augment the ref_ matrix with 3x1 zero vector to make multiplication non-singular
+	// Eigen::vector<double, 6, 1> ref_aug;
+	// ref_aug << ref_(0), ref_(1), ref_(2), 0, 0, 0;
+	// ym_dot  = Am * pose_info + Bm * ref_aug;
 	ym = Bm * ref_ * expAmk;
+/*
+	//use boost ode solver
+	runge_kutta_dopri5<ym_state,double,ym_state,double,vector_space_algebra> ym_stepper;
+	ym_stepper.do_step([](const ym_state& x, ym_state& dxdt, const double t)->void{
+		dxdt = x;
+	}, ym_dot, 0.0, ym, 0.01);*/
 
 	//compute tracking error, e = y - y_m
 	tracking_error = pose_info - ym;
@@ -195,23 +207,27 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	}
 
 	//SEE HEADER FOR INFO ON SIZE OF MATRICES
-	u_control = (Ky_hat.transpose() * pose_info) + (Kr_hat.transpose() * ref_) + (pred);
+	u_control = (Ky_hat.transpose() * pose_info) + (Kr_hat.transpose() * ref_);// + (pred);
+	//take theabsolute value ofthe control law
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		this->u_control = u_control;
 		updateController = true;
 	}
 
-	OUT("\n pred: \n" 		 << pred);
-/*	OUT("\n ref_: \n" 		<< ref_.transpose());
-	OUT("\n y: \n" 			<< pose_info.transpose());*/
-	OUT("\n u^T: \n" 			<< u_control.transpose());
 
-	if(print){		
-		OUT("\nKy_hat_dot: \n" << Ky_hat_dot);
-		OUT("\nKr_hat_dot: \n" << Kr_hat_dot);
-		OUT("\ntracking_error: \n" << tracking_error.transpose());
-		OUT("\nControl Law: \n" << u_control.transpose());
+	if(print){	
+		OUT("\n pred: " 		 << pred.transpose());
+		OUT("ref : " << ref_.transpose());
+		OUT("u^T: " 			<< u_control.transpose());
+
+		OUT("ym_dot: " << ym_dot.transpose());
+		OUT("ym: " << ym.transpose());
+
+		// OUT("\nKy_hat_dot: \n" << Ky_hat_dot);
+		// OUT("\nKr_hat_dot: \n" << Kr_hat_dot);
+		OUT("tracking_error: " << tracking_error.transpose());
+		OUT("Control Law: " << u_control.transpose());
 	}
 
 	geometry_msgs::Twist u_valves;
@@ -270,6 +286,7 @@ int main(int argc, char** argv)
 { 
 	ros::init(argc, argv, "controller_node", ros::init_options::AnonymousName);
 	ros::NodeHandle n;
+	bool print;
 
 	Eigen::Vector3f ref;
 	// ref.resize(3);
@@ -282,6 +299,8 @@ int main(int argc, char** argv)
 		ref(0) = atof(argv[1]);    //ref z
 		ref(1) = atof(argv[2]);	  //ref pitch
 		ref(2) = atof(argv[3]);	  //ref yaw
+		if(argc>3)
+			print = true;
 	}
 	catch(std::exception& e){
 		e.what();
@@ -290,7 +309,7 @@ int main(int argc, char** argv)
 
 	Eigen::Vector3d refd;
 	refd = ref.cast<double>(); 
-	Controller c(n, refd);
+	Controller c(n, refd,print);
 
     ros::Subscriber sub_multi = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::ref_model_multisub, &c );
 	ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	

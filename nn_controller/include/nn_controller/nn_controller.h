@@ -118,7 +118,7 @@ namespace amfc_control
                         pose_info_delayed, 
                         pose_info_delta;  //from sensor
 
-        Eigen::MatrixXd expAmk, ym;         //reference model 
+        Eigen::MatrixXd expAmk, ym, ym_dot;         //reference model 
 
         /*Lambda is an unknown pos def symmetric matrix in R^{m x m}
         * matrix of
@@ -146,6 +146,9 @@ namespace amfc_control
 
         /* The type of container used to hold the state vector */
         using state = Eigen::Matrix<double, 3, 6>;
+        using ym_state = Eigen::Vector3d;
+        //we augment the ref_ matrix with 3x1 zero vector to make multiplication non-singular
+        Eigen::VectorXd ref_aug;
 
         void initMatrices()
         {   
@@ -165,13 +168,13 @@ namespace amfc_control
             Am *= -1334./1705;
 
             //initialize B so that we have the difference between voltages to each IAB
-            B(0,0) = 1; B(0, 1) = -1;
-            B(1,2) = 1; B(1, 3) = -1;
-            B(2,4) = 1; B(2, 5) = -1;
+            B(0,0) = 1; B(0, 1) = 64;
+            B(1,2) = 1; B(1, 3) = 64;
+            B(2,4) = 1; B(2, 5) = 1;
             //initialize Bm so that we have the difference between voltages to each IAB
-            Bm(0,0) = 1; Bm(0, 1) = -1;
-            Bm(1,2) = 1; Bm(1, 3) = -1;
-            Bm(2,4) = 1; Bm(2, 5) = -1;
+            Bm(0,0) = 1; Bm(0, 1) = 64;
+            Bm(1,2) = 1; Bm(1, 3) = 64;
+            Bm(2,4) = 1; Bm(2, 5) = 1;
             pose_info.resize(3);
 
             //gamma scaling factor for adaptive gains
@@ -179,6 +182,8 @@ namespace amfc_control
 
             Gamma_y *= k;
             Gamma_r *= k;
+
+            // Gamma_y(1, 1) *= -1; //this makes u1 (left_inlet dakota valve positive)
 
             OUT("P Matrix: \n " << P);
             OUT("\nAm Matrix: \n" << Am);
@@ -192,7 +197,7 @@ namespace amfc_control
     public:
         // Constructor.
         Controller(ros::NodeHandle nc, 
-                    const Eigen::Vector3d& ref);
+                    const Eigen::Vector3d& ref, bool print);
         Controller();
         // Destructor.
         virtual ~Controller();

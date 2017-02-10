@@ -272,10 +272,7 @@ local function main()
       local gradOutputs   = cost:backward(preds, targets)
       local gradInputs    = neunet:backward(inputs, gradOutputs) 
 
-
-      -- if loss < 300 then
-        model:updateParameters(5e-3)
-      -- end
+      model:updateParameters(5e-3)
 
       if iter % 2  == 0 then collectgarbage() end
        
