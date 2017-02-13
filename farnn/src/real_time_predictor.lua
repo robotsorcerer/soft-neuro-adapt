@@ -25,7 +25,8 @@ opt = {
   silent        = true,
   model         = 'lstm',
   real_time_net = true, --use real-time network approximator
-  hiddenSize    = {9, 5, 3},
+  hiddenSize    = {9, 6, 6},
+  seed          = 123,
   backend       = 'cunn',  --cudnn or cunn
   checkpoint    = 'network/data_fastlstm-net.t7'
 }
@@ -41,6 +42,7 @@ if paths.filep(filename)
 testlogger = optim.Logger(paths.concat('outputs' .. '/testlog.txt'))
 
 noutputs  = 6 --opt.noutputs
+torch.manualSeed(opt.seed)
 
 local function init()
   --GPU Settings -----------------------------------------------------------------------
@@ -82,7 +84,6 @@ local function init()
   end
 
   netmods = model.modules;
-  if opt.verbose then print('netmods: \n', netmods) end
   --------------------------------------------------------------------------------
   return cost, model
 end
@@ -122,6 +123,7 @@ local u_sub       = nh:subscribe("/mannequine_head/u_valves", controlSpec, 10, {
 --advertisers to nn_controller.cpp
 local pred_pub    = nh:advertise("/mannequine_pred/preds",    pred_spec, 100, false, connect_cb, disconnect_cb)
 local net_pub     = nh:advertise("mannequine_pred/net_weights", net_spec, 10)
+local bias_pub     = nh:advertise("mannequine_pred/net_biases", net_spec, 10)
 local loss_pub    = nh:advertise('/mannequine_pred/net_loss', loss_spec, 10)
 --messages for subscribe
 poseMsg, uMsg, inputs  = {}, {}, {}
@@ -190,14 +192,17 @@ local function netToMsg(model)
   br_weights = broadcast_weights:double()
   br_biases  = broadcast_biases:double()
 
+  print('br_weights: \n', br_weights)
+  print('br_biases: \n', br_biases)
   --[[concatenate the weights and biases before publishing
   --For recurrent modules,note that the first three columns 
   will be the weights while the last one 
   column will be the bias]]
   local netmsg = torch.cat({br_weights, br_biases}, 2)
 
-  params = tensorToMsg(netmsg)
-  return params
+  wgts_params = tensorToMsg(br_weights)
+  bias_params = tensorToMsg(br_biases)
+  return wgts_params, bias_params
 end
 
 --[[we need to strip the torch.typeTensor before
@@ -226,6 +231,11 @@ end
 local function main() 
   local epoch = 0
   local cost, model = init()
+  local params, gradParams = model:getParameters()
+  --initialize weight matrices from a normal randon distribution
+  params:copy(torch.randn(params:size()))
+  -- print('params', params)
+  -- sys.sleep(10)
   local pred_table = {}
 
   if(opt.real_time_net) then
@@ -255,9 +265,9 @@ local function main()
       targets[{{}, {2}}] = poseMsg.pitch
       targets[{{}, {3}}] = poseMsg.yaw 
       --augment the nontracted states with 0
-      targets[{{}, {4}}] = 0 
-      targets[{{}, {5}}] = 0
-      targets[{{}, {6}}] = 0 
+      targets[{{}, {4}}] = 1 
+      targets[{{}, {5}}] = 1
+      targets[{{}, {6}}] = 1 
 
       print('inputs: ', inputs)  
       -- print('targets: ', targets)  
@@ -277,9 +287,10 @@ local function main()
       if iter % 2  == 0 then collectgarbage() end
        
       if opt.verbose then
-        print('preds:'); print(tensorToNice(preds)); 
-        print('targets: '); print(tensorToNice(targets))
+        print('preds:', tensorToNice(preds)); 
+        print('targets: ', tensorToNice(targets))
         print('loss: ', loss)
+        -- print('out: ', br_weights --[[* inputs + br_biases]])
       end
       testlogger:add{loss}
 
@@ -293,12 +304,13 @@ local function main()
       --serialize loss msgs
       loss_msg.data = loss
       --publish net weights
-      local params     = netToMsg(model)
+      local wgts_params, bias_params  = netToMsg(model)
 
       --publish all the messages
       pred_pub:publish(pred_msg)
       loss_pub:publish(loss_msg)
-      net_pub:publish(params)
+      net_pub:publish(wgts_params)
+      bias_pub:publish(bias_params)
 
       iter = iter + 1     
     end

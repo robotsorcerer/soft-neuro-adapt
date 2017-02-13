@@ -80,8 +80,13 @@ namespace amfc_control
     private:
         //these from /vicon/headtwist topic
         geometry_msgs::Vector3 linear, angular;
-        std::mutex mutex, pose_mutex, weights_mutex;
-        bool updatePoseInfo, print, updateController, updateWeights;
+        std::mutex mutex, pose_mutex, weights_mutex, biases_mutex;
+        bool updatePoseInfo, print, updateController, updateWeights, 
+             updateBiases, resetController;
+        //useSigma adapts the controllaw nased on 
+        //sigma modifiocation
+        bool useSigma;
+        double sigma_y, sigma_r;
         //these are ref model params
         Eigen::VectorXd tracking_error, 
                         tracking_error_delayed, 
@@ -89,7 +94,7 @@ namespace amfc_control
         std::chrono::time_point<std::chrono::high_resolution_clock> start, now;
         ros::NodeHandle n_;
         ros::Publisher pub, pred_pub_, control_pub_;
-        double k;
+        double k, dt;
         int m, n;
         unsigned counter;
         /* @brief P is symmetric positive definite matrix obtained from the lyapunov functiuon Q
@@ -116,9 +121,12 @@ namespace amfc_control
                       Ky_hat_delta, Kr_hat_delta; 
         Eigen::VectorXd pose_info, 
                         pose_info_delayed, 
-                        pose_info_delta;  //from sensor
-
-        Eigen::MatrixXd expAmk, ym, ym_dot;         //reference model 
+                        pose_info_delta;        //from sensor
+        //reference model output, ref_model differential and final value of ref
+        //model integral
+        Eigen::Vector3d ym, ym_dot, ym_int;     
+        //reference model  and integration term
+        Eigen::MatrixXd expAmk, expAmk_tau;              
 
         /*Lambda is an unknown pos def symmetric matrix in R^{m x m}
         * matrix of
@@ -134,8 +142,8 @@ namespace amfc_control
         // trained net predictor input tuple
         nn_controller::predictor pred_;
         //neural net  pre-trained weights
-        Eigen::Matrix<double, 3, 3> modelWeights;
-        Eigen::Vector3d modelBiases;
+        Eigen::Matrix<double, 6, 6> modelWeights;
+        Eigen::VectorXd modelBiases;
 
         boost::asio::io_service io_service;
         const std::string multicast_address;
@@ -149,12 +157,15 @@ namespace amfc_control
         using ym_state = Eigen::Vector3d;
         //we augment the ref_ matrix with 3x1 zero vector to make multiplication non-singular
         Eigen::VectorXd ref_aug;
+        Eigen::Matrix<double, 6,6> idealModelWeights;
+        Eigen::VectorXd idealBiases;
+        Eigen::VectorXd guessControl;
 
         void initMatrices()
         {   
             n = 3; m = 6; 
             Am.setIdentity(n, n);
-            Bm.setZero(n, m);
+            Bm.setIdentity(n, n);       //note from B*Lambda*Kr^T
             B.setZero(n, m);        //R^{3 x 6}
             Gamma_y.setIdentity(n, n); //will be 3 X 3 matrix
             Gamma_r.setIdentity(n, n); //will be 3 X 3 matrix
@@ -163,19 +174,23 @@ namespace amfc_control
             Lambda.setIdentity(m, m);            
             P.setIdentity(n, n); // R ^{n x n}
             expAmk.setIdentity(n, n);
+            expAmk_tau.setIdentity(n,n);
 
-            P *= -1705./2668; //-0.639055472264; //
+            modelBiases.resize(6);
+
+            P *= -11503./180; //-1705./2668; //
             Am *= -1334./1705;
 
             //initialize B so that we have the difference between voltages to each IAB
             B(0,0) = 1; B(0, 1) = 64;
             B(1,2) = 1; B(1, 3) = 64;
             B(2,4) = 1; B(2, 5) = 1;
-            //initialize Bm so that we have the difference between voltages to each IAB
-            Bm(0,0) = 1; Bm(0, 1) = 64;
-            Bm(1,2) = 1; Bm(1, 3) = 64;
-            Bm(2,4) = 1; Bm(2, 5) = 1;
+
             pose_info.resize(3);
+
+            //initialize y_m based on expected value of y
+            ym << 190.898196896, 17.3539236916, 
+                  34.7293864688;
 
             //gamma scaling factor for adaptive gains
             k = 1e-6;
@@ -183,21 +198,36 @@ namespace amfc_control
             Gamma_y *= k;
             Gamma_r *= k;
 
-            // Gamma_y(1, 1) *= -1; //this makes u1 (left_inlet dakota valve positive)
+            /*Initialize weights from previously trained model to usebefore
+            we converge in the online approximator*/
+            idealModelWeights << 3.7133e+01, -1.4934e+00,  3.8134e+01,
+                                 2.9362e+01, -3.4522e+01, -3.3090e+01,
+                                 1.7951e+00, -1.7639e-01,  2.4107e+00,  
+                                 2.7318e+00, -3.7043e+00, -1.1980e+00,
+                                 7.1878e+00, -1.3644e+00,  6.5950e+00,  
+                                 5.8266e+00, -6.5263e+00, -8.3548e+00,
+                                 3.9877e-01,  1.0487e+00, -2.2137e-01,  
+                                 6.7413e-01,  8.9013e-04, -2.7893e-01,
+                                 1.0266e+00,  3.7444e+00,  1.4412e+00,  
+                                 7.9007e-01,  9.8485e-01,  5.4271e-01,
+                                 8.4146e-01, -6.5101e-01,  9.8610e-01, 
+                                 -3.1613e-01, -6.4775e-01, -2.3919e-01;
+            idealBiases.resize(6);
+            idealBiases << 54.3523, 1.1706, 10.6537,  0.1493, -0.2866, -0.8298;
 
-            OUT("P Matrix: \n " << P);
-            OUT("\nAm Matrix: \n" << Am);
-            OUT("\nB Matrix: \n" << B);
-            OUT("\nBm Matrix: \n" << Bm);
-            OUT("\nGamma_y Matrix: \n" << -Gamma_y);
-            OUT("\nGamma_r Matrix: \n" << Gamma_r);
-            OUT("\nref_ : \n" << ref_);
+            //control law that will be used in first iteration
+            guessControl.resize(6);
+            guessControl << 0.85, 200, 0.75, 263, 0.53, 0.86;
+
+            //initialize Kr_hat and Ky_hat to dummy values for sigma modification
+            Kr_hat.setIdentity(n,m);
+            Ky_hat.setIdentity(n,m);
         }
 
     public:
         // Constructor.
         Controller(ros::NodeHandle nc, 
-                    const Eigen::Vector3d& ref, bool print);
+                    const Eigen::Vector3d& ref, bool print, bool useSigma);
         Controller();
         // Destructor.
         virtual ~Controller();
@@ -231,9 +261,9 @@ namespace amfc_control
                 nn_controller::predictor_params::Response  &res);
         void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
         ros::Time getTime();
-        //subscribe to the reference model parameters
-        // virtual void ref_model_subscriber(const std_msgs::String::ConstPtr& ref_model_params);
-        virtual void ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params);        
+        //subscribe to the weights and biases params
+        virtual void weights_sub(const std_msgs::Float64MultiArray::ConstPtr& weights_sub);  
+        virtual void bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params);       
         virtual void pose_subscriber(const ensenso::HeadPose& headPose);
     };
 }

@@ -7,6 +7,7 @@
 #include <std_msgs/Float64MultiArray.h>
 #include "nn_controller/nn_controller.h"
 
+#include <boost/numeric/odeint/stepper/runge_kutta4.hpp>
 #include <boost/numeric/odeint/stepper/runge_kutta_dopri5.hpp>
 #include <boost/numeric/odeint/algebra/vector_space_algebra.hpp>
 
@@ -14,11 +15,15 @@ using namespace amfc_control;
 using namespace boost::numeric::odeint;
 
 //constructor
-Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool print)
-: n_(nc), ref_(ref), updatePoseInfo(false), updateController(false),
- updateWeights(false), print(print), counter(0), multicast_address("235.255.0.1")
+Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool print,
+						bool useSigma)
+: n_(nc), ref_(ref), updatePoseInfo(false), updateController(false), useSigma(useSigma),
+  resetController(false), updateWeights(false), print(print), counter(0), 
+  multicast_address("235.255.0.1")
 {	 		 
 	initMatrices();	
+	sigma_y = 0.01;
+	sigma_r = 0.01;
 	ref_aug.resize(6);
 	ref_aug << ref_(0), ref_(1), ref_(2), 0, 0, 0;
 	pred_pub_ = n_.advertise<nn_controller::predictor>("/osa_pred", 10);
@@ -54,35 +59,43 @@ void Controller::pose_subscriber(const ensenso::HeadPose& headPose)
 	updatePoseInfo  = true;		
 }
 
-//net subscriber from sample.lua in RAL/farnn
-void Controller::ref_model_multisub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params)
+void Controller::bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params)
+{
+	std::vector<double> model_params = bias_params->data;
+	Eigen::VectorXd modelBiases;
+	modelBiases.resize(6);
+
+	std::lock_guard<std::mutex> biases_lock(biases_mutex);
+	for(auto i = 0; i < 6; ++i){
+		modelBiases(i) = model_params[i];
+	}
+
+	this->modelBiases  = modelBiases;
+	updateBiases	   = true;
+
+	// OUT("modelBiases: " << modelBiases.transpose());
+}
+
+//net weights subscriber from sample.lua in RAL/farnn
+void Controller::weights_sub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params)
 {
 	std::vector<double> model_params = ref_model_params->data;
 
 	//retrieve the pre-trained weights and biases 
-	Eigen::Matrix<double, 3, 3> modelWeights;
-	Eigen::Vector3d modelBiases;
+	Eigen::Matrix<double, 6, 6> modelWeights;
 	std::lock_guard<std::mutex> weights_lock(weights_mutex);
-	{	
-		modelWeights(0,0) = model_params[0];
-		modelWeights(0,1) = model_params[1];
-		modelWeights(0,2) = model_params[2];
-		modelWeights(1,0) = model_params[4];
-		modelWeights(1,1) = model_params[5];
-		modelWeights(1,2) = model_params[6];
-		modelWeights(2,0) = model_params[8];
-		modelWeights(2,1) = model_params[9];
-		modelWeights(2,2) = model_params[10];
-
-		modelBiases(0)	  = model_params[3];
-		modelBiases(1)	  = model_params[7];
-		modelBiases(2)	  = model_params[11];
-
-		this->modelWeights = modelWeights;
-		this->modelBiases  = modelBiases;
-
-		updateWeights = true;
+	int k = 0;
+	for(auto i = 0; i < 6; ++i){
+		for(auto j = 0; j < 6; ++j){
+			modelWeights(i,j) = model_params[k];
+			++k;
+		}
 	}
+
+	this->modelWeights = modelWeights;
+	updateWeights = true;
+
+	// OUT("modelWeights: " << modelWeights);
 }
 
 
@@ -117,11 +130,6 @@ bool Controller::configure_predictor_params(
 		updatePoseInfo = false;
 	}
 
-	// pose_info << headPose.z,// 1,  		//roll to zero
-	// 			 headPose.pitch, headPose.yaw;   //setting roll to zero
-	// res.header.seq = counter;
-	// res.header.stamp = getTime();
-	// res.header.frame_id = "net_predictor_input";
 	res.u1 		=	u_control_local(0);
 	res.u2 		=	u_control_local(1);
 	res.u3		=	u_control_local(2);
@@ -132,8 +140,6 @@ bool Controller::configure_predictor_params(
 	res.z		=	pose_info(0);
 	res.pitch	=	pose_info(1);
 	res.yaw		=	pose_info(2);
-
-	OUT("\npose_info: " << pose_info);
 
 	return true;
 }
@@ -158,35 +164,34 @@ void Controller::loss_subscriber(const std_msgs::Float64& net_loss)
 void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
 	tracking_error.resize(3);
-	expAmk *= std::exp(-1334./1705*counter);
-	//we augment the ref_ matrix with 3x1 zero vector to make multiplication non-singular
-	// Eigen::vector<double, 6, 1> ref_aug;
-	// ref_aug << ref_(0), ref_(1), ref_(2), 0, 0, 0;
-	// ym_dot  = Am * pose_info + Bm * ref_aug;
-	ym = Bm * ref_ * expAmk;
-/*
-	//use boost ode solver
-	runge_kutta_dopri5<ym_state,double,ym_state,double,vector_space_algebra> ym_stepper;
-	ym_stepper.do_step([](const ym_state& x, ym_state& dxdt, const double t)->void{
-		dxdt = x;
-	}, ym_dot, 0.0, ym, 0.01);*/
-
+	expAmk *= std::exp(-1334./1705*counter);	
+	//Bm is initialized to identity
+	ym = Bm * ref_ * expAmk;  //take laplace transform of ref model
 	//compute tracking error, e = y - y_m
 	tracking_error = pose_info - ym;
-	Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B;
-	Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B;
+	if(useSigma){		
+		Ky_hat_dot = -Gamma_y * ((pose_info * tracking_error.transpose() * P * B) +
+								 (sigma_y * Ky_hat));
+		Kr_hat_dot = -Gamma_r * ((ref_      * tracking_error.transpose() * P * B) +
+								 (sigma_r * Kr_hat));
+
+	}else{
+		Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B;
+		Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B;
+	}
 
 	//use boost ode solver
 	runge_kutta_dopri5<state,double,state,double,vector_space_algebra> stepper;
 	//use reference for the derivative
 	stepper.do_step([](const state& x, state & dxdt, const double t)->void{
 		dxdt = x;
-	}, Ky_hat_dot, 0.0, Ky_hat, 0.01);
+	}, Ky_hat_dot, counter, Ky_hat, 0.01);
 	//integrate Ky_hat_dot
 	stepper.do_step([](const state& x, state & dxdt, const double t)->void{
 		dxdt = x;
-	}, Kr_hat_dot, 0.0, Kr_hat, 0.01);
-
+	}, Kr_hat_dot, counter, Kr_hat, 0.01);
+	//will be [3x1]. We are integrating the second part of the rhs soln to the 
+	//linear ref_ model
 	//retrieve net predictions
 	Eigen::VectorXd pred;
 	pred.resize(6);
@@ -206,29 +211,63 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		loss = this->loss;
 	}
 
-	//SEE HEADER FOR INFO ON SIZE OF MATRICES
-	u_control = (Ky_hat.transpose() * pose_info) + (Kr_hat.transpose() * ref_);// + (pred);
-	//take theabsolute value ofthe control law
+	//Get model biases and weights in real time
+	//get weights
+	Eigen::Matrix<double, 6, 6> modelWeights;
+	if(updateWeights){
+		std::lock_guard<std::mutex> weights_lock (weights_mutex);
+		modelWeights = this->modelWeights;
+		updateWeights = false;
+	}
+	//get biases
+	Eigen::VectorXd modelBiases;
+	modelBiases.resize(6);
+	if(updateBiases)
 	{
-		std::lock_guard<std::mutex> lock(mutex);
-		this->u_control = u_control;
-		updateController = true;
+		std::lock_guard<std::mutex> biases_lock (biases_mutex);
+		modelBiases = this->modelBiases;
+		updateBiases = false;
 	}
 
+	u_control = (Ky_hat.transpose() * pose_info) + 
+				(Kr_hat.transpose() * ref_) + 
+				idealModelWeights * guessControl * idealBiases;
+	if(resetController)
+	{
+/*		//form lagged vector
+		Eigen::VectorXd laggedVector;
+		laggedVector.resize(6);
+
+		laggedVector << pose_info(0), pose_info(1), pose_info(2),
+						u_control(0) - u_control(1),
+						u_control(2) - u_control(3), 
+						u_control(4) - u_control(5);
+		//calculate network out	
+		pred.resize(6); //will be regressor vector from neural network
+		pred = modelWeights*laggedVector+modelBiases;
+
+*/		u_control = (Ky_hat.transpose() * pose_info) + (Kr_hat.transpose() * ref_) + (pred);
+	}
+	std::lock_guard<std::mutex> lock(mutex);
+	this->u_control = u_control;
 
 	if(print){	
-		OUT("\n pred: " 		 << pred.transpose());
-		OUT("ref : " << ref_.transpose());
-		OUT("u^T: " 			<< u_control.transpose());
+		OUT("\npred: " 		 << pred.transpose());
+		// OUT("ref : " << ref_.transpose());
+		// OUT("u^T: " 			<< u_control.transpose());
 
-		OUT("ym_dot: " << ym_dot.transpose());
+		// OUT("Bm: " << Bm);
+		// OUT("ym_dot: " << ym_dot.transpose());
 		OUT("ym: " << ym.transpose());
 
-		// OUT("\nKy_hat_dot: \n" << Ky_hat_dot);
-		// OUT("\nKr_hat_dot: \n" << Kr_hat_dot);
+		// // OUT("Ky_hat_dot: " << Ky_hat_dot);
+		// OUT("Ky_hat		: " << Ky_hat);
+		// OUT("Kr_hat: " << Kr_hat);
+
 		OUT("tracking_error: " << tracking_error.transpose());
 		OUT("Control Law: " << u_control.transpose());
 	}
+	resetController = true;
 
 	geometry_msgs::Twist u_valves;
 	u_valves.linear.x  = u_control(0);
@@ -245,10 +284,10 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	//fallback since rosrio is messing up
 	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), 
 	        	  u_valves, ref_, eig2Pose);
-
 	++counter;
 }
 
+//currently unused
 bool Controller::configure_controller(
 	nn_controller::controller::Request  &req,
 	nn_controller::controller::Response  &res)
@@ -286,7 +325,8 @@ int main(int argc, char** argv)
 { 
 	ros::init(argc, argv, "controller_node", ros::init_options::AnonymousName);
 	ros::NodeHandle n;
-	bool print;
+	bool print = false;
+	bool useSigma(false);
 
 	Eigen::Vector3f ref;
 	// ref.resize(3);
@@ -299,8 +339,10 @@ int main(int argc, char** argv)
 		ref(0) = atof(argv[1]);    //ref z
 		ref(1) = atof(argv[2]);	  //ref pitch
 		ref(2) = atof(argv[3]);	  //ref yaw
-		if(argc>3)
+		if(atoi(argv[4]) == 1)
 			print = true;
+		if(atoi(argv[5]) == 1)
+			useSigma = true;
 	}
 	catch(std::exception& e){
 		e.what();
@@ -309,19 +351,16 @@ int main(int argc, char** argv)
 
 	Eigen::Vector3d refd;
 	refd = ref.cast<double>(); 
-	Controller c(n, refd,print);
+	Controller c(n, refd,print, useSigma);
 
-    ros::Subscriber sub_multi = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::ref_model_multisub, &c );
+    ros::Subscriber sub_weights = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::weights_sub, &c );
+    ros::Subscriber sub_bias  = n.subscribe("/mannequine_pred/net_biases", 100, &Controller::bias_sub, &c);
 	ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
 	//subscribe to real -time predictor parameters
 	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::pred_subscriber, &c);
 	ros::Subscriber sub_loss = n.subscribe("/mannequine_pred/net_loss", 100, &Controller::loss_subscriber, &c);
 	ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", 
 										&Controller::configure_controller, &c);
-	//not working
-	// ros::ServiceServer pred_serv = n.advertiseService("/mannequine_head/predictor_params", 
-										// &Controller::configure_predictor_params, &c);
-
 	ros::spin();
 
 	ros::shutdown();
