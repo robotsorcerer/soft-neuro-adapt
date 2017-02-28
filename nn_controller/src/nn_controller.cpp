@@ -1,5 +1,6 @@
 
 #include <string>
+#include <fstream>
 #include <exception>
 #include <std_msgs/String.h>
 #include <ensenso/HeadPose.h>
@@ -16,24 +17,21 @@ using namespace boost::numeric::odeint;
 
 //constructor
 Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool print,
-						bool useSigma)
+						bool useSigma, bool save)
 : n_(nc), ref_(ref), updatePoseInfo(false), updateController(false), useSigma(useSigma),
-  resetController(false), updateWeights(false), print(print), counter(0), 
+  save(save), resetController(false), updateWeights(false), print(print), counter(0), 
   multicast_address("235.255.0.1")
 {	 		 
 	initMatrices();	
 	sigma_y = 0.01;
 	sigma_r = 0.01;
-	ref_aug.resize(6);
-	ref_aug << ref_(0), ref_(1), ref_(2), 0, 0, 0;
-	pred_pub_ = n_.advertise<nn_controller::predictor>("/osa_pred", 10);
 	control_pub_ = n_.advertise<geometry_msgs::Twist>("/mannequine_head/u_valves", 100);
 }
 
 //copy constructor
 Controller::Controller()
 {
-	start = std::chrono::high_resolution_clock::now();
+
 }
 
 // Destructor.
@@ -103,7 +101,7 @@ void Controller::getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd 
 {
 	pose_info << //headPose.x, headPose.y,
 				 headPose.z,// 1,  		//roll to zero
-				 headPose.pitch, headPose.yaw;   //setting roll to zero
+				 headPose.pitch, headPose.roll; //headPose.yaw;   //setting roll to zero
 	//set ref's non-controlled states to measurement
 	ControllerParams(std::move(pose_info));
 }
@@ -144,13 +142,14 @@ bool Controller::configure_predictor_params(
 	return true;
 }
 
-void Controller::pred_subscriber(const geometry_msgs::Point& pred)
+void Controller::pred_subscriber(const geometry_msgs::Pose& pred)
 {
 	std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
 	this->pred.resize(6);
 
-	this->pred << pred.x, pred.y, pred.z,
-					0,		0,		0;
+	this->pred << pred.position.x, pred.position.y, pred.position.z,
+				  pred.orientation.x, pred.orientation.y, pred.orientation.z;
+
 	updatePred = true;
 }
 
@@ -164,20 +163,23 @@ void Controller::loss_subscriber(const std_msgs::Float64& net_loss)
 void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
 	tracking_error.resize(3);
-	expAmk *= std::exp(-1334./1705*counter);	
+	expAmk *= std::exp(Am(0,0)*counter);	
 	//Bm is initialized to identity
-	ym = Bm * ref_ * expAmk;  //take laplace transform of ref model
+	ym = Bm * expAmk * ref_ ;  //take laplace transform of ref model
 	//compute tracking error, e = y - y_m
 	tracking_error = pose_info - ym;
-	if(useSigma){		
-		Ky_hat_dot = -Gamma_y * ((pose_info * tracking_error.transpose() * P * B) +
-								 (sigma_y * Ky_hat));
-		Kr_hat_dot = -Gamma_r * ((ref_      * tracking_error.transpose() * P * B) +
-								 (sigma_r * Kr_hat));
 
-	}else{
-		Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B;
-		Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B;
+	if(useSigma){		
+		Ky_hat_dot = -Gamma_y * ((pose_info * tracking_error.transpose() * P * B * sgnLambda) +
+								 (sigma_y * Ky_hat));
+		Kr_hat_dot = -Gamma_r * ((ref_      * tracking_error.transpose() * P * B * sgnLambda) +
+								 (sigma_r * Kr_hat));
+		OUT("\nWith sigma modification");
+	}
+	else{
+		OUT("\nWithout sigma modification")
+		Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
+		Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
 	}
 
 	//use boost ode solver
@@ -195,20 +197,17 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	//retrieve net predictions
 	Eigen::VectorXd pred;
 	pred.resize(6);
-	if(updatePred)
+	if(!updatePred)
+	{
+		pred << pose_info(0), pose_info(0), 
+				pose_info(1), pose_info(1),
+				pose_info(2), pose_info(2);
+	}
+	else
 	{
 		std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
 		updatePred = false;
 		pred = this->pred;
-	}
-
-	//retrieve predictor loss
-	double loss;
-	if(updateNetLoss)
-	{
-		std::lock_guard<std::mutex> net_loss_locker(net_loss_mutex);
-		updateNetLoss = false;
-		loss = this->loss;
 	}
 
 	//Get model biases and weights in real time
@@ -229,45 +228,57 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		updateBiases = false;
 	}
 
-	u_control = (Ky_hat.transpose() * pose_info) + 
-				(Kr_hat.transpose() * ref_) + 
-				idealModelWeights * guessControl * idealBiases;
-	if(resetController)
-	{
-/*		//form lagged vector
-		Eigen::VectorXd laggedVector;
-		laggedVector.resize(6);
+	/*
+	* Calculate Control Law
+	*/
+	Eigen::VectorXd laggedVector;
+	laggedVector.resize(6);
+	// laggedVector << pose_info(0), pose_info(1), pose_info(2),
+	// 				u_control(0) - u_control(1),
+	// 				u_control(2) - u_control(3), 
+	// 				u_control(4) - u_control(5);
+	//calculate network out	
+	Eigen::VectorXd wgtsPred;
+	wgtsPred.resize(6); //will be regressor vector from neural network
+	// wgtsPred = modelWeights*laggedVector+modelBiases;
 
-		laggedVector << pose_info(0), pose_info(1), pose_info(2),
-						u_control(0) - u_control(1),
-						u_control(2) - u_control(3), 
-						u_control(4) - u_control(5);
-		//calculate network out	
-		pred.resize(6); //will be regressor vector from neural network
-		pred = modelWeights*laggedVector+modelBiases;
+	// if((pred(0) || pred(1) || pred(2) || pred(3) || pred(4) || pred(5)) > 100){
+	// 	u_control = (Ky_hat.transpose() * pose_info) + 
+	// 				(Kr_hat.transpose() * ref_);
+	// }
+	// else{	
+		OUT("With Net Error");	
+		u_control = (Ky_hat.transpose() * pose_info) + 
+					(Kr_hat.transpose() * ref_)  + pred; // + wgtsPred;  //
+	// }
 
-*/		u_control = (Ky_hat.transpose() * pose_info) + (Kr_hat.transpose() * ref_) + (pred);
-	}
+	u_control = u_control.cwiseAbs();
 	std::lock_guard<std::mutex> lock(mutex);
-	this->u_control = u_control;
+	{
+		this->u_control = u_control;
+	}
 
-	if(print){	
-		OUT("\npred: " 		 << pred.transpose());
-		// OUT("ref : " << ref_.transpose());
-		// OUT("u^T: " 			<< u_control.transpose());
-
-		// OUT("Bm: " << Bm);
-		// OUT("ym_dot: " << ym_dot.transpose());
-		OUT("ym: " << ym.transpose());
-
-		// // OUT("Ky_hat_dot: " << Ky_hat_dot);
-		// OUT("Ky_hat		: " << Ky_hat);
-		// OUT("Kr_hat: " << Kr_hat);
+	if(print)
+	{	
+		OUT("ref_: " 			<< ref_.transpose());
+		OUT("pose: " 		 << pose_info.transpose());
+		OUT("pred: " << pred.transpose());
 
 		OUT("tracking_error: " << tracking_error.transpose());
 		OUT("Control Law: " << u_control.transpose());
+		// OUT("u w/o net: " << ((Ky_hat.transpose() * pose_info) + 
+		// 			(Kr_hat.transpose() * ref_)).transpose());
 	}
 	resetController = true;
+
+	if(save)
+	{
+		std::ofstream midface;
+		midface.open("ref_pose.csv", std::ofstream::out | std::ofstream::app);
+		midface << ref_(0) <<"\t" <<ref_(1) << "\t" << ref_(2) << "\t" <<
+				pose_info(0) <<"\t" <<pose_info(1) << "\t" << pose_info(2) << "\n"; 
+		midface.close();
+	}
 
 	geometry_msgs::Twist u_valves;
 	u_valves.linear.x  = u_control(0);
@@ -308,28 +319,33 @@ bool Controller::configure_controller(
 
 	return true;
 }
+
 void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, ensenso::HeadPose& eig2Pose)
 {
     eig2Pose.z = pose_info(0);
     eig2Pose.pitch = pose_info(1);
-    eig2Pose.yaw = pose_info(2);
+    eig2Pose.roll = pose_info(2);
 }
 
 void help()
 {
 	OUT("\t\tAdd the 3DOF desired trajectory separated by a single space");
-	OUT("\t\tLike so: rosrun nn_controller nn_controller <z> <pitch> <yaw>");
+	OUT("\t\tLike so: rosrun nn_controller nn_controller <z> <pitch> <yaw>" << 
+			 "\t\t[<print> <useSigma> <save>]");
+	OUT("\t\twhere the last three arguments are optional");
+	OUT("\t\tto print, use \"1\" in place of <print> etc");
 }
 
 int main(int argc, char** argv)
 { 
 	ros::init(argc, argv, "controller_node", ros::init_options::AnonymousName);
 	ros::NodeHandle n;
-	bool print = false;
-	bool useSigma(false);
+	bool print(false), useSigma(false), save(false);
+
+	help();
 
 	Eigen::Vector3f ref;
-	// ref.resize(3);
+	ref.resize(3);
 	if(argc < 2)
 	{
 		help();
@@ -337,12 +353,14 @@ int main(int argc, char** argv)
 	} 
 	try{		
 		ref(0) = atof(argv[1]);    //ref z
-		ref(1) = atof(argv[2]);	  //ref pitch
-		ref(2) = atof(argv[3]);	  //ref yaw
+		ref(1) = atof(argv[2]);	   //ref pitch
+		ref(2) = atof(argv[3]);	   //ref yaw
 		if(atoi(argv[4]) == 1)
 			print = true;
 		if(atoi(argv[5]) == 1)
-			useSigma = true;
+			useSigma = false;
+		if(atoi(argv[6]) == 1)
+			save = true;
 	}
 	catch(std::exception& e){
 		e.what();
@@ -351,7 +369,7 @@ int main(int argc, char** argv)
 
 	Eigen::Vector3d refd;
 	refd = ref.cast<double>(); 
-	Controller c(n, refd,print, useSigma);
+	Controller c(n, refd,print, useSigma, save);
 
     ros::Subscriber sub_weights = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::weights_sub, &c );
     ros::Subscriber sub_bias  = n.subscribe("/mannequine_pred/net_biases", 100, &Controller::bias_sub, &c);

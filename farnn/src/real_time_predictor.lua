@@ -23,6 +23,7 @@ opt = {
   verbose       = true,
   maxIter       = 20,
   silent        = true,
+  squash        = false,
   model         = 'lstm',
   real_time_net = true, --use real-time network approximator
   hiddenSize    = {9, 6, 6},
@@ -113,7 +114,7 @@ spinner:start()
 nh          = ros.NodeHandle()
 poseSpec    = ros.MsgSpec('ensenso/HeadPose')
 controlSpec = ros.MsgSpec('geometry_msgs/Twist')
-pred_spec   = ros.MsgSpec('geometry_msgs/Point')
+pred_spec   = ros.MsgSpec('geometry_msgs/Pose')
 loss_spec   = ros.MsgSpec('std_msgs/Float64')
 net_spec    = ros.MsgSpec('std_msgs/Float64MultiArray')
 
@@ -134,7 +135,8 @@ loss_msg = ros.Message(loss_spec)
 --callbacks
 pose_subscriber:registerCallback(function(msg, header)
   -- print('\nheadPose: \n', msg)
-  poseMsg.z = msg.z; poseMsg.pitch = msg.pitch; poseMsg.yaw = msg.yaw;
+  poseMsg.z = msg.z; poseMsg.pitch = msg.pitch; poseMsg.roll = msg.roll; 
+                      poseMsg.yaw = msg.yaw;
 end)
 
 u_sub:registerCallback(function(msg, header)
@@ -192,8 +194,8 @@ local function netToMsg(model)
   br_weights = broadcast_weights:double()
   br_biases  = broadcast_biases:double()
 
-  print('br_weights: \n', br_weights)
-  print('br_biases: \n', br_biases)
+  -- print('br_weights: \n', br_weights)
+  -- print('br_biases: \n', br_biases)
   --[[concatenate the weights and biases before publishing
   --For recurrent modules,note that the first three columns 
   will be the weights while the last one 
@@ -228,13 +230,27 @@ local tensorToNice = function(vec)
     return table.concat(t, '  ')
 end
 
+--construct sigmoiud function to squash network outputs to range of valves
+sigmoid = nn.Sequential()
+sigmoid:add(nn.Linear(1, 1))
+sigmoid:add(nn.Sigmoid())
+
+local function squash_sigmoid(x)
+  local xx = torch.DoubleTensor(1):fill(x)
+  local res = sigmoid:forward(xx)
+  -- print('xx: ', xx, 'res: ', res)
+  return res
+end
+
+
 local function main() 
   local epoch = 0
   local cost, model = init()
   local params, gradParams = model:getParameters()
+  print('params', params:size())
+  print('gradParams', gradParams:size())
   --initialize weight matrices from a normal randon distribution
   params:copy(torch.randn(params:size()))
-  -- print('params', params)
   -- sys.sleep(10)
   local pred_table = {}
 
@@ -260,16 +276,20 @@ local function main()
       inputs[{{},{4}}] = uMsg.u4
       inputs[{{},{5}}] = uMsg.u5
       inputs[{{},{6}}] = uMsg.u6
+      inputs[{{},{7}}] = poseMsg.z
+      inputs[{{},{8}}] = poseMsg.pitch
+      inputs[{{},{9}}] = poseMsg.roll
 
       targets[{{}, {1}}] = poseMsg.z 
-      targets[{{}, {2}}] = poseMsg.pitch
-      targets[{{}, {3}}] = poseMsg.yaw 
+      targets[{{}, {2}}] = poseMsg.z
+      targets[{{}, {3}}] = poseMsg.pitch
       --augment the nontracted states with 0
-      targets[{{}, {4}}] = 1 
-      targets[{{}, {5}}] = 1
-      targets[{{}, {6}}] = 1 
+      targets[{{}, {4}}] = poseMsg.pitch
+      targets[{{}, {5}}] = poseMsg.roll
 
-      print('inputs: ', inputs)  
+      targets[{{}, {6}}] = poseMsg.roll
+
+      -- print('inputs: ', inputs)  
       -- print('targets: ', targets)  
 
       if opt.real_time_net then
@@ -285,21 +305,34 @@ local function main()
       model:updateParameters(5e-3)
 
       if iter % 2  == 0 then collectgarbage() end
-       
-      if opt.verbose then
-        print('preds:', tensorToNice(preds)); 
-        print('targets: ', tensorToNice(targets))
-        print('loss: ', loss)
-        -- print('out: ', br_weights --[[* inputs + br_biases]])
-      end
+      
+
       testlogger:add{loss}
 
       --populate msgs for ros publishers
       --serialize preds msg
+
       pred_table = dump(preds)
-      pred_msg.x = pred_table[1]
-      pred_msg.y = pred_table[2]
-      pred_msg.z = pred_table[3]
+      --squash dakota valve inputs to 0 and 1 duty cycle
+      if(squash) then
+        pred_table[1] = dump(squash_sigmoid(pred_table[1]))[1]
+        pred_table[3] = dump(squash_sigmoid(pred_table[3]))[1]
+        pred_table[5] = dump(squash_sigmoid(pred_table[5]))[1]
+        pred_table[6] = dump(squash_sigmoid(pred_table[6]))[1]
+      end
+
+      pred_msg.position.x = pred_table[1]
+      pred_msg.position.y = pred_table[2]
+      pred_msg.position.z = pred_table[3]
+      pred_msg.orientation.x = pred_table[4]
+      pred_msg.orientation.y = pred_table[5]
+      pred_msg.orientation.z = pred_table[6]
+
+      if opt.verbose then
+        print('preds:', pred_msg); 
+        print('targets: ', tensorToNice(targets))
+        print('loss: ', loss)
+      end
 
       --serialize loss msgs
       loss_msg.data = loss
