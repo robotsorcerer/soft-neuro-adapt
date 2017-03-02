@@ -383,13 +383,10 @@ namespace amfc_control
             pose_info.resize(3);
 
             //gamma scaling factor for adaptive gains
-            k = 1e-10;
+            k = 1e-12/8;
 
-            Gamma_y(0,0) *= k;   Gamma_y(1,1) *= k; 
-            Gamma_y(2,2) *= k; 
-
-            Gamma_r(0,0) *= k;  Gamma_r(1,1) *= k;
-            Gamma_r(2,2) *= k;
+            Gamma_y *= k;// * Gamma_y.diagonal();
+            Gamma_r *= k;// * Gamma_r.diagonal();
 
             /*Initialize weights from previously trained model to usebefore
             we converge in the online approximator*/
@@ -458,10 +455,12 @@ namespace amfc_control
                 nn_controller::predictor_params::Request  &req,
                 nn_controller::predictor_params::Response  &res);
         void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
+        void getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info);
         ros::Time getTime();
         //subscribe to the weights and biases params
         virtual void weights_sub(const std_msgs::Float64MultiArray::ConstPtr& weights_sub);  
         virtual void bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params);       
         virtual void pose_subscriber(const ensenso::HeadPose& headPose);
+        virtual void vicon_pose_subscriber(const geometry_msgs::Pose& headPose);
     };
 }

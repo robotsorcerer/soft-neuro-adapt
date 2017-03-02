@@ -5,6 +5,7 @@
 #include <std_msgs/String.h>
 #include <ensenso/HeadPose.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Pose.h>
 #include <std_msgs/Float64MultiArray.h>
 #include "nn_controller/nn_controller.h"
 
@@ -48,10 +49,19 @@ ros::Time Controller::getTime()
 // pose subscriber from ensenso_seg
 void Controller::pose_subscriber(const ensenso::HeadPose& headPose)
 {
-	Eigen::VectorXd pose_info;
-	pose_info.resize(3);		//CRITICAL OR SEGFAULT
 	getPoseInfo(headPose, pose_info);
 
+	std::lock_guard<std::mutex> pose_locker(pose_mutex);
+	this->pose_info = pose_info;
+	updatePoseInfo  = true;		
+}
+
+// pose subscriber from vicon_sub
+void Controller::vicon_pose_subscriber(const geometry_msgs::Pose& headPose)
+{
+	getPoseInfo(headPose, pose_info);
+
+	// ROS_INFO_STREAM("headPose: " << pose_info);
 	std::lock_guard<std::mutex> pose_locker(pose_mutex);
 	this->pose_info = pose_info;
 	updatePoseInfo  = true;		
@@ -102,6 +112,18 @@ void Controller::getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd 
 	pose_info << //headPose.x, headPose.y,
 				 headPose.z,// 1,  		//roll to zero
 				 headPose.pitch, headPose.roll; //headPose.yaw;   //setting roll to zero
+	this->pose_info = pose_info;
+	//set ref's non-controlled states to measurement
+	ControllerParams(std::move(pose_info));
+}
+
+void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info)
+{
+	pose_info << //headPose.x, headPose.y,
+				 headPose.position.z,// 1,  		//roll to zero
+				 headPose.orientation.x, headPose.orientation.y; //headPose.yaw;   //setting roll to zero
+	
+	this->pose_info = pose_info;
 	//set ref's non-controlled states to measurement
 	ControllerParams(std::move(pose_info));
 }
@@ -174,14 +196,13 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 								 (sigma_y * Ky_hat));
 		Kr_hat_dot = -Gamma_r * ((ref_      * tracking_error.transpose() * P * B * sgnLambda) +
 								 (sigma_r * Kr_hat));
-		OUT("\nWith sigma modification");
+		// OUT("\nWith sigma modification");
 	}
 	else{
-		OUT("\nWithout sigma modification")
+		// OUT("\nWithout sigma modification")
 		Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
 		Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
 	}
-
 	//use boost ode solver
 	runge_kutta_dopri5<state,double,state,double,vector_space_algebra> stepper;
 	//use reference for the derivative
@@ -247,7 +268,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	// 				(Kr_hat.transpose() * ref_);
 	// }
 	// else{	
-		OUT("With Net Error");	
+		// OUT("With Net Error");	
 		u_control = (Ky_hat.transpose() * pose_info) + 
 					(Kr_hat.transpose() * ref_)  + pred; // + wgtsPred;  //
 	// }
@@ -260,7 +281,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	if(print)
 	{	
-		OUT("ref_: " 			<< ref_.transpose());
+		OUT("\nref_: " 			<< ref_.transpose());
 		OUT("pose: " 		 << pose_info.transpose());
 		OUT("pred: " << pred.transpose());
 
@@ -340,40 +361,41 @@ int main(int argc, char** argv)
 { 
 	ros::init(argc, argv, "controller_node", ros::init_options::AnonymousName);
 	ros::NodeHandle n;
-	bool print(false), useSigma(false), save(false);
+	bool print, useSigma, save, useVicon(true);
 
 	help();
 
-	Eigen::Vector3f ref;
+	Eigen::Vector3d ref;
 	ref.resize(3);
-	if(argc < 2)
-	{
-		help();
-		return EXIT_FAILURE;
-	} 
+
 	try{		
-		ref(0) = atof(argv[1]);    //ref z
-		ref(1) = atof(argv[2]);	   //ref pitch
-		ref(2) = atof(argv[3]);	   //ref yaw
-		if(atoi(argv[4]) == 1)
-			print = true;
-		if(atoi(argv[5]) == 1)
-			useSigma = false;
-		if(atoi(argv[6]) == 1)
-			save = true;
+		//supply values from the cmd line or retrieve them 
+		//from the ros parameter server
+		n.getParam("z", ref(0))	;    	//ref z
+		n.getParam("pitch", ref(1));	//ref pitch
+		n.getParam("roll", ref(2));	    //ref yaw
+		// if(atoi(argv[4]) == 1)
+		n.getParam("print", print);
+		// if(atoi(argv[5]) == 1)
+		n.getParam("useSigma", useSigma);
+		// if(atoi(argv[6]) == 1)
+		save = n.getParam("save", save);
 	}
 	catch(std::exception& e){
 		e.what();
 	}
 
 
-	Eigen::Vector3d refd;
-	refd = ref.cast<double>(); 
-	Controller c(n, refd,print, useSigma, save);
+	// Eigen::Vector3d refd;
+	// refd = ref.cast<double>(); 
+	Controller c(n, ref, print, useSigma, save);
 
     ros::Subscriber sub_weights = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::weights_sub, &c );
     ros::Subscriber sub_bias  = n.subscribe("/mannequine_pred/net_biases", 100, &Controller::bias_sub, &c);
-	ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
+	// if(useVicon)
+		ros::Subscriber sub_vicon = n.subscribe("/mannequine_head/pose", 100, &Controller::vicon_pose_subscriber, &c);	
+	// else
+		// ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
 	//subscribe to real -time predictor parameters
 	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::pred_subscriber, &c);
 	ros::Subscriber sub_loss = n.subscribe("/mannequine_pred/net_loss", 100, &Controller::loss_subscriber, &c);

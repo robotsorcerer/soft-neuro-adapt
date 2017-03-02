@@ -23,7 +23,8 @@ opt = {
   verbose       = true,
   maxIter       = 20,
   silent        = true,
-  squash        = false,
+  useVicon      = true,
+  squash        = true,
   model         = 'lstm',
   real_time_net = true, --use real-time network approximator
   hiddenSize    = {9, 6, 6},
@@ -112,7 +113,15 @@ spinner   = ros.AsyncSpinner()
 spinner:start()
 
 nh          = ros.NodeHandle()
-poseSpec    = ros.MsgSpec('ensenso/HeadPose')
+
+poseSpec    = {}
+
+if opt.useVicon then 
+  poseSpec  = ros.MsgSpec('geometry_msgs/Pose')
+else
+  poseSpec    = ros.MsgSpec('ensenso/HeadPose')
+end
+
 controlSpec = ros.MsgSpec('geometry_msgs/Twist')
 pred_spec   = ros.MsgSpec('geometry_msgs/Pose')
 loss_spec   = ros.MsgSpec('std_msgs/Float64')
@@ -135,8 +144,15 @@ loss_msg = ros.Message(loss_spec)
 --callbacks
 pose_subscriber:registerCallback(function(msg, header)
   -- print('\nheadPose: \n', msg)
-  poseMsg.z = msg.z; poseMsg.pitch = msg.pitch; poseMsg.roll = msg.roll; 
+  if(not opt.useVicon) then
+    poseMsg.z = msg.z; poseMsg.pitch = msg.pitch; poseMsg.roll = msg.roll; 
                       poseMsg.yaw = msg.yaw;
+  else
+    poseMsg.z = msg.position.z; 
+    poseMsg.roll = msg.orientation.x;
+    poseMsg.pitch = msg.orientation.y;
+    poseMsg.yaw   = msg.orientation.z;
+  end
 end)
 
 u_sub:registerCallback(function(msg, header)
@@ -230,6 +246,18 @@ local tensorToNice = function(vec)
     return table.concat(t, '  ')
 end
 
+local geometryPoseToNice = function(poseTab)
+  local t = {}
+  x1 = poseTab.position.x
+  y1 = poseTab.position.y
+  z1 = poseTab.position.z
+
+  x2 = poseTab.orientation.x
+  y2 = poseTab.orientation.y
+  z2 = poseTab.orientation.z
+  return table.concat(t, x1, '  ', y1, '  ', z1, '  ', x2, '  ', y2, '  ', z2)
+end
+
 --construct sigmoiud function to squash network outputs to range of valves
 sigmoid = nn.Sequential()
 sigmoid:add(nn.Linear(1, 1))
@@ -239,6 +267,12 @@ local function squash_sigmoid(x)
   local xx = torch.DoubleTensor(1):fill(x)
   local res = sigmoid:forward(xx)
   -- print('xx: ', xx, 'res: ', res)
+  return res
+end
+
+local function squash_pvq(x)
+  local xx = torch.DoubleTensor(1):fill(x)
+  local res = 400*sigmoid:forward(xx)
   return res
 end
 
@@ -270,6 +304,9 @@ local function main()
       local inputs  = torch.CudaTensor(1, 9)
       local targets = torch.CudaTensor(1,6)
 
+      print("poseMsg: ", poseMsg)
+      print("uMsg: ", uMsg)
+
       inputs[{{},{1}}] = uMsg.u1
       inputs[{{},{2}}] = uMsg.u2
       inputs[{{},{3}}] = uMsg.u3
@@ -280,14 +317,14 @@ local function main()
       inputs[{{},{8}}] = poseMsg.pitch
       inputs[{{},{9}}] = poseMsg.roll
 
-      targets[{{}, {1}}] = poseMsg.z 
-      targets[{{}, {2}}] = poseMsg.z
-      targets[{{}, {3}}] = poseMsg.pitch
+      targets[{{}, {1}}] = poseMsg.pitch 
+      targets[{{}, {2}}] = poseMsg.pitch
+      targets[{{}, {3}}] = poseMsg.roll
       --augment the nontracted states with 0
-      targets[{{}, {4}}] = poseMsg.pitch
-      targets[{{}, {5}}] = poseMsg.roll
+      targets[{{}, {4}}] = poseMsg.roll
+      targets[{{}, {5}}] = poseMsg.z
 
-      targets[{{}, {6}}] = poseMsg.roll
+      targets[{{}, {6}}] = poseMsg.z
 
       -- print('inputs: ', inputs)  
       -- print('targets: ', targets)  
@@ -319,17 +356,20 @@ local function main()
         pred_table[3] = dump(squash_sigmoid(pred_table[3]))[1]
         pred_table[5] = dump(squash_sigmoid(pred_table[5]))[1]
         pred_table[6] = dump(squash_sigmoid(pred_table[6]))[1]
+        --squash pvq valves
+        pred_table[2] = dump(squash_pvq(pred_table[2]))[1]  --pvq1
+        pred_table[4] = dump(squash_pvq(pred_table[4]))[1]  --pvq1
       end
 
       pred_msg.position.x = pred_table[1]
-      pred_msg.position.y = pred_table[2]
-      pred_msg.position.z = pred_table[3]
-      pred_msg.orientation.x = pred_table[4]
-      pred_msg.orientation.y = pred_table[5]
-      pred_msg.orientation.z = pred_table[6]
+      pred_msg.position.y = pred_table[3]
+      pred_msg.position.z = pred_table[5]
+      pred_msg.orientation.x = pred_table[6]
+      pred_msg.orientation.y = pred_table[2]
+      pred_msg.orientation.z = pred_table[4]
 
       if opt.verbose then
-        print('preds:', pred_msg); 
+        print('preds: ', pred_table)--geometryPoseToNice(pred_msg)); 
         print('targets: ', tensorToNice(targets))
         print('loss: ', loss)
       end

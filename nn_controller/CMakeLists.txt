@@ -84,7 +84,7 @@ if (USE_CAFFE)
     add_definitions(-DUSE_CAFFE)
     if (USE_CAFFE_GPU)
         add_definitions(-DCAFFE_GPU)
-        find_package(CUDA 7.0 REQUIRED)
+        find_package(CUDA 5.5 REQUIRED)
         include_directories(${CUDA_INCLUDE_DIRS})
     else (USE_CAFFE_GPU)
         add_definitions(-DCPU_ONLY)
@@ -128,7 +128,7 @@ add_definitions(${EIGEN_DEFINITIONS})
 
 
 ## Declare a C++ executable
- add_executable(nn_controller src/nn_controller.cpp)
+add_executable(nn_controller src/nn_controller.cpp)
 add_dependencies(nn_controller ${PROJECT_NAME}_gencpp)
 add_dependencies(nn_controller ${catkin_EXPORTED_TARGETS})
 
