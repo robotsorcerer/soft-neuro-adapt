@@ -142,7 +142,7 @@ endif (USE_CAFFE)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(nn_controller
-  ${catkin_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} -ldl /home/robotec/catkin_ws/devel/lib/libboostsender.so
+  ${catkin_LIBRARIES} -lm -ldl ${Boost_FILESYSTEM_LIBRARY}
  )
 
 #############
