@@ -1,52 +1,87 @@
 import torch
-from torch.autograd import Variable
-import torch.nn.functional as F
+
 import torch.nn as nn
+import torch.optim as optim
+
+import torch.nn.functional as F
+from torch.autograd import Variable
+from torch.nn.parameter import Parameter
+
+import torch.cuda
 import numpy as np
+
+from qpth.qp import QPFunction
 
 import matplotlib.pyplot as plt
 
 class LSTMModel(nn.Module):
-    def __init__(self, nFeatures, nCls, bn, nineq=200, neq=0, eps=1e-4, 
+    def __init__(self, nFeatures, nCls,bn,  nineq=12, neq=0, eps=1e-4, 
                 noutputs=3,numLayers=1, nHidden=[9, 6, 6]):
-        super().__init__()
+        super(LSTMModel, self).__init__()
+        
+        self.nFeatures = nFeatures
+        self.nHidden = nHidden
+        # self.bn = bn
+        self.nCls = nCls
+        self.nineq = nineq
+        self.neq = neq
+        self.eps = eps
+
+        # if bn:
+        #     self.bn1 = nn.BatchNorm1d(nHidden)
+        #     self.bn2 = nn.BatchNorm1d(nCls)
 
         self.cost = nn.MSELoss()
-        self.nHidden = nHidden
         self.noutputs = noutputs
         # self.neunet = nn.Sequential()
         self.lstm1  = nn.LSTM(nHidden[0],nHidden[0],num_layers=numLayers)
-        self.drop1  = nn.Dropout(0.3)
         self.lstm2  = nn.LSTM(nHidden[0],nHidden[1],num_layers=numLayers)
-        self.drop2  = nn.Dropout(0.3)
-        self.lstm3  = nn.LSTM(nHidden[1],nHidden[2],num_layers=numLayers),
-        self.drop3  = nn.Dropout(0.3),
-        self.output = nn.Linear(nHidden[2], noutputs)
+        self.lstm3  = nn.LSTM(nHidden[1],nHidden[2],num_layers=numLayers)
+        self.drop   = nn.Dropout(0.3)
+        self.fc1 = nn.Linear(nHidden[2], noutputs)
+        self.fc2 = nn.Linear(noutputs, noutputs)
 
+        self.M = Variable(torch.tril(torch.ones(nCls, nCls)))
+        self.L = Parameter(torch.tril(torch.rand(nCls, nCls)))
+        self.G = Parameter(torch.Tensor(nineq, nCls).uniform_(-1,1))
+
+        """
+        define constraints, z_i, and slack variables, s_i,
+        for six valves. z_i and c_i are learnable parameters
+        """
+        self.z0 = Parameter(torch.zeros(nCls))
+        self.s0 = Parameter(torch.ones(nineq))
+    """
+    def cuda(self):
+        # TODO: Is there a more automatic way?
+        for x in [self.L, self.G, self.z0, self.s0]:
+            x.data = x.data.cuda()
+
+        return super().cuda()
+    """
     def forward(self, x):
         nBatch = x.size(0)
 
         # FC-ReLU-QP-FC-Softmax
-        # LSTM-dropout-LSTM-dropout-lstm-dropout-QP-FC
+        # LSTM-dropout-LSTM-dropout-lstm-dropout-FC-QP-FC
         x = x.view(nBatch, -1)
-        x = self.lstm1(x)
-        x = self.drop1(x)
-        x = self.lstm2(x)
-        x = self.drop2(x)
-        x = self.lstm3(x)
-        x = self.drop3(x)
+        x = self.drop(self.lstm1(x))
+        x = self.drop(self.lstm2(x))
+        x = self.drop(self.lstm3(x))
+        x = self.fc1(x)
 
-        Q = self.Q.unsqueeze(0).expand(nBatch, self.Q.size(0), self.Q.size(1))
-        p = -x.view(nBatch,-1)
-        G = self.G.unsqueeze(0).expand(nBatch, self.G.size(0), self.G.size(1))
-        h = self.h.unsqueeze(0).expand(nBatch, self.h.size(0))
-        A = self.A.unsqueeze(0).expand(nBatch, self.A.size(0), self.A.size(1))
-        b = self.b.unsqueeze(0).expand(nBatch, self.b.size(0))
+        Q = self.cost
+        #define inequality constraints for the six valves upperbounded by 1
+        h0 = self.G.mv(self.z0)+self.s0-1
+        #define inequality constraints for the six valves lowerbounded by 0
+        h0p = self.G.mv(self.z0p)+self.s0p
 
-        x = QPFunction(verbose=False)(p.double(), Q, G, h, A, b).float()
+        e   = Variable(torch.Tensor())
+        x = QPFunction(verbose=False)(x,Q,G,h1,h2,e,e)
+        
         x = self.fc2(x)
 
-        return F.log_softmax(x)
+        return F.sigmoid(x) #squash signals between 0 and 1
 
     # define model
     def lstm_model():
@@ -67,6 +102,32 @@ class LSTMModel(nn.Module):
         print cost
         print(neunet)
 
+    def test_RNN_cell():
+        # this is just a smoke test; these modules are implemented through
+        # autograd so no Jacobian test is needed
+        for module in (nn.RNNCell, nn.GRUCell):
+            for bias in (True, False):
+                input = Variable(torch.randn(3, 10))
+                hx = Variable(torch.randn(3, 20))
+                cell = module(10, 20, bias=bias)
+                for i in range(6):
+                    hx = cell(input, hx)
+
+                hx.sum().backward()
+
+    def test_LSTM_cell():
+        # this is just a smoke test; these modules are implemented through
+        # autograd so no Jacobian test is needed
+        for bias in (True, False):
+            input = Variable(torch.randn(3, 10))
+            hx = Variable(torch.randn(3, 20))
+            cx = Variable(torch.randn(3, 20))
+            lstm = nn.LSTMCell(10, 20, bias=bias)
+            for i in range(6):
+                hx, cx = lstm(input, (hx, cx))
+
+            (hx + cx).sum().backward()
+
 # rnn = nn.LSTM(10,20,2)
 # input = Variable(torch.randn(5,3, 10))
 # h0 = Variable(torch.randn(2,3, 20))
@@ -76,38 +137,8 @@ class LSTMModel(nn.Module):
 # print ('output', output)
 # print('hn ', hn)
 
-def test_RNN_cell():
-    # this is just a smoke test; these modules are implemented through
-    # autograd so no Jacobian test is needed
-    for module in (nn.RNNCell, nn.GRUCell):
-        for bias in (True, False):
-            input = Variable(torch.randn(3, 10))
-            hx = Variable(torch.randn(3, 20))
-            cell = module(10, 20, bias=bias)
-            for i in range(6):
-                hx = cell(input, hx)
-
-            hx.sum().backward()
-
-def test_LSTM_cell():
-    # this is just a smoke test; these modules are implemented through
-    # autograd so no Jacobian test is needed
-    for bias in (True, False):
-        input = Variable(torch.randn(3, 10))
-        hx = Variable(torch.randn(3, 20))
-        cx = Variable(torch.randn(3, 20))
-        lstm = nn.LSTMCell(10, 20, bias=bias)
-        for i in range(6):
-            hx, cx = lstm(input, (hx, cx))
-
-        (hx + cx).sum().backward()
-
-# test_LSTM_cell()
-
-# lstm_model()
-
-model = LSTMModel()
-model.lstm_model()
+# baseLSTM = LSTMModel(6,3,True)
+# baseLSTM.lstm_model()
 
 '''
 class RNN(nn.Module):
