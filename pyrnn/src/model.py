@@ -15,8 +15,8 @@ from qpth.qp import QPFunction
 import matplotlib.pyplot as plt
 
 class LSTMModel(nn.Module):
-    def __init__(self, nFeatures, nCls,bn,  nineq=12, neq=0, eps=1e-4, 
-                noutputs=3,numLayers=1, nHidden=[9, 6, 6]):
+    def __init__(self, nFeatures, nCls,bn, nHidden, nineq=12, neq=0, eps=1e-4, 
+                noutputs=3,numLayers=1):
         super(LSTMModel, self).__init__()
         
         self.nFeatures = nFeatures
@@ -43,22 +43,17 @@ class LSTMModel(nn.Module):
 
         self.M = Variable(torch.tril(torch.ones(nCls, nCls)))
         self.L = Parameter(torch.tril(torch.rand(nCls, nCls)))
-        self.G = Parameter(torch.Tensor(nineq, nCls).uniform_(-1,1))
+        self.G = Parameter(torch.Tensor(nineq/2, nCls).uniform_(-1,1))
 
         """
         define constraints, z_i, and slack variables, s_i,
         for six valves. z_i and c_i are learnable parameters
         """
         self.z0 = Parameter(torch.zeros(nCls))
-        self.s0 = Parameter(torch.ones(nineq))
-    """
-    def cuda(self):
-        # TODO: Is there a more automatic way?
-        for x in [self.L, self.G, self.z0, self.s0]:
-            x.data = x.data.cuda()
+        self.s0 = Parameter(torch.ones(nineq/2))
+        self.z0p = Parameter(torch.zeros(nCls))
+        self.s0p = Parameter(torch.ones(nineq/2))
 
-        return super().cuda()
-    """
     def forward(self, x):
         nBatch = x.size(0)
 
@@ -72,12 +67,16 @@ class LSTMModel(nn.Module):
 
         Q = self.cost
         #define inequality constraints for the six valves upperbounded by 1
-        h0 = self.G.mv(self.z0)+self.s0-1
+        h0 = self.G.mv(self.z0)+self.s0-Parameter(torch.ones(nineq/2))
         #define inequality constraints for the six valves lowerbounded by 0
-        h0p = self.G.mv(self.z0p)+self.s0p
+        h1 = self.G.mv(self.z0p)-self.s0p
+        #concat h0 and h1 into h
+        h = torch.cat((h0, h1),0)
+        #concat G to the global G
+        G = torch.cat((G, G), 0)
 
         e   = Variable(torch.Tensor())
-        x = QPFunction(verbose=False)(x,Q,G,h1,h2,e,e)
+        x = QPFunction(verbose=False)(x,Q,G,h,e,e)
         
         x = self.fc2(x)
 
