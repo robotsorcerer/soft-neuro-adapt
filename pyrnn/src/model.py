@@ -15,23 +15,18 @@ from qpth.qp import QPFunction
 import matplotlib.pyplot as plt
 
 class LSTMModel(nn.Module):
-    def __init__(self, nFeatures, nCls,bn, nHidden, nineq=12, neq=0, eps=1e-4, 
+    def __init__(self, nFeatures, nCls, nHidden, nineq=12, neq=0, eps=1e-4, 
                 noutputs=3,numLayers=1):
         super(LSTMModel, self).__init__()
         
         self.nFeatures = nFeatures
         self.nHidden = nHidden
-        # self.bn = bn
         self.nCls = nCls
         self.nineq = nineq
         self.neq = neq
         self.eps = eps
 
-        # if bn:
-        #     self.bn1 = nn.BatchNorm1d(nHidden)
-        #     self.bn2 = nn.BatchNorm1d(nCls)
-
-        self.cost = nn.MSELoss()
+        self.cost = nn.MSELoss(size_average=False)
         self.noutputs = noutputs
         # self.neunet = nn.Sequential()
         self.lstm1  = nn.LSTM(nHidden[0],nHidden[0],num_layers=numLayers)
@@ -56,7 +51,7 @@ class LSTMModel(nn.Module):
 
     def forward(self, x):
         nBatch = x.size(0)
-
+        print('x: ', x.size(0))
         # FC-ReLU-QP-FC-Softmax
         # LSTM-dropout-LSTM-dropout-lstm-dropout-FC-QP-FC
         x = x.view(nBatch, -1)
@@ -64,7 +59,7 @@ class LSTMModel(nn.Module):
         x = self.drop(self.lstm2(x))
         x = self.drop(self.lstm3(x))
         x = self.fc1(x)
-
+        """
         Q = self.cost
         #define inequality constraints for the six valves upperbounded by 1
         h0 = self.G.mv(self.z0)+self.s0-Parameter(torch.ones(nineq/2))
@@ -77,7 +72,7 @@ class LSTMModel(nn.Module):
 
         e   = Variable(torch.Tensor())
         x = QPFunction(verbose=False)(x,Q,G,h,e,e)
-        
+        """        
         x = self.fc2(x)
 
         return F.sigmoid(x) #squash signals between 0 and 1

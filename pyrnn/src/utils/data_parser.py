@@ -1,4 +1,5 @@
 import torch
+from torch.autograd import Variable
 import scipy.io as sio
 
 def loadSavedMatFile(x):
@@ -20,15 +21,22 @@ def loadSavedMatFile(x):
 
 def split_data(x):
 	base_in, base_out, left_in, left_out, right_in, right_out, x, y, z, pitch, yaw = loadSavedMatFile(x)
-	inputs = torch.cat((base_in, base_out, left_in, left_out, right_in, right_out), 0)
-	outputs = torch.cat((z, pitch, yaw), 0)
+	inputs = torch.cat((base_in, base_out, left_in, 
+						left_out, right_in, right_out, 
+						z, pitch, yaw), 1)
+	outputs = torch.cat((z, pitch, yaw), 1)
 
-	k = int(0.8*base_in.size(0))
+	N = int(inputs.size(0))
+
+	nTrain = int(N*(1.-0.1))
+	nTest  = N - nTrain
 	# print('outputs: \n', base_in[0:int(k)])
-	train_in = torch.cat((base_in[0:k], base_out[0:k], left_in[0:k], left_out[0:k], right_in[0:k], right_out[0:k]), 0)
-	train_out = torch.cat((z[0:k], pitch[0:k], yaw[0:k]), 0)
+	train_in = inputs[:nTrain]
+	train_out = outputs[:nTrain]
+	test_in = inputs[nTrain:]
+	test_out = inputs[nTrain:]
 
-	test_in = torch.cat((base_in[k:], base_out[k:], left_in[k:], left_out[k:], right_in[k:], right_out[k:]), 0)
-	train_out = torch.cat((z[k:], pitch[k:], yaw[k:]), 0)
+	base_idx = torch.LongTensor([1])
+	# print(inputs.narrow(0, 0, base_in.size(0)))
 
 	return train_in, train_out, test_in, test_out
