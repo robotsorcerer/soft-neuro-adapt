@@ -3,6 +3,7 @@
 Code for the Self-Correcting Neuro Adaptive Controller
 
 ### Dependencies
+- [Python 2.7+]()
 
 - [PyTorch](http://pytorch.org/)
 	<pre><code> conda install pytorch torchvision -c soumith </code></pre>
@@ -48,9 +49,9 @@ Code for the Self-Correcting Neuro Adaptive Controller
 
 	With the vicon system, you get a more accurate representation. We would want four markers on the face in a rhombic manner (preferrably named `fore`, `left` , `right`, and `chin`); make sure the subject and segment are appropriately named `Superdude/head` in Nexus. We would also want four markers on the base panel from which the rotation of the face with respect to the panel frame is computed (call these markers `tabfore`, `tabright`, `tableft` and `tabchin` respectively). Make sure the subject and segment are named `Panel/rigid` in Nexus. In terminal, bring up the vicon system
 
-	```bash		
-		<pre class="terminal"><code> Terminal$:	rosrun vicon_bridge vicon.launch</pre></code>
-	```
+		
+	<pre class="terminal"><code> Terminal$:	rosrun vicon_bridge vicon.launch</pre></code>
+	
 
 - 	Neural Network Function Aproximator
 
@@ -63,6 +64,6 @@ Code for the Self-Correcting Neuro Adaptive Controller
 
 	- PyRNN
 
-	`roscd` into `pyrnn src` folder and do python main.py
+	`roscd` into `pyrnn src` folder and do `python main.py`
 
 

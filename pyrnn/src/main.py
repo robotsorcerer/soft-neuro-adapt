@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# coding=utf-8
 
 import argparse
 import csv
@@ -63,7 +64,9 @@ def _init_pubs_and_subs():
     _pose_sub = ROSCommEmulator(
         '', '', "/mannequine_head/pose", Pose
     )
-    pose_dict = _pose_sub._subscriber_msg
+    pose_msg = _pose_sub._subscriber_msg
+
+    print 'pose_msg', pose_msg
 
     rospy.spin()
 
@@ -91,7 +94,7 @@ def main():
     parser.add_argument('--rnnLR', type=float,default=5e-3)
     parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
     args = parser.parse_args()
-    # args.cuda = not args.no_cuda and torch.cuda.is_available()
+    #args.cuda = not args.no_cuda and torch.cuda.is_available()
 
     nFeatures, nCls, nHidden = 6, 3, map(int, args.hiddenSize)
     #ineq constraints are [12 x 3] in total
@@ -139,22 +142,23 @@ def main():
     # test(args, 0, net, testF, testW, testX, testY)
     train_in, train_out, test_in, train_out = split_data("data/data.mat")
     optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
-    train(args, net, optimizer, trainX, trainY, trainW, trainF)
+#     train(args, net, optimizer, trainX, trainY, trainW, trainF)
 
-def train(args, neunet, optimizer, trainX, trainY, trainW, trainF):
+# def train(args, net, optimizer, trainX, trainY, trainW, trainF):
     batchSize = args.batchSize  
     iter,lr = 0, args.rnnLR 
     num_epochs = 500
 
-    batch_data_t = torch.FloatTensor(batchSize, trainX.size(1))
-    batch_targets_t = torch.FloatTensor(batchSize, trainY.size(1))
+#     batch_data_t = torch.FloatTensor(batchSize, trainX.size(1))
+#     batch_targets_t = torch.FloatTensor(batchSize, trainY.size(1))
 
-    if args.cuda:
-        batch_data_t = batch_data_t.cuda()
-        batch_targets_t = batch_targets_t.cuda()
+#     if args.cuda:
+#         batch_data_t = batch_data_t.cuda()
+#         batch_targets_t = batch_targets_t.cuda()
 
-    batch_data = Variable(batch_data_t, requires_grad=False)
-    batch_targets = Variable(batch_targets_t, requires_grad=False)
+#     batch_data = Variable(batch_data_t, requires_grad=False)
+#     batch_targets = Variable(batch_targets_t, requires_grad=False)
+
 
     #inputs and outputs
     for epoch in range(num_epochs):
@@ -163,17 +167,15 @@ def train(args, neunet, optimizer, trainX, trainY, trainW, trainF):
 
         # Forward + Backward + Optimize
         optimizer.zero_grad()
-        outputs = neunet(inputs)
-        loss    = neunet.criterion(outputs, labels)
+        outputs = net(inputs)
+        loss    = net.criterion(outputs, labels)
         loss.backward()
         optimizer.step()
         
         if (epoch % 10) == 0:
-            # print ('Epoch [%d/%d], Loss: %.4f' 
-                       # %(epoch+1, num_epochs, loss.data[0]))
             print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
                 epoch, epoch+batchSize, trainX.size(0),
-                float(i+batchSize)/trainX.size(0)*100,
+                float(iter+batchSize)/trainX.size(0)*100,
                 loss.data[0]))
     '''        
     for i in range(0, trainX.size(0), batchSize):
