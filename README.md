@@ -9,6 +9,18 @@ Code for the Self-Correcting Neuro Adaptive Controller
 
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
+- [Conda Catkin_pkg]
+	
+	```bash
+		conda install -c auto catkin_pkg
+	```
+
+- [Conda Ros_pkg]
+	
+	```bash
+		conda install -c trentonoliphant rospkg=1.0.29
+	```
+
 - The [Superchick package](https://github.com/lakehanne/superchicko)
 
 - Vision-based tracker
@@ -23,10 +35,10 @@ Code for the Self-Correcting Neuro Adaptive Controller
 -	Ensenso
 	If you plan to use ensenso, do this in terminal
 
-	```bash
-		<pre class="terminal"><code> Terminal 1$	rosrun ensenso ensenso_bridge </pre></code>
-		<pre class="terminal"><code> Terminal 2$:	rosrun ensenso ensenso_seg </pre></code>
-	```
+	
+	<pre class="terminal"><code> Terminal 1$	rosrun ensenso ensenso_bridge </pre></code>
+	<pre class="terminal"><code> Terminal 2$:	rosrun ensenso ensenso_seg </pre></code>
+	
 
 	This should open up the face scene and segment out the face as well as compute the cartesian coordinates and roll, pitch, yaw angles of the face in the scene.
 
