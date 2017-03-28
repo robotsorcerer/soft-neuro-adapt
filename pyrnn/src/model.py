@@ -1,3 +1,4 @@
+# coding=utf-8
 import torch
 
 import torch.nn as nn
@@ -13,20 +14,6 @@ import numpy as np
 from qpth.qp import QPFunction
 
 import matplotlib.pyplot as plt
-
-
-#hyperparams
-inputSize = 9
-nHidden   = 9
-numLayers = 2
-sequence_length = 9
-num_epochs = 500
-noutputs = 3
-batchSize = 1
-
-# Loss and Optimizer
-criterion = nn.MSELoss(size_average=False)
-optimizer = torch.optim.SGD(lstm.parameters(), lr=0.1)
 
 class LSTMModel(nn.Module):
     '''
@@ -55,6 +42,7 @@ class LSTMModel(nn.Module):
         self.nHidden = nHidden
         self.batchSize = batchSize
         self.noutputs = noutputs
+        self.criterion = nn.MSELoss(size_average=False)
         
         #define recurrent and linear layers
         self.lstm1  = nn.LSTM(inputSize,nHidden[0],num_layers=numLayers)
@@ -65,21 +53,21 @@ class LSTMModel(nn.Module):
 
     def forward(self, x):
         # Set initial states 
-        h0 = Variable(torch.Tensor(self.num_layers, batchSize, self.nHidden[0])) 
-        c0 = Variable(torch.Tensor(self.num_layers, batchSize, self.nHidden[0]))        
+        h0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0])) 
+        c0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]))        
         # Forward propagate RNN layer 1
         out, _ = self.lstm1(x, (h0, c0)) 
         out = self.drop(out)
         
         # Set hidden layer 2 states 
-        h1 = Variable(torch.Tensor(self.num_layers, batchSize, self.nHidden[1])) 
-        c1 = Variable(torch.Tensor(self.num_layers, batchSize, self.nHidden[1]))        
+        h1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1])) 
+        c1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1]))        
         # Forward propagate RNN layer 2
         out, _ = self.lstm2(out, (h1, c1))  
         
         # Set hidden layer 3 states 
-        h2 = Variable(torch.Tensor(self.num_layers, batchSize, self.nHidden[2])) 
-        c2 = Variable(torch.Tensor(self.num_layers, batchSize, self.nHidden[2]))        
+        h2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2])) 
+        c2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2]))        
         # Forward propagate RNN layer 2
         out, _ = self.lstm3(out, (h2, c2)) 
         out = self.drop(out) 
@@ -87,6 +75,16 @@ class LSTMModel(nn.Module):
         # Decode hidden state of last time step
         out = self.fc(out[:, -1, :])  
         return out
+
+"""
+#hyperparams
+inputSize = 9
+nHidden   = 9
+numLayers = 2
+sequence_length = 9
+num_epochs = 500
+noutputs = 3
+batchSize = 1
 
 lstm = LSTMModel(inputSize, nHidden, batchSize, noutputs, numLayers)
 #lstm.cuda()
@@ -110,6 +108,7 @@ for epoch in range(num_epochs):
     if (epoch % 10) == 0:
         print ('Epoch [%d/%d], Loss: %.4f' 
                    %(epoch+1, num_epochs, loss.data[0]))
+"""        
 
 
 
@@ -120,7 +119,7 @@ for epoch in range(num_epochs):
 
 class unusedFunctions():
 
-    def __init__():
+    # def __init__():
 
     def lstm_model():
         cost          = nn.MSELoss()
@@ -177,22 +176,3 @@ class unusedFunctions():
 
 # baseLSTM = LSTMModel(6,3,True)
 # baseLSTM.lstm_model()
-
-#hyperparams
-inputSize = 1
-nHidden   = 9
-numLayers = 2
-sequence_length = 9
-num_epochs = 500
-noutputs = 3
-
-lstm = LSTMModel(inputSize, nHidden, noutputs=3, numLayers=1)
-lstm.cuda()
-
-# Loss and Optimizer
-criterion = nn.MSELoss(size_average=False)
-optimizer = torch.optim.SGD(lstm.parameters(), lr=0.1)
-
-#images and labels
-images = torch.Tensor(1, 9, 3)
-labels = torch.Tensor(3)

@@ -27,32 +27,58 @@ import setproctitle
 import model
 import sys
 sys.path.insert(0, "utils")
+sys.path.insert(1, "ros")
+
 #custom utility functions 
 try:    
     # from utils.data_parser import loadSavedMatFile
     from data_parser import split_data
+    from agent_ros import ROSCommEmulator
 except Exception, e:
     raise e
     print('No Import of Utils')
+    print 'No import of ROSCommEmulator'
 
 from IPython.core import ultratb
 sys.excepthook = ultratb.FormattedTB(mode='Verbose',
      color_scheme='Linux', call_pdb=1)
 
+import rospy
+
+
 def print_header(msg):
     print('===>', msg)
+
+def _init_pubs_and_subs():
+
+    # control and pose dict
+    control_dict, pose_dict = {}, {}
+
+    #subscribe
+    _control_sub = ROSCommEmulator(
+        '', '', "/mannequine_head/u_valves", Twist
+    )
+    control_msg = _control_sub._subscriber_msg
+
+    _pose_sub = ROSCommEmulator(
+        '', '', "/mannequine_head/pose", Pose
+    )
+    pose_dict = _pose_sub._subscriber_msg
+
+    rospy.spin()
+
 
 def main(): 
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-cuda', action='store_true')
     parser.add_argument('--eps', type=float, default=1e-4)
-    parser.add_argument('--batchSize', type=int, default=100)
+    parser.add_argument('--batchSize', type=int, default=1)
     parser.add_argument('--data', type=str, default='data')
     parser.add_argument('--gpu', type=int,  default=0)
     parser.add_argument('--noutputs', type=int, default=3)
     parser.add_argument('--display', type=int,  default=1)
     parser.add_argument('--verbose', type=bool, default=True)
-    parser.add_argument('--cuda', type=bool,    default=True)
+    parser.add_argument('--cuda', type=bool,    default=False)
     parser.add_argument('--maxIter', type=int,  default=10000)
     parser.add_argument('--silent', type=bool,  default=True)
     parser.add_argument('--useVicon', type=bool, default=True)
@@ -72,7 +98,15 @@ def main():
     # print('model ', model)
 
     print_header('Building model')
-    net = model.LSTMModel(nFeatures, nCls, nHidden)
+
+    #hyperparams
+    inputSize = 9
+    numLayers = 2
+    sequence_length = 9
+    noutputs = 3
+    batchSize = args.batchSize
+
+    net = model.LSTMModel(inputSize, nHidden, batchSize, noutputs, numLayers)
 
     if args.cuda:
         net = net.cuda()
@@ -104,13 +138,13 @@ def main():
     # writeParams(args, net, 'init')
     # test(args, 0, net, testF, testW, testX, testY)
     train_in, train_out, test_in, train_out = split_data("data/data.mat")
-    criterion = nn.MSELoss(size_average=False)
     optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
     train(args, net, optimizer, trainX, trainY, trainW, trainF)
 
 def train(args, neunet, optimizer, trainX, trainY, trainW, trainF):
     batchSize = args.batchSize  
     iter,lr = 0, args.rnnLR 
+    num_epochs = 500
 
     batch_data_t = torch.FloatTensor(batchSize, trainX.size(1))
     batch_targets_t = torch.FloatTensor(batchSize, trainY.size(1))
@@ -129,8 +163,8 @@ def train(args, neunet, optimizer, trainX, trainY, trainW, trainF):
 
         # Forward + Backward + Optimize
         optimizer.zero_grad()
-        outputs = lstm(inputs)
-        loss    = criterion(outputs, labels)
+        outputs = neunet(inputs)
+        loss    = neunet.criterion(outputs, labels)
         loss.backward()
         optimizer.step()
         
