@@ -10,13 +10,13 @@ Code for the Self-Correcting Neuro Adaptive Controller
 
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
-- [Conda Catkin_pkg]
+- [Conda Catkin_pkg](https://anaconda.org/auto/catkin_pkg)
 	
 	```bash
 		conda install -c auto catkin_pkg
 	```
 
-- [Conda Ros_pkg]
+- [Conda Ros_pkg](https://anaconda.org/jdh88/rospkg)
 	
 	```bash
 		conda install -c trentonoliphant rospkg=1.0.29
