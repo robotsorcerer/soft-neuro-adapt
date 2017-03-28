@@ -45,31 +45,42 @@ sys.excepthook = ultratb.FormattedTB(mode='Verbose',
      color_scheme='Linux', call_pdb=1)
 
 import rospy
+from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Pose
 
+class PubSub(object):
+
+    """docstring for PubSub"""
+
+    def __init__(self, arg, Twist, Pose):
+        super(PubSub, self).__init__()
+        self.arg = arg
+
+        self.control_action = dict()
+        self.head_pose = dict()
+        
+    def _init_pubs_and_subs(self):
+
+        # control and pose dict
+        control_dict, pose_dict = {}, {}
+
+        #subscribe
+        _control_sub = ROSCommEmulator(
+            '', '', "/mannequine_head/u_valves", Twist
+        )
+        control_msg = _control_sub._subscriber_msg
+
+        _pose_sub = ROSCommEmulator(
+            '', '', "/mannequine_head/pose", Pose
+        )
+        pose_msg = _pose_sub._subscriber_msg
+
+        print 'pose_msg', pose_msg
+
+        rospy.spin()
 
 def print_header(msg):
     print('===>', msg)
-
-def _init_pubs_and_subs():
-
-    # control and pose dict
-    control_dict, pose_dict = {}, {}
-
-    #subscribe
-    _control_sub = ROSCommEmulator(
-        '', '', "/mannequine_head/u_valves", Twist
-    )
-    control_msg = _control_sub._subscriber_msg
-
-    _pose_sub = ROSCommEmulator(
-        '', '', "/mannequine_head/pose", Pose
-    )
-    pose_msg = _pose_sub._subscriber_msg
-
-    print 'pose_msg', pose_msg
-
-    rospy.spin()
-
 
 def main(): 
     parser = argparse.ArgumentParser()
@@ -89,7 +100,7 @@ def main():
     parser.add_argument('--work', type=str, default='work')
     parser.add_argument('--squash', type=bool,default= True)
     parser.add_argument('--model', type=str,default= 'lstm')
-    parser.add_argument('--real_time_net', type=bool,default=True, help='use real-time network approximator')
+    parser.add_argument('--real_net', type=bool,default=True, help='use real-time network approximator')
     parser.add_argument('--seed', type=int,default=123)
     parser.add_argument('--rnnLR', type=float,default=5e-3)
     parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
@@ -142,23 +153,25 @@ def main():
     # test(args, 0, net, testF, testW, testX, testY)
     train_in, train_out, test_in, train_out = split_data("data/data.mat")
     optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
-#     train(args, net, optimizer, trainX, trainY, trainW, trainF)
+    train(args, net, optimizer, trainX, trainY, trainW, trainF)
 
-# def train(args, net, optimizer, trainX, trainY, trainW, trainF):
+def train(args, net, optimizer, trainX, trainY, trainW, trainF):
     batchSize = args.batchSize  
     iter,lr = 0, args.rnnLR 
     num_epochs = 500
 
-#     batch_data_t = torch.FloatTensor(batchSize, trainX.size(1))
-#     batch_targets_t = torch.FloatTensor(batchSize, trainY.size(1))
+    batch_data_t = torch.FloatTensor(batchSize, trainX.size(1))
+    batch_targets_t = torch.FloatTensor(batchSize, trainY.size(1))
 
-#     if args.cuda:
-#         batch_data_t = batch_data_t.cuda()
-#         batch_targets_t = batch_targets_t.cuda()
+    if args.cuda:
+        batch_data_t = batch_data_t.cuda()
+        batch_targets_t = batch_targets_t.cuda()
 
-#     batch_data = Variable(batch_data_t, requires_grad=False)
-#     batch_targets = Variable(batch_targets_t, requires_grad=False)
+    batch_data = Variable(batch_data_t, requires_grad=False)
+    batch_targets = Variable(batch_targets_t, requires_grad=False)
 
+
+    ps = PubSub(object, Twist, Pose)
 
     #inputs and outputs
     for epoch in range(num_epochs):
@@ -177,26 +190,11 @@ def main():
                 epoch, epoch+batchSize, trainX.size(0),
                 float(iter+batchSize)/trainX.size(0)*100,
                 loss.data[0]))
-    '''        
-    for i in range(0, trainX.size(0), batchSize):
-        batch_data[:] = trainX.data[i:i+batchSize]
-        batch_targets[:] = trainY.data[i:i+batchSize]
 
-        optimizer.zero_grad()
-        preds = neunet(batch_data)
-        loss = neunet.cost(preds, batch_targets)
-        loss.backward()
-        optimizer.step()
+            ps._init_pubs_and_subs
 
-        err = get_nErr(preds.data, batch_targets.data)/batchSize
-        print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f} Err: {:.4f}'.format(
-            epoch, i+batchSize, trainX.size(0),
-            float(i+batchSize)/trainX.size(0)*100,
-            loss.data[0], err))
-
-        trainW.writerow((epoch-1+float(i+batchSize)/trainX.size(0), loss.data[0], err))
-        trainF.flush()
-    '''
+        # trainW.writerow((epoch-1+float(iter+batchSize)/trainX.size(0), loss.data[0], err))
+        # trainF.flush()
 
 def writeParams(args, model, tag):
     if args.model == 'optnet':
@@ -204,4 +202,4 @@ def writeParams(args, model, tag):
         np.savetxt(os.path.join(args.save, 'A.{}'.format(tag)), A)
     
 if __name__ == '__main__':
-    main()
+    main()    
