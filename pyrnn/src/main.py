@@ -101,10 +101,11 @@ def main():
 
     trainX, trainY, testX, testY = split_data("data/data.mat")
 
-    writeParams(args, net, 'init')
+    # writeParams(args, net, 'init')
     # test(args, 0, net, testF, testW, testX, testY)
-    # train_in, train_out, test_in, train_out = split_data("data/data.mat")
-    optimizer = optim.Adam(net.parameters(), lr=args.rnnLR)
+    train_in, train_out, test_in, train_out = split_data("data/data.mat")
+    criterion = nn.MSELoss(size_average=False)
+    optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
     train(args, net, optimizer, trainX, trainY, trainW, trainF)
 
 def train(args, neunet, optimizer, trainX, trainY, trainW, trainF):
@@ -121,6 +122,26 @@ def train(args, neunet, optimizer, trainX, trainY, trainW, trainF):
     batch_data = Variable(batch_data_t, requires_grad=False)
     batch_targets = Variable(batch_targets_t, requires_grad=False)
 
+    #inputs and outputs
+    for epoch in range(num_epochs):
+        inputs = Variable(torch.Tensor(5, 1, 9))
+        labels = Variable(torch.Tensor(5, 3))
+
+        # Forward + Backward + Optimize
+        optimizer.zero_grad()
+        outputs = lstm(inputs)
+        loss    = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        
+        if (epoch % 10) == 0:
+            # print ('Epoch [%d/%d], Loss: %.4f' 
+                       # %(epoch+1, num_epochs, loss.data[0]))
+            print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
+                epoch, epoch+batchSize, trainX.size(0),
+                float(i+batchSize)/trainX.size(0)*100,
+                loss.data[0]))
+    '''        
     for i in range(0, trainX.size(0), batchSize):
         batch_data[:] = trainX.data[i:i+batchSize]
         batch_targets[:] = trainY.data[i:i+batchSize]
@@ -139,6 +160,7 @@ def train(args, neunet, optimizer, trainX, trainY, trainW, trainF):
 
         trainW.writerow((epoch-1+float(i+batchSize)/trainX.size(0), loss.data[0], err))
         trainF.flush()
+    '''
 
 def writeParams(args, model, tag):
     if args.model == 'optnet':
