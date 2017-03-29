@@ -22,6 +22,12 @@ Code for the Self-Correcting Neuro Adaptive Controller
 		conda install -c trentonoliphant rospkg=1.0.29
 	```
 
+- [Conda netifaces](https://anaconda.org/bcbio/netifaces)
+
+	```bash
+		conda install -c bcbio netifaces=0.10.4
+	```
+
 - The [Superchick package](https://github.com/lakehanne/superchicko)
 
 - Vision-based tracker

@@ -34,7 +34,7 @@ sys.path.insert(1, "ros")
 try:    
     # from utils.data_parser import loadSavedMatFile
     from data_parser import split_data
-    from agent_ros import ROSCommEmulator
+    from ros_comm import Listener
 except Exception, e:
     raise e
     print('No Import of Utils')
@@ -48,41 +48,10 @@ import rospy
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Pose
 
-class PubSub(object):
-
-    """docstring for PubSub"""
-
-    def __init__(self, arg, Twist, Pose):
-        super(PubSub, self).__init__()
-        self.arg = arg
-
-        self.control_action = dict()
-        self.head_pose = dict()
-        
-    def _init_pubs_and_subs(self):
-
-        # control and pose dict
-        control_dict, pose_dict = {}, {}
-
-        #subscribe
-        _control_sub = ROSCommEmulator(
-            '', '', "/mannequine_head/u_valves", Twist
-        )
-        control_msg = _control_sub._subscriber_msg
-
-        _pose_sub = ROSCommEmulator(
-            '', '', "/mannequine_head/pose", Pose
-        )
-        pose_msg = _pose_sub._subscriber_msg
-
-        print 'pose_msg', pose_msg
-
-        rospy.spin()
-
 def print_header(msg):
     print('===>', msg)
 
-def main(): 
+def main(trainX, trainY): 
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-cuda', action='store_true')
     parser.add_argument('--eps', type=float, default=1e-4)
@@ -95,6 +64,7 @@ def main():
     parser.add_argument('--cuda', type=bool,    default=False)
     parser.add_argument('--maxIter', type=int,  default=10000)
     parser.add_argument('--silent', type=bool,  default=True)
+    parser.add_argument('--sim', type=bool,  default=False)
     parser.add_argument('--useVicon', type=bool, default=True)
     parser.add_argument('--save', type=str, default='save')
     parser.add_argument('--work', type=str, default='work')
@@ -107,11 +77,10 @@ def main():
     args = parser.parse_args()
     #args.cuda = not args.no_cuda and torch.cuda.is_available()
 
+
     nFeatures, nCls, nHidden = 6, 3, map(int, args.hiddenSize)
     #ineq constraints are [12 x 3] in total
     # print('model ', model)
-
-    print_header('Building model')
 
     #hyperparams
     inputSize = 9
@@ -124,6 +93,9 @@ def main():
 
     if args.cuda:
         net = net.cuda()
+
+    # print_header
+    ('Building model')
 
     t = '{}'.format('optnet')
     if args.save is None:
@@ -147,15 +119,15 @@ def main():
     testW.writerow(fields)
     testF.flush()
 
-    trainX, trainY, testX, testY = split_data("data/data.mat")
+    if args.sim:
+        trainX, trainY, testX, testY = split_data("data/data.mat")
+        train_in, train_out, test_in, train_out = split_data("data/data.mat")
 
-    # writeParams(args, net, 'init')
-    # test(args, 0, net, testF, testW, testX, testY)
-    train_in, train_out, test_in, train_out = split_data("data/data.mat")
     optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
-    train(args, net, optimizer, trainX, trainY, trainW, trainF)
 
-def train(args, net, optimizer, trainX, trainY, trainW, trainF):
+    train(args, net, optimizer, trainX, trainY)
+
+def train(args, net, optimizer, trainX, trainY):
     batchSize = args.batchSize  
     iter,lr = 0, args.rnnLR 
     num_epochs = 500
@@ -169,14 +141,10 @@ def train(args, net, optimizer, trainX, trainY, trainW, trainF):
 
     batch_data = Variable(batch_data_t, requires_grad=False)
     batch_targets = Variable(batch_targets_t, requires_grad=False)
-
-
-    ps = PubSub(object, Twist, Pose)
-
-    #inputs and outputs
+    
     for epoch in range(num_epochs):
-        inputs = Variable(torch.Tensor(5, 1, 9))
-        labels = Variable(torch.Tensor(5, 3))
+        inputs = trainX     #Variable(torch.Tensor(5, 1, 9))
+        labels = trainY     #Variable(torch.Tensor(5, 3))
 
         # Forward + Backward + Optimize
         optimizer.zero_grad()
@@ -185,21 +153,49 @@ def train(args, net, optimizer, trainX, trainY, trainW, trainF):
         loss.backward()
         optimizer.step()
         
+        if rospy.is_shutdown():
+            break
+
         if (epoch % 10) == 0:
             print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
                 epoch, epoch+batchSize, trainX.size(0),
                 float(iter+batchSize)/trainX.size(0)*100,
                 loss.data[0]))
-
-            ps._init_pubs_and_subs
-
-        # trainW.writerow((epoch-1+float(iter+batchSize)/trainX.size(0), loss.data[0], err))
-        # trainF.flush()
-
+    
 def writeParams(args, model, tag):
     if args.model == 'optnet':
         A = model.A.data.cpu().numpy()
         np.savetxt(os.path.join(args.save, 'A.{}'.format(tag)), A)
+
+def exportsToTensor(pose, controls):
+    #will be [torch.FloatTensor of size 1x9]
+    inputs = Variable(torch.Tensor([[
+                            controls.get('lo', 0), controls.get('bo', 0),
+                            controls.get('bi', 0), controls.get('li', 0), 
+                            controls.get('ro', 0), controls.get('ri', 0),
+                            pose.get('z', 0), pose.get('pitch', 0), 
+                            pose.get('yaw', 0)
+                        ]]))
+
+    #will be [torch.FloatTensor of size 1x3]
+    targets = Variable(torch.Tensor([[                            
+                            pose.get('z', 0), pose.get('pitch', 0), 
+                            pose.get('yaw', 0)
+                            ]]))
+    return inputs, targets
+
     
 if __name__ == '__main__':
-    main()    
+
+    l = Listener(Pose, Twist)
+    r = rospy.Rate(10)
+
+    while not rospy.is_shutdown():
+
+        trainX, trainY = exportsToTensor(l.pose_export, l.controls_export)
+        # print l.controls_export.get('lo', None)
+        # print l.pose_export.get("pitch", None)
+        # print trainX
+        main(trainX, trainY)
+        r.sleep()
+        pass
