@@ -169,19 +169,23 @@ def writeParams(args, model, tag):
 
 def exportsToTensor(pose, controls):
     #will be [torch.FloatTensor of size 1x9]
-    inputs = Variable(torch.Tensor([[
+    inputs = torch.Tensor([[
                             controls.get('lo', 0), controls.get('bo', 0),
                             controls.get('bi', 0), controls.get('li', 0), 
                             controls.get('ro', 0), controls.get('ri', 0),
                             pose.get('z', 0), pose.get('pitch', 0), 
                             pose.get('yaw', 0)
-                        ]]))
+                        ]])
+    inputs = Variable(
+                     (torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(5,1,9))
+                     )
 
     #will be [torch.FloatTensor of size 1x3]
-    targets = Variable(torch.Tensor([[                            
+    targets = (torch.Tensor([[                            
                             pose.get('z', 0), pose.get('pitch', 0), 
                             pose.get('yaw', 0)
-                            ]]))
+                            ]])).expand(5, 3)
+    targets = Variable(targets)
     return inputs, targets
 
     
