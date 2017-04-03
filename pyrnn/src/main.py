@@ -94,7 +94,11 @@ def main(epoch, trainX, trainY):
     noutputs = 3
     batchSize = args.batchSize
 
-    net = model.LSTMModel(inputSize, nHidden, batchSize, noutputs, numLayers)
+    # QP Hyperparameters
+    nz, neq, nineq, QPenalty = 12, 6, 0, 12, args.QPenalty
+
+    net = model.LSTMModel(nz, neq, nineq, Qpenalty, 
+                          inputSize, nHidden, batchSize, noutputs, numLayers)
 
     if args.cuda:
         net = net.cuda()

@@ -31,10 +31,40 @@ class LSTMModel(nn.Module):
         output (seq_len, batch, hidden_size * num_directions)
         h_n (num_layers * num_directions, batch, hidden_size)
         c_n (num_layers * num_directions, batch, hidden_size):
+
+    QP Layer:
+        nz = 6, neq = 0, nineq = 12, QPenalty = 0.1
     '''
-    def __init__(self, inputSize, nHidden, batchSize, noutputs=3, numLayers=2):
+    def __init__(self, nz, neq, nineq, Qpenalty, inputSize, nHidden, batchSize, noutputs=3, numLayers=2):
+
         super(LSTMModel, self).__init__()
-        
+
+        # QP Parameters
+        nx = nz * 2  #cause inequality is double sided (see my notes)
+        self.neq = neq
+        self.nineq = ineq
+        self.nz = nz
+
+        self.Q = Variable(Qpenalty*torch.eye(nx).double())
+        self.G = Variable(torch.eye(nx).double())
+        for i in range(6):
+            self.G[i][i] *= -1
+        self.h = Variable(torch.ones(nx).double())
+        self.A = 1000*npr.randn(neq, nz)
+        self.b = Variable(torch.zeros(self.A.size(0)).double())
+        def qp_layer(x):
+            nBatch = x.size(0)
+            Q = self.Q.unsqueeze(0).expand(nBatch, self.nz, nHidden)
+            G = self.G.unsqueeze(0).expand(nBatch, nHidden, self.nHidden)
+            h = self.h.unsqueeze(0).expand(nBatch, self.nineq)
+            A = self.A.unsqueeze(0).expand(nBatch, 1, self.neq)
+            b = self.b.unsqueeze(0).expand(nBatch, 1)
+            x = QPFunction()(x.double(), Q, G, h, A, b).float()
+            return x
+        self.qp_layer = qp_layer
+
+
+        # Backprop Through Time (Recurrent Layer) Params
         self.cost = nn.MSELoss(size_average=False)
         self.noutputs = noutputs
         self.num_layers = numLayers
@@ -52,6 +82,8 @@ class LSTMModel(nn.Module):
         self.drop   = nn.Dropout(0.3)
 
     def forward(self, x):
+        nBatch = x.size(0)
+
         # Set initial states 
         h0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0])) 
         c0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]))        
@@ -73,8 +105,11 @@ class LSTMModel(nn.Module):
         out = self.drop(out) 
         
         # Decode hidden state of last time step
-        out = self.fc(out[:, -1, :])  
-        return out
+        out = self.fc(out[:, -1, :]) 
+
+        #Now add QP Layer
+        out = out.view(nBatch, -1) 
+        return self.qp_layer(out)
 
 class OptNet(nn.Module):
     """ Solve a single SQP iteration of the scheduling problem"""

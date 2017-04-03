@@ -2,6 +2,10 @@
 
 Code for the Self-Correcting Neuro Adaptive Controller
 
+### QPProof
+
+![QPProof_Doc](pyrnn/src/data/QPProof.pdf)
+
 ### Dependencies
 - [Python 2.7+]()
 
