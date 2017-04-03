@@ -76,45 +76,31 @@ class LSTMModel(nn.Module):
         out = self.fc(out[:, -1, :])  
         return out
 
-"""
-#hyperparams
-inputSize = 9
-nHidden   = 9
-numLayers = 2
-sequence_length = 9
-num_epochs = 500
-noutputs = 3
-batchSize = 1
+class OptNet(nn.Module):
+    """ Solve a single SQP iteration of the scheduling problem"""
+    def __init__(self, n, nz, neq, nineq, Qpenalty):
+        super().__init__()
+        '''
+        nz = 6, n = 12, neq = 0, nineq = 12, QPenalty = 0.1
+        '''
+        nx = n * 2  #cause inequality is double sided (see my notes)
+        self.Q = Variable(Qpenalty*torch.eye(nx).double())
+        self.G = Variable(-torch.eye(nx).double())
+        self.h = Variable(torch.zeros(nx).double())
+        self.A = 1000*npr.randn(neq, nz)
+        self.b = Variable(torch.zeros(self.A.size(0)).double())
 
-lstm = LSTMModel(inputSize, nHidden, batchSize, noutputs, numLayers)
-#lstm.cuda()
+    def forward(self, puzzles):
+        nBatch = puzzles.size(0)
 
-# Loss and Optimizer
-criterion = nn.MSELoss(size_average=False)
-optimizer = torch.optim.SGD(lstm.parameters(), lr=0.1)
+        Q = self.Q.unsqueeze(0).expand(nBatch, self.Q.size(0), self.Q.size(1))
+        p = -puzzles.view(nBatch,-1)
+        G = self.G.unsqueeze(0).expand(nBatch, self.G.size(0), self.G.size(1))
+        h = self.h.unsqueeze(0).expand(nBatch, self.h.size(0))
+        A = self.A.unsqueeze(0).expand(nBatch, self.A.size(0), self.A.size(1))
+        b = self.b.unsqueeze(0).expand(nBatch, self.b.size(0))
 
-#images and labels
-for epoch in range(num_epochs):
-    inputs = Variable(torch.Tensor(5, 1, 9))
-    labels = Variable(torch.Tensor(5, 3))
-
-    # Forward + Backward + Optimize
-    optimizer.zero_grad()
-    outputs = lstm(inputs)
-    loss    = criterion(outputs, labels)
-    loss.backward()
-    optimizer.step()
-    
-    if (epoch % 10) == 0:
-        print ('Epoch [%d/%d], Loss: %.4f' 
-                   %(epoch+1, num_epochs, loss.data[0]))
-"""        
-
-
-
-
-
-
+        return QPFunction(verbose=False)(p.double(), Q, G, h, A, b).float().view_as(puzzles)
 
 
 class unusedFunctions():
@@ -164,15 +150,3 @@ class unusedFunctions():
                 hx, cx = lstm(input, (hx, cx))
 
             (hx + cx).sum().backward()
-
-# rnn = nn.LSTM(10,20,2)
-# input = Variable(torch.randn(5,3, 10))
-# h0 = Variable(torch.randn(2,3, 20))
-# c0 = Variable(torch.randn(2,3,20))
-# output, hn = rnn(input, (h0, c0))
-
-# print ('output', output)
-# print('hn ', hn)
-
-# baseLSTM = LSTMModel(6,3,True)
-# baseLSTM.lstm_model()

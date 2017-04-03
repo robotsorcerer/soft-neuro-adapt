@@ -51,7 +51,7 @@ from geometry_msgs.msg import Pose
 def print_header(msg):
     print('===>', msg)
 
-def main(trainX, trainY): 
+def main(epoch, trainX, trainY): 
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-cuda', action='store_true')
     parser.add_argument('--eps', type=float, default=1e-4)
@@ -74,9 +74,14 @@ def main(trainX, trainY):
     parser.add_argument('--seed', type=int,default=123)
     parser.add_argument('--rnnLR', type=float,default=5e-3)
     parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
+    optnetP = subparsers.add_parser('optnet')
+    optnetP.add_argument('--Qpenalty', type=float, default=0.1)
     args = parser.parse_args()
     #args.cuda = not args.no_cuda and torch.cuda.is_available()
-
+    t = '{}'.format(args.model)
+    if args.model == 'optnet':
+        t += '.Qpenalty={}'.format(args.Qpenalty)
+    setproctitle.setproctitle('lekan.soft-robot.' + t)
 
     nFeatures, nCls, nHidden = 6, 3, map(int, args.hiddenSize)
     #ineq constraints are [12 x 3] in total
@@ -125,9 +130,9 @@ def main(trainX, trainY):
 
     optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
 
-    train(args, net, optimizer, trainX, trainY)
+    train(args, net, epoch, optimizer, trainX, trainY)
 
-def train(args, net, optimizer, trainX, trainY):
+def train(args, net, epoch, optimizer, trainX, trainY):
     batchSize = args.batchSize  
     iter,lr = 0, args.rnnLR 
     num_epochs = 500
@@ -142,25 +147,25 @@ def train(args, net, optimizer, trainX, trainY):
     batch_data = Variable(batch_data_t, requires_grad=False)
     batch_targets = Variable(batch_targets_t, requires_grad=False)
     
-    for epoch in range(num_epochs):
-        inputs = trainX     #Variable(torch.Tensor(5, 1, 9))
-        labels = trainY     #Variable(torch.Tensor(5, 3))
+    # for epoch in range(num_epochs):
+    inputs = trainX     #Variable(torch.Tensor(5, 1, 9))
+    labels = trainY     #Variable(torch.Tensor(5, 3))
 
-        # Forward + Backward + Optimize
-        optimizer.zero_grad()
-        outputs = net(inputs)
-        loss    = net.criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        
-        if rospy.is_shutdown():
-            break
+    # Forward + Backward + Optimize
+    optimizer.zero_grad()
+    outputs = net(inputs)
+    loss    = net.criterion(outputs, labels)
+    loss.backward()
+    optimizer.step()
+    
+    # if rospy.is_shutdown():
+        # break
 
-        if (epoch % 10) == 0:
-            print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
-                epoch, epoch+batchSize, trainX.size(0),
-                float(iter+batchSize)/trainX.size(0)*100,
-                loss.data[0]))
+    if (epoch % 10) == 0:
+        print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
+            epoch, epoch+batchSize, trainX.size(0),
+            float(iter+batchSize)/trainX.size(0)*100,
+            loss.data[0]))
     
 def writeParams(args, model, tag):
     if args.model == 'optnet':
@@ -193,13 +198,14 @@ if __name__ == '__main__':
 
     l = Listener(Pose, Twist)
     r = rospy.Rate(10)
-
+    epoch = 0
     while not rospy.is_shutdown():
 
         trainX, trainY = exportsToTensor(l.pose_export, l.controls_export)
         # print l.controls_export.get('lo', None)
         # print l.pose_export.get("pitch", None)
         # print trainX
-        main(trainX, trainY)
+        epoch += 1
+        main(epoch, trainX, trainY)
         r.sleep()
         pass
