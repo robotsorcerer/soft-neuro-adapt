@@ -10,6 +10,7 @@ from torch.nn.parameter import Parameter
 
 import torch.cuda
 import numpy as np
+import numpy.random as npr
 
 from qpth.qp import QPFunction
 
@@ -42,13 +43,14 @@ class LSTMModel(nn.Module):
         # QP Parameters
         nx = nz * 2  #cause inequality is double sided (see my notes)
         self.neq = neq
-        self.nineq = ineq
+        self.nineq = nineq
         self.nz = nz
 
         self.Q = Variable(Qpenalty*torch.eye(nx).double())
-        self.G = Variable(torch.eye(nx).double())
+        G = torch.eye(nx).double()
         for i in range(6):
-            self.G[i][i] *= -1
+            G[i][i] *= -1
+        self.G = Variable(G)
         self.h = Variable(torch.ones(nx).double())
         self.A = 1000*npr.randn(neq, nz)
         self.b = Variable(torch.zeros(self.A.size(0)).double())

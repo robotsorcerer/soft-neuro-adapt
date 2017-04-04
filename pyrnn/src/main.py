@@ -70,16 +70,21 @@ def main(epoch, trainX, trainY):
     parser.add_argument('--work', type=str, default='work')
     parser.add_argument('--squash', type=bool,default= True)
     parser.add_argument('--model', type=str,default= 'lstm')
+    parser.add_argument('--qpenalty', type=float, default=0.1)
     parser.add_argument('--real_net', type=bool,default=True, help='use real-time network approximator')
     parser.add_argument('--seed', type=int,default=123)
     parser.add_argument('--rnnLR', type=float,default=5e-3)
     parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
-    optnetP = subparsers.add_parser('optnet')
+    subparsers = parser.add_subparsers(dest='model')
+    subparsers.required = True
+    # rnnP = subparsers.add_parser('rnn')
+    # rnnP 
+    optnetP = subparsers.add_parser('lstm')
     optnetP.add_argument('--Qpenalty', type=float, default=0.1)
     args = parser.parse_args()
     #args.cuda = not args.no_cuda and torch.cuda.is_available()
     t = '{}'.format(args.model)
-    if args.model == 'optnet':
+    if args.model == 'lstm':
         t += '.Qpenalty={}'.format(args.Qpenalty)
     setproctitle.setproctitle('lekan.soft-robot.' + t)
 
@@ -95,9 +100,9 @@ def main(epoch, trainX, trainY):
     batchSize = args.batchSize
 
     # QP Hyperparameters
-    nz, neq, nineq, QPenalty = 12, 6, 0, 12, args.QPenalty
+    nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
 
-    net = model.LSTMModel(nz, neq, nineq, Qpenalty, 
+    net = model.LSTMModel(nz, neq, nineq, QPenalty, 
                           inputSize, nHidden, batchSize, noutputs, numLayers)
 
     if args.cuda:
