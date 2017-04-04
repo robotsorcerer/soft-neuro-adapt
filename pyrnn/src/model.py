@@ -45,26 +45,29 @@ class LSTMModel(nn.Module):
         self.neq = neq
         self.nineq = nineq
         self.nz = nz
+        self.nHidden = nHidden
 
         self.Q = Variable(Qpenalty*torch.eye(nx).double())
+        # self.L = Parameter(torch.potrf(Q))        
         G = torch.eye(nx).double()
         for i in range(6):
             G[i][i] *= -1
         self.G = Variable(G)
         self.h = Variable(torch.ones(nx).double())
-        self.A = 1000*npr.randn(neq, nz)
-        self.b = Variable(torch.zeros(self.A.size(0)).double())
+        self.A = Parameter(torch.rand(nx, nx).double())
+        self.b = Variable(torch.ones(self.A.size(0)).double())
+
         def qp_layer(x):
             nBatch = x.size(0)
-            Q = self.Q.unsqueeze(0).expand(nBatch, self.nz, nHidden)
-            G = self.G.unsqueeze(0).expand(nBatch, nHidden, self.nHidden)
+            Q = self.Q.unsqueeze(0).expand(nBatch, nx, nx)
+            G = self.G.unsqueeze(0).expand(nBatch, nx, nx)
             h = self.h.unsqueeze(0).expand(nBatch, self.nineq)
-            A = self.A.unsqueeze(0).expand(nBatch, 1, self.neq)
-            b = self.b.unsqueeze(0).expand(nBatch, 1)
+            A = self.A.unsqueeze(0).expand(nBatch, nx, nx)
+            b = self.b.unsqueeze(0).expand(nBatch, nx)
+            e = Variable(torch.Tensor())
             x = QPFunction()(x.double(), Q, G, h, A, b).float()
             return x
         self.qp_layer = qp_layer
-
 
         # Backprop Through Time (Recurrent Layer) Params
         self.cost = nn.MSELoss(size_average=False)
