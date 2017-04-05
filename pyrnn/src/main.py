@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # coding=utf-8
 
 import argparse
@@ -35,10 +35,10 @@ try:
     # from utils.data_parser import loadSavedMatFile
     from data_parser import split_data
     from ros_comm import Listener
-except Exception, e:
-    raise e
+except ImportError:
+    # raise e
     print('No Import of Utils')
-    print 'No import of ROSCommEmulator'
+    print('No import of ROSCommEmulator')
 
 from IPython.core import ultratb
 sys.excepthook = ultratb.FormattedTB(mode='Verbose',
@@ -88,7 +88,7 @@ def main(epoch, trainX, trainY):
         t += '.Qpenalty={}'.format(args.Qpenalty)
     setproctitle.setproctitle('lekan.soft-robot.' + t)
 
-    nFeatures, nCls, nHidden = 6, 3, map(int, args.hiddenSize)
+    nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
     #ineq constraints are [12 x 3] in total
     # print('model ', model)
 
@@ -96,11 +96,11 @@ def main(epoch, trainX, trainY):
     inputSize = 9
     numLayers = 2
     sequence_length = 9
-    noutputs = 3
+    noutputs = 6
     batchSize = args.batchSize
 
     # QP Hyperparameters
-    nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
+    nz, neq, nineq, QPenalty = 3, 0, 6, args.qpenalty
 
     net = model.LSTMModel(nz, neq, nineq, QPenalty, 
                           inputSize, nHidden, batchSize, noutputs, numLayers)

@@ -47,10 +47,12 @@ class LSTMModel(nn.Module):
         self.nz = nz
         self.nHidden = nHidden
 
+        print('nHidden: ', nHidden)
+
         self.Q = Variable(Qpenalty*torch.eye(nx).double())
         # self.L = Parameter(torch.potrf(Q))        
         G = torch.eye(nx).double()
-        for i in range(6):
+        for i in range(nz):
             G[i][i] *= -1
         self.G = Variable(G)
         self.h = Variable(torch.ones(nx).double())
@@ -65,7 +67,7 @@ class LSTMModel(nn.Module):
             A = self.A.unsqueeze(0).expand(nBatch, nx, nx)
             b = self.b.unsqueeze(0).expand(nBatch, nx)
             e = Variable(torch.Tensor())
-            x = QPFunction()(x.double(), Q, G, h, A, b).float()
+            x = QPFunction()(x.double(), Q, G, h, e, e).float()
             return x
         self.qp_layer = qp_layer
 
@@ -162,7 +164,7 @@ class unusedFunctions():
                             nn.Dropout(0.3),
                             nn.Linear(hidden[2], noutputs)
             )
-        print cost
+        print(cost)
         print(neunet)
 
     def test_RNN_cell():

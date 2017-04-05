@@ -6,6 +6,25 @@ Code for the Self-Correcting Neuro Adaptive Controller
 
 ![QPProof_Doc](pyrnn/src/data/QPProof.pdf)
 
+### Activating Environments 
+
+The code is being phased into python 3.6+
+
+To wrap the python 3.6 environment around your python skin, do
+
+```bash
+conda create -n py35 python=3.5 anaconda
+```
+
+To activate conda 3.6  environment, use:
+
+```bash
+# > source activate py36
+#
+# To deactivate this environment, use:
+# > source deactivate py36
+```
+
 ### Dependencies
 - [Python 2.7+]()
 
@@ -26,6 +45,13 @@ Code for the Self-Correcting Neuro Adaptive Controller
 		conda install -c trentonoliphant rospkg=1.0.29
 	```
 
+	For python3.6, use 
+
+	```bash
+		pip install -i https://pypi.anaconda.org/pypi/simple catkin_pkg
+	```
+
+	Or download the latest tgz from [here](http://download.ros.org/downloads/rospkg/)
 - [Conda netifaces](https://anaconda.org/bcbio/netifaces)
 
 	```bash
