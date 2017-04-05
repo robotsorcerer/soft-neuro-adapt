@@ -77,30 +77,27 @@ def main(epoch, trainX, trainY):
     parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
     subparsers = parser.add_subparsers(dest='model')
     subparsers.required = True
-    # rnnP = subparsers.add_parser('rnn')
-    # rnnP 
+
     optnetP = subparsers.add_parser('lstm')
     optnetP.add_argument('--Qpenalty', type=float, default=0.1)
     args = parser.parse_args()
-    #args.cuda = not args.no_cuda and torch.cuda.is_available()
+
     t = '{}'.format(args.model)
     if args.model == 'lstm':
         t += '.Qpenalty={}'.format(args.Qpenalty)
     setproctitle.setproctitle('lekan.soft-robot.' + t)
 
     nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
-    #ineq constraints are [12 x 3] in total
-    # print('model ', model)
 
     #hyperparams
     inputSize = 9
     numLayers = 2
     sequence_length = 9
-    noutputs = 6
+    noutputs = 3
     batchSize = args.batchSize
 
     # QP Hyperparameters
-    nz, neq, nineq, QPenalty = 3, 0, 6, args.qpenalty
+    nz, neq, nineq, QPenalty = 6, 0, 6, args.qpenalty
 
     net = model.LSTMModel(nz, neq, nineq, QPenalty, 
                           inputSize, nHidden, batchSize, noutputs, numLayers)
@@ -108,7 +105,6 @@ def main(epoch, trainX, trainY):
     if args.cuda:
         net = net.cuda()
 
-    # print_header
     ('Building model')
 
     t = '{}'.format('optnet')
@@ -145,18 +141,7 @@ def train(args, net, epoch, optimizer, trainX, trainY):
     batchSize = args.batchSize  
     iter,lr = 0, args.rnnLR 
     num_epochs = 500
-
-    batch_data_t = torch.FloatTensor(batchSize, trainX.size(1))
-    batch_targets_t = torch.FloatTensor(batchSize, trainY.size(1))
-
-    if args.cuda:
-        batch_data_t = batch_data_t.cuda()
-        batch_targets_t = batch_targets_t.cuda()
-
-    batch_data = Variable(batch_data_t, requires_grad=False)
-    batch_targets = Variable(batch_targets_t, requires_grad=False)
     
-    # for epoch in range(num_epochs):
     inputs = trainX     #Variable(torch.Tensor(5, 1, 9))
     labels = trainY     #Variable(torch.Tensor(5, 3))
 
@@ -167,9 +152,6 @@ def train(args, net, epoch, optimizer, trainX, trainY):
     loss.backward()
     optimizer.step()
     
-    # if rospy.is_shutdown():
-        # break
-
     if (epoch % 10) == 0:
         print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
             epoch, epoch+batchSize, trainX.size(0),
