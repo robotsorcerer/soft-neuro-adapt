@@ -89,7 +89,7 @@ def main(epoch, trainX, trainY):
 
     nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
 
-    #hyperparams
+    #Global Hyperparams
     inputSize = 9
     numLayers = 2
     sequence_length = 9
@@ -97,7 +97,14 @@ def main(epoch, trainX, trainY):
     batchSize = args.batchSize
 
     # QP Hyperparameters
-    nz, neq, nineq, QPenalty = 6, 0, 6, args.qpenalty
+    '''
+    6 valves = nz = 6
+    no equality contraints neq = 0
+    due to double sided inequliaties and introduction of 
+    slack variables, nineq = 12
+    QPenalty is arbitrarily chosen. Ideally, set to 1
+    '''
+    nz, neq, nineq, QPenalty = 3, 0, 3, args.qpenalty
 
     net = model.LSTMModel(nz, neq, nineq, QPenalty, 
                           inputSize, nHidden, batchSize, noutputs, numLayers)
@@ -117,17 +124,6 @@ def main(epoch, trainX, trainY):
         os.makedirs(save)
     
     npr.seed(1)
-
-    fields = ['epoch', 'loss', 'err']
-    trainF = open(os.path.join(save, 'train.csv'), 'w')
-    trainW = csv.writer(trainF)
-    trainW.writerow(fields)
-    trainF.flush()
-    fields = ['epoch', 'loss', 'err']
-    testF = open(os.path.join(save, 'test.csv'), 'w')
-    testW = csv.writer(testF)
-    testW.writerow(fields)
-    testF.flush()
 
     if args.sim:
         trainX, trainY, testX, testY = split_data("data/data.mat")
@@ -158,11 +154,6 @@ def train(args, net, epoch, optimizer, trainX, trainY):
             float(iter+batchSize)/trainX.size(0)*100,
             loss.data[0]))
     
-def writeParams(args, model, tag):
-    if args.model == 'optnet':
-        A = model.A.data.cpu().numpy()
-        np.savetxt(os.path.join(args.save, 'A.{}'.format(tag)), A)
-
 def exportsToTensor(pose, controls):
     #will be [torch.FloatTensor of size 1x9]
     inputs = torch.Tensor([[
