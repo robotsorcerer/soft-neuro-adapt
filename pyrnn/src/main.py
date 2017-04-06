@@ -61,7 +61,7 @@ def main(epoch, trainX, trainY):
     parser.add_argument('--noutputs', type=int, default=3)
     parser.add_argument('--display', type=int,  default=1)
     parser.add_argument('--verbose', type=bool, default=True)
-    parser.add_argument('--cuda', type=bool,    default=False)
+    parser.add_argument('--cuda', type=bool,    default=True)
     parser.add_argument('--maxIter', type=int,  default=10000)
     parser.add_argument('--silent', type=bool,  default=True)
     parser.add_argument('--sim', type=bool,  default=False)
@@ -141,6 +141,10 @@ def train(args, net, epoch, optimizer, trainX, trainY):
     inputs = trainX     #Variable(torch.Tensor(5, 1, 9))
     labels = trainY     #Variable(torch.Tensor(5, 3))
 
+    if args.cuda:
+        inputs = inputs.cuda()
+        labels = labels.cuda()
+
     # Forward + Backward + Optimize
     optimizer.zero_grad()
     outputs = net(inputs)
@@ -175,7 +179,6 @@ def exportsToTensor(pose, controls):
     targets = Variable(targets)
     return inputs, targets
 
-    
 if __name__ == '__main__':
 
     l = Listener(Pose, Twist)
