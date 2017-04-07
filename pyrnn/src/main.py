@@ -67,7 +67,6 @@ def main(epoch, trainX, trainY):
     parser.add_argument('--sim', type=bool,  default=False)
     parser.add_argument('--useVicon', type=bool, default=True)
     parser.add_argument('--save', type=str, default='save')
-    parser.add_argument('--work', type=str, default='work')
     parser.add_argument('--squash', type=bool,default= True)
     parser.add_argument('--model', type=str,default= 'lstm')
     parser.add_argument('--qpenalty', type=float, default=0.1)
@@ -93,7 +92,7 @@ def main(epoch, trainX, trainY):
     inputSize = 9
     numLayers = 2
     sequence_length = 9
-    noutputs = 3
+    noutputs = 6
     batchSize = args.batchSize
 
     # QP Hyperparameters
@@ -104,7 +103,7 @@ def main(epoch, trainX, trainY):
     slack variables, nineq = 12
     QPenalty is arbitrarily chosen. Ideally, set to 1
     '''
-    nz, neq, nineq, QPenalty = 3, 0, 3, args.qpenalty
+    nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
 
     net = model.LSTMModel(nz, neq, nineq, QPenalty, 
                           inputSize, nHidden, batchSize, noutputs, numLayers)
@@ -138,8 +137,8 @@ def train(args, net, epoch, optimizer, trainX, trainY):
     iter,lr = 0, args.rnnLR 
     num_epochs = 500
     
-    inputs = trainX     #Variable(torch.Tensor(5, 1, 9))
-    labels = trainY     #Variable(torch.Tensor(5, 3))
+    inputs = trainX     
+    labels = trainY     
 
     if args.cuda:
         inputs = inputs.cuda()
@@ -148,8 +147,6 @@ def train(args, net, epoch, optimizer, trainX, trainY):
     # Forward + Backward + Optimize
     optimizer.zero_grad()
     outputs = net(inputs)
-
-    # print('inputs', inputs, 'outputs: ', labels)
 
     loss    = net.criterion(outputs, labels)
     loss.backward()
@@ -162,7 +159,10 @@ def train(args, net, epoch, optimizer, trainX, trainY):
             loss.data[0]))
     
 def exportsToTensor(pose, controls):
-    #will be [torch.FloatTensor of size 1x9]
+
+    seqLength = 5
+    outputSize = 6
+
     inputs = torch.Tensor([[
                             controls.get('lo', 0), controls.get('bo', 0),
                             controls.get('bi', 0), controls.get('li', 0), 
@@ -171,14 +171,15 @@ def exportsToTensor(pose, controls):
                             pose.get('yaw', 0)
                         ]])
     inputs = Variable(
-                     (torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(5,1,9))
+                     (torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9))
                      )
 
     #will be [torch.FloatTensor of size 1x3]
     targets = (torch.Tensor([[                            
-                            pose.get('z', 0), pose.get('pitch', 0), 
-                            pose.get('yaw', 0)
-                            ]])).expand(5, 1, 3)
+                            pose.get('z', 0), pose.get('z', 0), 
+                            pose.get('pitch', 0), pose.get('pitch', 0), 
+                            pose.get('yaw', 0), pose.get('yaw', 0)
+                            ]])).expand(seqLength, 1, outputSize)
     targets = Variable(targets)
     return inputs, targets
 

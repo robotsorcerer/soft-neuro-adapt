@@ -37,9 +37,13 @@ class LSTMModel(nn.Module):
     QP Layer:
         nz = 6, neq = 0, nineq = 12, QPenalty = 0.1
     '''
-    def __init__(self, nz, neq, nineq, Qpenalty, inputSize, nHidden, batchSize, noutputs=3, numLayers=2):
+    def __init__(self, nz, neq, nineq, Qpenalty, inputSize, nHidden, 
+                 batchSize, noutputs=3, numLayers=2):
 
         super(LSTMModel, self).__init__()
+        '''
+        inputSize = 9, nHidden = [9,6,6], batchSize = 1
+        '''
 
         # QP Parameters
         nx = nz     #cause inequality is double sided (see my notes)
@@ -54,7 +58,7 @@ class LSTMModel(nn.Module):
         for i in range(nz):
             G[i][i] *= -1
         self.G = Variable(G.cuda())
-        self.h = Variable(torch.ones(nx).cuda())
+        self.h = Variable(torch.ones(nineq).cuda())
         e = Variable(torch.Tensor().cuda())
 
         def qp_layer(x):
@@ -70,10 +74,10 @@ class LSTMModel(nn.Module):
             Returns: \hat z: a (nBatch, nz) Tensor.
             '''
             nBatch = x.size(0)
-            Q = self.Q  #.unsqueeze(0).expand(nBatch, nx, nx)
-            p = self.p  #.unsqueeze(0).expand(nBatch, nx)
-            G = self.G  #.unsqueeze(0).expand(nBatch, nineq, nx)
-            h = self.h  #.unsqueeze(0).expand(nBatch, nineq)
+            Q = self.Q  
+            p = x.view(nBatch, -1) 
+            G = self.G  
+            h = self.h  
             e = Variable(torch.Tensor().cuda())
             x = QPFunction()(Q, p, G, h, e, e).cuda()
             return x
@@ -119,15 +123,6 @@ class LSTMModel(nn.Module):
         out, _ = self.lstm3(out, (h2, c2)) 
         out = self.drop(out) 
         
-        # '''
-        # Decode hidden state of last time step
-        out = self.fc(out[:, -1, :]) 
-
-        #Now add QP Layer
-        out = out.view(nBatch, -1) 
-        return out #self.qp_layer(out) 
-        # '''
-        '''
         # Decode hidden state of last time step
         out = self.fc(out[:, -1, :]) 
 
@@ -135,8 +130,7 @@ class LSTMModel(nn.Module):
         out = out.view(nBatch, -1) 
 
         out = self.qp_layer(out)
-        # out = out.expand_as(torch.LongTensor(self.batchSize, self.noutputs))
-        print(out)
-        '''
+
 
         return out
+        # '''
