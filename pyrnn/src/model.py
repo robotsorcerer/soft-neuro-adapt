@@ -119,9 +119,24 @@ class LSTMModel(nn.Module):
         out, _ = self.lstm3(out, (h2, c2)) 
         out = self.drop(out) 
         
+        # '''
         # Decode hidden state of last time step
         out = self.fc(out[:, -1, :]) 
 
         #Now add QP Layer
         out = out.view(nBatch, -1) 
-        return self.qp_layer(out)
+        return out #self.qp_layer(out) 
+        # '''
+        '''
+        # Decode hidden state of last time step
+        out = self.fc(out[:, -1, :]) 
+
+        #Now add QP Layer
+        out = out.view(nBatch, -1) 
+
+        out = self.qp_layer(out)
+        # out = out.expand_as(torch.LongTensor(self.batchSize, self.noutputs))
+        print(out)
+        '''
+
+        return out

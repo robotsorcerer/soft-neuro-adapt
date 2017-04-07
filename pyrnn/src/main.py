@@ -148,6 +148,9 @@ def train(args, net, epoch, optimizer, trainX, trainY):
     # Forward + Backward + Optimize
     optimizer.zero_grad()
     outputs = net(inputs)
+
+    # print('inputs', inputs, 'outputs: ', labels)
+
     loss    = net.criterion(outputs, labels)
     loss.backward()
     optimizer.step()
@@ -175,7 +178,7 @@ def exportsToTensor(pose, controls):
     targets = (torch.Tensor([[                            
                             pose.get('z', 0), pose.get('pitch', 0), 
                             pose.get('yaw', 0)
-                            ]])).expand(5, 3)
+                            ]])).expand(5, 1, 3)
     targets = Variable(targets)
     return inputs, targets
 
