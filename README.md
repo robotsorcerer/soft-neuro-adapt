@@ -4,66 +4,87 @@ Code for the Self-Correcting Neuro Adaptive Controller
 
 ### QPProof
 
-![QPProof_Doc](pyrnn/src/data/QPProof.pdf)
+Please see my [blog post](http://lakehanne.github.io/QP-Layer-MRAS).
 
-### Activating Environments 
+### Dependencies 
+- tqdm
+- python 3.5+
+- ros pkg
+- catkin pkg
+- pytorch
 
-The code is being phased into python 3.6+
+#### Activating Environments 
 
-To wrap the python 3.6 environment around your python skin, do
+The code is finally phased into python 3.6+. If you have a base ROS installation that uses
+ Python 2.7 and you want to keep your native pythonpath, the best way to change your python version 
+ without messing stuff up is to install python3.6 with conda and activate the py36 environment
+ everytime you use this code.
+
+To install e.g. a python 3.6 environment around your python skin, do
 
 ```bash
-conda create -n py35 python=3.5 anaconda
+conda create -n py36 python=3.6 anaconda
 ```
 
-To activate conda 3.6  environment, use:
+To activate conda 3.6  environment, do:
 
 ```bash
 # > source activate py36
-#
-# To deactivate this environment, use:
+```
+
+To deactivate this environment, use:
+
+```bash
 # > source deactivate py36
 ```
 
-### Dependencies
-- [Python 2.7+]()
+### Install Dependencies
+
+```bash
+	pip install -r requirements.txt
+```
 
 - [PyTorch](http://pytorch.org/)
+
 	<pre><code> conda install pytorch torchvision -c soumith </code></pre>
 
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
-- [Conda Catkin_pkg](https://anaconda.org/auto/catkin_pkg)
+Additionally, since we are using python 3.6 and this code runs on ros indigo, we would want to install necessary ros
+packages for the py36 environment using conda without messing up our base installation.
+
+- [Conda Catkin Package](https://anaconda.org/auto/catkin_pkg)
 	
 	```bash
 		conda install -c auto catkin_pkg
 	```
 
-- [Conda Ros_pkg](https://anaconda.org/jdh88/rospkg)
+- [Conda ROS Package](https://anaconda.org/jdh88/rospkg)
 	
-	```bash
+<!-- 	```bash
 		conda install -c trentonoliphant rospkg=1.0.29
-	```
+	``` -->
 
-	For python3.6, use 
+	It's pypi installable:
 
 	```bash
 		pip install -i https://pypi.anaconda.org/pypi/simple catkin_pkg
 	```
 
 	Or download the latest tgz from [here](http://download.ros.org/downloads/rospkg/)
+
 - [Conda netifaces](https://anaconda.org/bcbio/netifaces)
+
+	This is very critical as rospy uses this to communicate across the underlying unix socket protocol.
 
 	```bash
 		conda install -c bcbio netifaces=0.10.4
 	```
 
-- The [Superchick package](https://github.com/lakehanne/superchicko)
-
 - Vision-based tracker
-	- My clone of the [vicon package](https://github.com/lakehanne/superchicko/tree/indigo-devel/vicon)
+	- My clone of the [vicon package](https://github.com/lakehanne/superchicko/tree/indigo-devel/vicon).
 
-	- The [Ensenso package](https://github.com/lakehanne/ensenso)
+	- The [Ensenso package](https://github.com/lakehanne/ensenso).
 
 ### Running the Package
 
@@ -92,7 +113,7 @@ To activate conda 3.6  environment, use:
 - 	Neural Network Function Aproximator
 
 
-	Previously written in Torch7 as the [farnn](/farnn) package, this code has been migrated to [pyrnn](/pyrnn) in the recently released [PyTorch](pytorch) language to take advantage of python libraries, cvx and quadratic convex programming.
+	Previously written in Torch7 as the [farnn](/farnn) package, this code has been migrated to [pyrnn](/pyrnn) in the recently released [PyTorch](pytorch) language to take advantage of python libraries, cvx and quadratic convex programming for contraint-based adaptive control.
 
 	- Farnn
 
