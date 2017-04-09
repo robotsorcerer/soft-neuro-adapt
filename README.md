@@ -61,10 +61,6 @@ packages for the py36 environment using conda without messing up our base instal
 
 - [Conda ROS Package](https://anaconda.org/jdh88/rospkg)
 	
-<!-- 	```bash
-		conda install -c trentonoliphant rospkg=1.0.29
-	``` -->
-
 	It's pypi installable:
 
 	```bash
