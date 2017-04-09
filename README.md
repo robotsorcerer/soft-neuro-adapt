@@ -1,6 +1,6 @@
 ### Intro
 
-Source codes for my Robotics and Automation Letters paper: A 3-DoF Neuro-Adaptive Pose Correcting system during cancer radiotherapy.  arXiv:1703.03821
+Source codes for my Robotics and Automation Letters paper: A 3-DoF Neuro-Adaptive Pose Correcting System For Frameless and Maskless Cancer Radiotherapy.  arXiv:1703.03821
 
 ### QPProof
 
