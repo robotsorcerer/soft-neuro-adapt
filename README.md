@@ -33,13 +33,13 @@ To deactivate this environment, use:
 #### Core dependencies
 - python 3.5+
 - pytorch
-- ROS
+- ros
 	
-	Pytorch version of this code Only works on gpu. Tested with cuda 8.0 and cuda run time version 367.49. 
-	To install, do
-		
-		<pre><code class="terminal"> Termnal x:$ conda install pytorch torchvision cuda80 -c soumith </code></pre>
-	
+The pytorch version of this code only works on gpu. Tested with cuda 8.0 and cuda run time version 367.49. 
+To install, do		
+	<pre class="terminal"><code>Termnal x:$ conda install pytorch torchvision cuda80 -c soumith </code></pre>
+
+Instaructions for installing ros can be found here:	
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
 #### PyPI dependencies 
@@ -52,20 +52,20 @@ PyPI installable using:
 
 This would install 
 
-- numpy>=1.12.1
-- scipy>=0.19.0
-- qpth>=0.0.5
-- cvxpy>=0.4.9
-- matplotlib>=2.0.0
-- ipython>=5.3.0
-- h5py>=2.7.0
-- setproctitle>=1.1.10
-- setGPU>=0.0.7
-- tqdm>=4.11.2
-- catkin_pkg>=0.3.1
-- block>=0.0.4
-- rospkg>=1.1.0
-- netifaces>=0.10.5
+- `numpy>=1.12.1`
+- `scipy>=0.19.0`
+- `qpth>=0.0.5`
+- `cvxpy>=0.4.9`
+- `matplotlib>=2.0.0`
+- `ipython>=5.3.0`
+- `h5py>=2.7.0`
+- `setproctitle>=1.1.10`
+- `setGPU>=0.0.7`
+- `tqdm>=4.11.2`
+- `catkin_pkg>=0.3.1`
+- `block>=0.0.4`
+- `rospkg>=1.1.0`
+- `netifaces>=0.10.5`
 
 
 ### Vision processing
@@ -92,11 +92,11 @@ This would install
 
 - 	Neural Network Function Aproximator
 
-	Previously written in Torch7 as the [farnn](/farnn) package, this code has been migrated to [pyrnn](/pyrnn) in the recently released [PyTorch](pytorch) deep nets framework to take advantage of python libraries, cvx and quadratic convex programming for contraint-based adaptive control.
+	Previously written in Torch7 as the [farnn](/farnn) package, this code has been migrated to [pyrnn](/pyrnn) in the recently released [pytorch](pytorch) deep nets framework to take advantage of python libraries, cvx and quadratic convex programming for contraints-based adaptive control.
 
 	- farnn
 
-	Running in Farnn is done by `roscd` ing into the `farnn src` folder and running `th real_time_predictor.lua` while [nn_controller](/nn_controller) is running).
+	Running `farnn` would consist of `roscd ing` into the `farnn src` folder and running `th real_time_predictor.lua` command while the [nn_controller](/nn_controller) is running).
 
 	- pyrnn
 
