@@ -1,6 +1,6 @@
 ### Intro
 
-Source codes for my Robotics and Automation Letters paper: A 3-DoF Neuro-Adaptive Pose Correcting System For Frameless and Maskless Cancer Radiotherapy.  arXiv:1703.03821
+Source codes for my Robotics and Automation Letters paper: A 3-DoF Neuro-Adaptive Pose Correcting System For Frameless and Maskless Cancer Radiotherapy.  Arxiv ID: arXiv:1703.03821
 
 ### QPProof
 
@@ -8,18 +8,18 @@ Please see my [blog post](http://lakehanne.github.io/QP-Layer-MRAS).
 
 #### Activating Environments 
 
-The code is finally phased into python 3.6+. If you have a base ROS installation that uses
- Python 2.7 and you want to keep your native pythonpath, the best way to change your python version 
- without messing stuff up is to install python3.6 with conda and activate the py36 environment
+The code is finally phased into python 3.5+. If you have a base ROS installation, e.g. indigo, that uses
+ Python 2.7 and you want to keep your native `pythonpath`, the best way to change your python version 
+ without messing stuff up is to install `python3.6` with `conda` and activate the py36 environment
  everytime you use this code.
 
-To install e.g. a python 3.6 environment around your python skin, do
+To install e.g. a python 3.6 environment around your base python skin, do
 
 ```bash
 	conda create -n py36 python=3.6 anaconda
 ```
 
-To activate conda 3.6  environment, do:
+To activate the `conda 3.6`  environment, do:
 
 ```bash
 # > source activate py36
@@ -34,16 +34,12 @@ To deactivate this environment, use:
 - python 3.5+
 - pytorch
 - ROS
-
-
-- [PyTorch](http://pytorch.org/)
 	
-	Only works on gpu. Tested with cuda 8.0 and cuda run time version 367.49
+	Pytorch version of this code Only works on gpu. Tested with cuda 8.0 and cuda run time version 367.49. 
+	To install, do
+		
+		<pre><code class="terminal"> Termnal x:$ conda install pytorch torchvision cuda80 -c soumith </code></pre>
 	
-	```bash
-		conda install pytorch torchvision cuda80 -c soumith </code></pre>
-	```
-
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
 #### PyPI dependencies 
@@ -70,7 +66,7 @@ These can be installed with
 
 ### Vision processing
 
-- [Option 1] Vision-based tracker
+- [Option 1] The Vicon System
 	- My clone of the [vicon package](https://github.com/lakehanne/superchicko/tree/indigo-devel/vicon).
 
 		With the vicon system, you get a more accurate world representation. We would want four markers on the face in a rhombic manner (preferrably named `fore`, `left` , `right`, and `chin` to conform with the direction cosines code that extracts the facial pose); make sure the `subject` and `segment` are appropriately named `Superdude/head` in `Nexus`. We would also want four markers on the base panel from which the rotation of the face with respect to the panel frame is computed (call these markers `tabfore`, `tabright`, `tableft` and `tabchin` respectively). Make sure the `subject` and `segment` are named `Panel/rigid` in `Nexus`. In terminal, bring up the vicon system
