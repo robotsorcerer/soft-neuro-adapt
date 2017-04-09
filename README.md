@@ -2,7 +2,7 @@
 
 Source codes for my Robotics and Automation Letters paper: A 3-DoF Neuro-Adaptive Pose Correcting System For Frameless and Maskless Cancer Radiotherapy.  Arxiv ID: arXiv:1703.03821
 
-### QPProof
+### QP Proof
 
 Please see my [blog post](http://lakehanne.github.io/QP-Layer-MRAS).
 
