@@ -46,7 +46,7 @@ To deactivate this environment, use:
 
 - [PyTorch](http://pytorch.org/)
 
-	<pre><code> conda install pytorch torchvision -c soumith </code></pre>
+	<pre><code> conda install pytorch torchvision cuda80 -c soumith </code></pre>
 
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
@@ -61,11 +61,7 @@ packages for the py36 environment using conda without messing up our base instal
 
 - [Conda ROS Package](https://anaconda.org/jdh88/rospkg)
 	
-	It's pypi installable:
-
-	```bash
-		pip install -i https://pypi.anaconda.org/pypi/simple catkin_pkg
-	```
+	It's pypi installable and it's in the [requirements.txt](/requirements.txt) file.
 
 	Or download the latest tgz from [here](http://download.ros.org/downloads/rospkg/)
 
