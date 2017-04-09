@@ -35,10 +35,7 @@ try:
     # from utils.data_parser import loadSavedMatFile
     from data_parser import split_data
     from ros_comm import Listener
-except ImportError:
-    # raise e
-    print('No Import of Utils')
-    print('No import of ROSCommEmulator')
+except ImportError: pass
 
 from IPython.core import ultratb
 sys.excepthook = ultratb.FormattedTB(mode='Verbose',
@@ -191,9 +188,6 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
 
         trainX, trainY = exportsToTensor(l.pose_export, l.controls_export)
-        # print l.controls_export.get('lo', None)
-        # print l.pose_export.get("pitch", None)
-        # print trainX
         epoch += 1
         main(epoch, trainX, trainY)
         r.sleep()
