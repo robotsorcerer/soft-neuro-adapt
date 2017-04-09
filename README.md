@@ -43,6 +43,15 @@ To deactivate this environment, use:
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
 #### PyPI dependencies 
+
+PyPI installable using:
+
+	```bash
+		pip install -r requirements.txt
+	```
+
+This would install 
+
 - numpy>=1.12.1
 - scipy>=0.19.0
 - qpth>=0.0.5
@@ -58,11 +67,6 @@ To deactivate this environment, use:
 - rospkg>=1.1.0
 - netifaces>=0.10.5
 
-These can be installed with 
-
-	```bash
-		pip install -r requirements.txt
-	```
 
 ### Vision processing
 
