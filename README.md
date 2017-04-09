@@ -1,6 +1,6 @@
 ### Intro
 
-Source codes for my Robotics and Automation Letters paper: A 3-DoF Neuro-Adaptive Pose Correcting System For Frameless and Maskless Cancer Radiotherapy.  Arxiv ID: arXiv:1703.03821
+Source codes for my **Robotics and Automation Letters paper: A 3-DoF Neuro-Adaptive Pose Correcting System For Frameless and Maskless Cancer Radiotherapy**.  Arxiv ID: arXiv:1703.03821
 
 ### QP Proof
 
@@ -10,7 +10,7 @@ Please see my [blog post](http://lakehanne.github.io/QP-Layer-MRAS).
 
 The code is finally phased into python 3.5+. If you have a base ROS installation, e.g. indigo, that uses
  Python 2.7 and you want to keep your native `pythonpath`, the best way to change your python version 
- without messing stuff up is to install `python3.6` with `conda` and activate the py36 environment
+ without messing stuff up is to install, for example a `python3.6` with `conda` and activate the py36 environment
  everytime you use this code.
 
 To install e.g. a python 3.6 environment around your base python skin, do
@@ -39,7 +39,7 @@ The pytorch version of this code only works on gpu. Tested with cuda 8.0 and cud
 To install, do		
 	<pre class="terminal"><code>Termnal x:$ conda install pytorch torchvision cuda80 -c soumith </code></pre>
 
-Instaructions for installing ros can be found here:	
+Instructions for installing ros can be found here:	
 - [ROS](http://wiki.ros.org/indigo/Installation/Ubuntu)
 
 #### PyPI dependencies 
