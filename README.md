@@ -70,15 +70,17 @@ This would install
 - [Option 1] The Vicon System
 	- My clone of the [vicon package](https://github.com/lakehanne/superchicko/tree/indigo-devel/vicon).
 
-		With the vicon system, you get a more accurate world representation. We would want four markers on the face in a rhombic manner (preferrably named `fore`, `left` , `right`, and `chin` to conform with the direction cosines code that extracts the facial pose); make sure the `subject` and `segment` are appropriately named `Superdude/head` in `Nexus`. We would also want four markers on the base panel from which the rotation of the face with respect to the panel frame is computed (call these markers `tabfore`, `tabright`, `tableft` and `tabchin` respectively). Make sure the `subject` and `segment` are named `Panel/rigid` in `Nexus`. In terminal, bring up the vicon system
-		
-		<pre class="terminal"><code> Terminal$:	rosrun vicon_bridge vicon.launch</pre></code>
+	Clone the vicon fork at the address above and follow the readme instructions there. 
 
-		This launches the [adaptive model-following control algorithm](/nn_controller), drection_cosines computation of head rotation about the table frame and the vicon ros subscriber node.
+	With the vicon system, you get a more accurate world representation. We would want four markers on the face in a rhombic manner (preferrably named `fore`, `left` , `right`, and `chin` to conform with the direction cosines code that extracts the facial pose); make sure the `subject` and `segment` are appropriately named `Superdude/head` in `Nexus`. We would also want four markers on the base panel from which the rotation of the face with respect to the panel frame is computed (call these markers `tabfore`, `tabright`, `tableft` and `tabchin` respectively). Make sure the `subject` and `segment` are named `Panel/rigid` in `Nexus`. In terminal, bring up the vicon system
+		
+	<pre class="terminal"><code> Terminal$:	rosrun vicon_bridge vicon.launch</pre></code>
+
+	This launches the [adaptive model-following control algorithm](/nn_controller), drection_cosines computation of head rotation about the table frame and the vicon ros subscriber node.
 		
 - [Option 2] The [Ensenso package](https://github.com/lakehanne/ensenso).
 
-	If you plan to use ensenso, do this in terminal
+	If you plan to use ensenso, clone the ensenso package via the link above and follow the README instructions therein. When done, do this in terminal
 
 	<pre class="terminal"><code> Terminal 1$	rosrun ensenso ensenso_bridge </pre></code>
 	<pre class="terminal"><code> Terminal 2$:	rosrun ensenso ensenso_seg </pre></code>
