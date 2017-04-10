@@ -89,7 +89,7 @@ This would install
 
 	The pose tuple of the face is broadcast on the topic `/mannequine_head/pose`. To generate the adaptive gains, we would need to bring up the [nn_controller node](/nn_controller). Do this,
 
-	<pre class="terminal"><code> Terminal 3:$ rosrun nn_controller nn_controller <ref_z>  <ref_pitch> <ref_roll> </code></pre>
+	<pre class="terminal"><code> Terminal 3:$ rosrun nn_controller nn_controller ref_z  ref_pitch ref_roll </code></pre>
 
 	Where <ref_x> represents the desired trajectory we want to raise the head.
 
