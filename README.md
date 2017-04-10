@@ -45,10 +45,7 @@ Instructions for installing ros can be found here:
 #### PyPI dependencies 
 
 PyPI installable using:
-
-	```bash
-		pip install -r requirements.txt
-	```
+	<pre class="terminal"><code> Terminal:$	pip install -r requirements.txt </code></pre>
 
 This would install 
 
@@ -88,11 +85,15 @@ This would install
 	
 	This should open up the face scene and segment out the face as well as compute the cartesian coordinates and roll, pitch, yaw angles of the face in the scene.
 
-	The pose tuple of the face is broadcast on the topic `/mannequine_head/pose`.
+	The pose tuple of the face is broadcast on the topic `/mannequine_head/pose`. To generate the adaptive gains, we would need to bring up the [nn_controller node](/nn_controller). Do this,
+
+	<pre class="terminal"><code> Terminal 3:$ rosrun nn_controller nn_controller <ref_z>  <ref_pitch> <ref_roll> </code></pre>
+
+	Where <ref_x> represents the desired trajectory we want to raise the head.
 
 - 	Neural Network Function Aproximator
 
-	Previously written in Torch7 as the [farnn](/farnn) package, this code has been migrated to [pyrnn](/pyrnn) in the recently released [pytorch](pytorch) deep nets framework to take advantage of python libraries, cvx and quadratic convex programming for contraints-based adaptive control.
+	Previously written in Torch7 as the [farnn](/farnn) package, this portion of the codebase has been migrated to [pyrnn](/pyrnn) in the recently released [pytorch](pytorch) deep nets framework to take advantage of python libraries, cvx and quadratic convex programming for contraints-based quadratic programming (useful for our adaptive controller).
 
 	- farnn
 
