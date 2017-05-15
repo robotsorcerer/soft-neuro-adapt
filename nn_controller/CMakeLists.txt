@@ -9,8 +9,8 @@ include_directories( ${EIGEN3_INCLUDE_DIRS} )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(Caffe_DIR                     $ENV{CAFFE_ROOT})
 
-OPTION(USE_CAFFE "Enable Caffe support" ON)
-OPTION(USE_CAFFE_GPU "Enable Caffe GPU support" ON)
+OPTION(USE_CAFFE "Enable Caffe support" OFF)
+OPTION(USE_CAFFE_GPU "Enable Caffe GPU support" OFF)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
@@ -19,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   ensenso
-  Caffe
+  # Caffe
 )
 
 find_package(Boost COMPONENTS filesystem system serialization
@@ -53,30 +53,11 @@ add_message_files(
    std_msgs
  )
 
-## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
-
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs ensenso message_runtime 
+  CATKIN_DEPENDS geometry_msgs roscpp rospy std_msgs ensenso message_runtime
   DEPENDS Boost
   LIBRARIES pathfinder
 )
-
-###########
-## Build ##
-###########
 
 # Include Caffe
 if (USE_CAFFE)
@@ -94,15 +75,6 @@ if (USE_CAFFE)
     include_directories(${CAFFE_INCLUDE_PATH})  # Should be set to /path/to/caffe/distribute/include
     # extra header paths
     include_directories(${CAFFE_EXTRA_PATH})
-    # add neural network to DDP controller files
-    #set(DDP_FILES ${DDP_FILES} src/neuralnetworkcaffe.cpp src/caffenncontroller.cpp)
-    # compile Caffe test
-    #rosbuild_add_executable(caffe_test src/caffe_test.cpp src/neural_network_caffe.cpp)
-    #target_link_libraries(caffe_test caffe protobuf)
-
-    # compile image processor node
-    #rosbuild_add_executable(caffe_img_processor src/img_processor.cpp src/neural_network_caffe.cpp)
-    #target_link_libraries(caffe_img_processor caffe protobuf)
 endif (USE_CAFFE)
 
 ## Specify additional locations of header files
@@ -124,13 +96,12 @@ add_definitions(${EIGEN_DEFINITIONS})
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-#add_dependencies(nn_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 ## Declare a C++ executable
 add_executable(nn_controller src/nn_controller.cpp)
 add_dependencies(nn_controller ${PROJECT_NAME}_gencpp)
-add_dependencies(nn_controller ${catkin_EXPORTED_TARGETS})
+add_dependencies(nn_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
