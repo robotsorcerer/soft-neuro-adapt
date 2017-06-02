@@ -37,7 +37,7 @@ class LSTMModel(nn.Module):
     QP Layer:
         nz = 6, neq = 0, nineq = 12, QPenalty = 0.1
     '''
-    def __init__(self, nz, neq, nineq, Qpenalty, inputSize, nHidden, 
+    def __init__(self, nz, neq, nineq, Qpenalty, inputSize, nHidden,
                  batchSize, noutputs=3, numLayers=2):
 
         super(LSTMModel, self).__init__()
@@ -74,10 +74,10 @@ class LSTMModel(nn.Module):
             Returns: \hat z: a (nBatch, nz) Tensor.
             '''
             nBatch = x.size(0)
-            Q = self.Q  
-            p = x.view(nBatch, -1) 
-            G = self.G  
-            h = self.h  
+            Q = self.Q
+            p = x.view(nBatch, -1)
+            G = self.G
+            h = self.h
             e = Variable(torch.Tensor().cuda())
             x = QPFunction()(Q, p, G, h, e, e).cuda()
             return x
@@ -92,7 +92,7 @@ class LSTMModel(nn.Module):
         self.batchSize = batchSize
         self.noutputs = noutputs
         self.criterion = nn.MSELoss(size_average=False)
-        
+
         #define recurrent and linear layers
         self.lstm1  = nn.LSTM(inputSize,nHidden[0],num_layers=numLayers)
         self.lstm2  = nn.LSTM(nHidden[0],nHidden[1],num_layers=numLayers)
@@ -103,31 +103,32 @@ class LSTMModel(nn.Module):
     def forward(self, x):
         nBatch = x.size(0)
 
-        # Set initial states 
-        h0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]).cuda()) 
-        c0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]).cuda())        
+        # # Set initial states
+        # h0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]).cuda())
+        # c0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]).cuda())
         # Forward propagate RNN layer 1
-        out, _ = self.lstm1(x, (h0, c0)) 
+        out, _ = self.lstm1(x)#, (h0, c0))
         out = self.drop(out)
-        
-        # Set hidden layer 2 states 
-        h1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1]).cuda()) 
-        c1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1]).cuda())        
+
+        # # Set hidden layer 2 states
+        # h1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1]).cuda())
+        # c1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1]).cuda())
         # Forward propagate RNN layer 2
-        out, _ = self.lstm2(out, (h1, c1))  
-        
-        # Set hidden layer 3 states 
-        h2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2]).cuda()) 
-        c2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2]).cuda())        
+        out, _ = self.lstm2(out)#, (h1, c1))
+
+        # # Set hidden layer 3 states
+        # h2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2]).cuda())
+        # c2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2]).cuda())
+
         # Forward propagate RNN layer 2
-        out, _ = self.lstm3(out, (h2, c2)) 
-        out = self.drop(out) 
-        
+        out, _ = self.lstm3(out)#, (h2, c2))
+        out = self.drop(out)
+
         # Decode hidden state of last time step
-        out = self.fc(out[:, -1, :]) 
+        out = self.fc(out[:, -1, :])
 
         #Now add QP Layer
-        out = out.view(nBatch, -1) 
+        out = out.view(nBatch, -1)
 
         out = self.qp_layer(out)
 

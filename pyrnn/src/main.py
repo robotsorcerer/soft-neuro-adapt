@@ -5,7 +5,7 @@ import argparse
 import csv
 import os
 import shutil
-from tqdm import tqdm
+# from tqdm import tqdm
 
 try: import setGPU
 except ImportError: pass
@@ -30,8 +30,8 @@ import sys
 sys.path.insert(0, "utils")
 sys.path.insert(1, "ros")
 
-#custom utility functions 
-try:    
+#custom utility functions
+try:
     # from utils.data_parser import loadSavedMatFile
     from data_parser import split_data
     from ros_comm import Listener
@@ -48,7 +48,7 @@ from geometry_msgs.msg import Pose
 def print_header(msg):
     print('===>', msg)
 
-def main(epoch, trainX, trainY): 
+def main(epoch, trainX, trainY):
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-cuda', action='store_true')
     parser.add_argument('--eps', type=float, default=1e-4)
@@ -96,13 +96,13 @@ def main(epoch, trainX, trainY):
     '''
     6 valves = nz = 6
     no equality contraints neq = 0
-    due to double sided inequliaties and introduction of 
+    due to double sided inequliaties and introduction of
     slack variables, nineq = 12
     QPenalty is arbitrarily chosen. Ideally, set to 1
     '''
     nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
 
-    net = model.LSTMModel(nz, neq, nineq, QPenalty, 
+    net = model.LSTMModel(nz, neq, nineq, QPenalty,
                           inputSize, nHidden, batchSize, noutputs, numLayers)
 
     if args.cuda:
@@ -118,7 +118,7 @@ def main(epoch, trainX, trainY):
     if os.path.isdir(save):
         shutil.rmtree(save)
         os.makedirs(save)
-    
+
     npr.seed(1)
 
     if args.sim:
@@ -130,12 +130,12 @@ def main(epoch, trainX, trainY):
     train(args, net, epoch, optimizer, trainX, trainY)
 
 def train(args, net, epoch, optimizer, trainX, trainY):
-    batchSize = args.batchSize  
-    iter,lr = 0, args.rnnLR 
+    batchSize = args.batchSize
+    iter,lr = 0, args.rnnLR
     num_epochs = 500
-    
-    inputs = trainX     
-    labels = trainY     
+
+    inputs = trainX
+    labels = trainY
 
     if args.cuda:
         inputs = inputs.cuda()
@@ -148,13 +148,13 @@ def train(args, net, epoch, optimizer, trainX, trainY):
     loss    = net.criterion(outputs, labels)
     loss.backward()
     optimizer.step()
-    
+
     if (epoch % 10) == 0:
         print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
             epoch, epoch+batchSize, trainX.size(0),
             float(iter+batchSize)/trainX.size(0)*100,
             loss.data[0]))
-    
+
 def exportsToTensor(pose, controls):
 
     seqLength = 5
@@ -162,9 +162,9 @@ def exportsToTensor(pose, controls):
 
     inputs = torch.Tensor([[
                             controls.get('lo', 0), controls.get('bo', 0),
-                            controls.get('bi', 0), controls.get('li', 0), 
+                            controls.get('bi', 0), controls.get('li', 0),
                             controls.get('ro', 0), controls.get('ri', 0),
-                            pose.get('z', 0), pose.get('pitch', 0), 
+                            pose.get('z', 0), pose.get('pitch', 0),
                             pose.get('yaw', 0)
                         ]])
     inputs = Variable(
@@ -172,9 +172,9 @@ def exportsToTensor(pose, controls):
                      )
 
     #will be [torch.FloatTensor of size 1x3]
-    targets = (torch.Tensor([[                            
-                            pose.get('z', 0), pose.get('z', 0), 
-                            pose.get('pitch', 0), pose.get('pitch', 0), 
+    targets = (torch.Tensor([[
+                            pose.get('z', 0), pose.get('z', 0),
+                            pose.get('pitch', 0), pose.get('pitch', 0),
                             pose.get('yaw', 0), pose.get('yaw', 0)
                             ]])).expand(seqLength, 1, outputSize)
     targets = Variable(targets)
@@ -188,6 +188,7 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
 
         trainX, trainY = exportsToTensor(l.pose_export, l.controls_export)
+        # print('X size {}, Y size {}'.format(trainX.size(), trainY.size()))
         epoch += 1
         main(epoch, trainX, trainY)
         r.sleep()
