@@ -102,26 +102,15 @@ class LSTMModel(nn.Module):
 
     def forward(self, x):
         nBatch = x.size(0)
-
-        # # Set initial states
-        # h0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]).cuda())
-        # c0 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[0]).cuda())
         # Forward propagate RNN layer 1
-        out, _ = self.lstm1(x)#, (h0, c0))
+        out, _ = self.lstm1(x)
         out = self.drop(out)
 
-        # # Set hidden layer 2 states
-        # h1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1]).cuda())
-        # c1 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[1]).cuda())
         # Forward propagate RNN layer 2
-        out, _ = self.lstm2(out)#, (h1, c1))
-
-        # # Set hidden layer 3 states
-        # h2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2]).cuda())
-        # c2 = Variable(torch.Tensor(self.num_layers, self.batchSize, self.nHidden[2]).cuda())
+        out, _ = self.lstm2(out)
 
         # Forward propagate RNN layer 2
-        out, _ = self.lstm3(out)#, (h2, c2))
+        out, _ = self.lstm3(out)
         out = self.drop(out)
 
         # Decode hidden state of last time step
@@ -132,6 +121,4 @@ class LSTMModel(nn.Module):
 
         out = self.qp_layer(out)
 
-
         return out
-        # '''

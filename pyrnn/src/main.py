@@ -188,7 +188,6 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
 
         trainX, trainY = exportsToTensor(l.pose_export, l.controls_export)
-        # print('X size {}, Y size {}'.format(trainX.size(), trainY.size()))
         epoch += 1
         main(epoch, trainX, trainY)
         r.sleep()

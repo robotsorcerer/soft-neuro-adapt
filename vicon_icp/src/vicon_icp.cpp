@@ -1,26 +1,28 @@
 /*
         Olalekan Ogunmolu. 
-        SeRViCe Lab, 
         June 01, 2017
+
+        See: A Model for Registration of 3D shapes, 
+             Paul Besl and Neil D. McKay
+
+             Eqs 23 - 27
 */
 
 #include "ros/ros.h"
 #include <ros/spinner.h>
 #include "std_msgs/String.h"
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>  //for bt Quaternion
 #include <geometry_msgs/Transform.h>
 
 #include <mutex>
-#include <chrono>
+#include <vector>
 #include <thread>
-#include <string>
 #include <typeinfo>
-#include <fstream>
 
 #include <vicon_bridge/Markers.h>
 #include <geometry_msgs/Point.h>
 
-#include <boost/thread.hpp>
 #include <Eigen/Eigenvalues>
 
 using namespace Eigen;
@@ -47,7 +49,7 @@ private:
     //Delta
     Vector3d Delta;
     //will contain rotationand translation of the head
-    geometry_msgs::Transform tf_info;
+    geometry_msgs::Transform pose_info;
 
     geometry_msgs::Point face_translation;
 
@@ -61,6 +63,8 @@ private:
     ros::Subscriber sub_markers;
 
     std::thread rotoTransThread;          
+    double roll, pitch, yaw;
+    double x, y, z;
 
 public:
     Receiver(ros::NodeHandle nm)
@@ -212,19 +216,11 @@ private:
         //find the cyclic components of the skew symmetric matric A_{ij} = (sigma_{px} + sigma_{px}^T )_{ij}
         A_Mat = sigma_px - sigma_px.transpose();
 
-        ROS_INFO_STREAM("A_Mat: " << A_Mat);
-
         //collect cyclic components of skew symmetric matrix
         Delta << A_Mat(1,2), A_Mat(2, 0), A_Mat(0, 1);
 
-        ROS_INFO_STREAM("Delta: " << Delta.transpose());
-
         temp.resize(3,3);
         temp = sigma_px + sigma_px.transpose() - (sigma_px.trace() * I3);
-
-        ROS_INFO_STREAM("temp Matrix: " <<  temp);
-
-        // Q.resize(4, 4);
 
         //Form the Q matrix
         Q(0, 0) =  sigma_px.trace();      Q(0, 1) = A_Mat(1,2);         Q(0, 2) = A_Mat(2, 0);   Q(0, 3) = A_Mat(0, 1);
@@ -238,7 +234,7 @@ private:
         EigenSolver<Matrix4d> eig(Q);
 
         // Note that eigVal and eigVec are std::complex types. To access their 
-        // real or imaginaryparts, call real or imag
+        // real or imaginary parts, call real or imag
         EigenSolver< Matrix4d >::EigenvalueType eigVals = eig.eigenvalues();
         EigenSolver< Matrix4d >::EigenvectorsType eigVecs = eig.eigenvectors();
 
@@ -251,31 +247,39 @@ private:
     {
         //create a look-up table of eig vectors and values
         std::vector<double> valueVectors {eigVals[0].real(), eigVals[1].real(), eigVals[2].real(), eigVals[3].real()};
-        // std::vector<> vectorVectors {eigVecs.col(0), eigVecs.col(1), eigVecs.col(2), eigVecs.col(3)};
-
+    
         auto max = valueVectors[0];
         int magicIdx;
         for(auto i = 1; i < valueVectors.size(); ++i)        {
-            if(valueVectors[i] > max)
-                max = valueVectors[i];
-                magicIdx = i;
+            if(valueVectors[i] > max){
+              max = valueVectors[i];
+              magicIdx = i;              
+            }
+
         }
         // std::cout << "current max = " << max.real() << typeid(max).name() << "\n";
         //find the eigen vector with the largest eigen value, This would be the optimal rotation quaternion 
         auto optimalEigVec = eigVecs.col(magicIdx);  
         
-        // tf::tfMessage tf_info;
-        tf_info.translation.x = face_translation.x;
-        tf_info.translation.y = face_translation.y;
-        tf_info.translation.z = face_translation.z;
+        pose_info.translation.x = face_translation.x;
+        pose_info.translation.y = face_translation.y;
+        pose_info.translation.z = face_translation.z;
 
-        tf_info.rotation.x = optimalEigVec[1].real();
-        tf_info.rotation.y = optimalEigVec[2].real();
-        tf_info.rotation.z = optimalEigVec[3].real();
-        tf_info.rotation.w = optimalEigVec[0].real();
+        pose_info.rotation.x = optimalEigVec[1].real();
+        pose_info.rotation.y = optimalEigVec[2].real();
+        pose_info.rotation.z = optimalEigVec[3].real();
+        pose_info.rotation.w = optimalEigVec[0].real();
 
-        ROS_INFO_STREAM("optimal rotation quaternion is: \n\n" << optimalEigVec);
-        ROS_INFO_STREAM("tf_info: " << tf_info);
+        tf::Quaternion quart(pose_info.rotation.x, \
+                        pose_info.rotation.y, \
+                        pose_info.rotation.z, \
+                        pose_info.rotation.w);
+
+        tf::Matrix3x3 Rot(quart);
+        Rot.getRPY(roll, pitch, yaw);
+
+        ROS_INFO_STREAM("pose_info: " << pose_info);
+        ROS_INFO("roll: %d | pitch: %d | yaw: %d ", roll, pitch, yaw);
     }
 };
 
