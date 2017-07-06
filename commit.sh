@@ -3,17 +3,17 @@
 # commits a change
 git add --all;
 
-echo "please enter the commit message followed by [enter]: "
+echo -e "please enter the commit message followed by [enter]: \n"
 
 read msg
 
 git commit -m "$msg"
 
-echo "Hello "$USER". Please enter the name of the upstream remote followed by [ENTER]. Type Enter to push to 'master' "
+echo "Hello "$USER".\nPlease enter the name of the upstream remote followed by [ENTER].\nType Enter to push to 'master' "
 
 read remote
 
-if [$remote == "" ]; then
+if [[ $remote == "" ]]; then
    remote=master
 fi
 
