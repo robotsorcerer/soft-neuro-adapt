@@ -6,38 +6,34 @@
 	<arg name="use_machine"       default="true" />
 
 	<arg name="subject_name"    value="Superdude"  />
-	<arg name="segment_name"    default="head" />	
-	<arg name="save"   default="false" />	
+	<arg name="segment_name"    default="head" />
+	<arg name="save"   default="false" />
 	<arg name="print"  default="true" />
 	<arg name="respawn" default="true" />
 	<arg name="sim"   default="false" />
-	<!-- Native Gram-Schmidt: use vicon_listener-->	
-	<arg name="icp"   default="true" />  
+	<!-- Native Gram-Schmidt: use vicon_listener-->
+	<arg name="icp"   default="true" />
+	<arg name="direction_cosines" default="false" />
 
 	<machine name="localhost" address="localhost" if="$(arg use_machine)"/>
-
-	<node pkg="vicon_listener" type="vicon_listener" name="Vicon_Listener" output="screen">
-		<param name="labview_hostport" type="str" value="192.168.1.5:82" />
-	</node>
-
 
 	<!-- if simulating, do not launch bridge nor listener -->
 	<node pkg="vicon_bridge" type="vicon_bridge" name="vicon" output="screen">
 		<param name="stream_mode" value="ClientPull" type="str" />
-		<param name="datastream_hostport" value="10.0.0.4:801" type="str" />
+		<param name="datastream_hostport" value="10.0.0.3:801" type="str" />
 		<param name="tf_ref_frame_id" value="/world" type="str" />
 		<param name="rate" type="int" value="30" />
 	</node>
 
 	<group if="$(arg icp)">
-		<node pkg="vicon_icp" type="vicon_icp" name="vicon_icp" output="screen"  args="$(arg subject_name) $(arg segment_name)" respawn="true">		
+		<node pkg="vicon_icp" type="vicon_icp" name="vicon_icp" output="screen"  args="$(arg subject_name) $(arg segment_name)" respawn="false">
 			<param name="save" value="$(arg save)" type="bool"/>
 			<param name="print" value="$(arg print)" type="bool"/>
 		</node>
-	</group>	
+	</group>
 
 	<group if="$(arg direction_cosines)">
-		<node pkg="vicon_listener" type="direction_cosines" name="direction_cosines" output="screen">				
+		<node pkg="vicon_listener" type="direction_cosines" name="direction_cosines" output="screen">
 			<param name="save" value="$(arg save)" type="bool"/>
 			<param name="print" value="$(arg print)" type="bool"/>
 			<param name="sim" value="$(arg sim)" type="bool" />
