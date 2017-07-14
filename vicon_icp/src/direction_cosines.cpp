@@ -486,7 +486,7 @@ int main(int argc, char **argv)
     
     uint32_t options = 0;
 
-    ros::init(argc, argv, listener, options);
+    ros::init(argc, argv, listener, ros::init_options::AnonymousName);
 
     bool save, print, sim;
 

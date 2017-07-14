@@ -93,26 +93,23 @@ private:
         running = true;
 
         sub_markers = nm_.subscribe("/vicon/markers", 10, &Receiver::callback, this);
-
         while(!updatePose) {
             if(!ros::ok()) {
               return;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-
         // spawn the threads
         rotoTransThread = std::thread(&Receiver::processRotoTrans, this);
+        if(rotoTransThread.joinable())
+            rotoTransThread.join();
     }
 
     void unspawn()
     {
         spinner.stop();
-        // ROS_INFO("Got here");
-
+        rotoTransThread.detach();
         running = false;
-        if(rotoTransThread.joinable())
-            rotoTransThread.join();
         // ROS_INFO("Got here again");
     }
 
@@ -171,27 +168,34 @@ private:
     // this closely follows pg 243 of the ICP paper by Besl and McKay
     void processRotoTrans()
     {
-        if(count == 1)         //store away zero pose of head
-        {
-            firstHeadMarkersVector.resize(num_points);
-            first_face_vec.resize(num_points);
-
-            std::lock_guard<std::mutex> lock(mutex);
-            firstHeadMarkersVector = this->headMarkersVector;
-            remove_mean(std::move(firstHeadMarkersVector));
-            //convert from geometry points to eigen
-            point_to_eigen(std::move(firstHeadMarkersVector), std::move(first_face_vec));
-        }
 
         std::vector<geometry_msgs::Point> headMarkersVector;
+        headMarkersVector.resize(num_points);
+        firstHeadMarkersVector.resize(num_points);
+        first_face_vec.resize(num_points);
 
         for(; running && ros::ok() ;)
-        {          
+        {    
+            if(count == 1)         //store away zero pose of head
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                firstHeadMarkersVector = this->headMarkersVector;
+                remove_mean(std::move(firstHeadMarkersVector));
+                //convert from geometry points to eigen
+                point_to_eigen(std::move(firstHeadMarkersVector), std::move(first_face_vec));
+            }
+
             if(updatePose)
             {
-                headMarkersVector.resize(num_points);
-                std::lock_guard<std::mutex> lock(mutex);
+                mutex.lock();
                 headMarkersVector = this->headMarkersVector;
+                updatePose = false;                    
+                mutex.unlock();
+                // {
+                //     std::lock_guard<std::mutex> lock(mutex);
+                //     headMarkersVector = this->headMarkersVector;
+                //     updatePose = false;                    
+                // }
 
                 //compute center of mass of model and measured point set
                 remove_mean(std::move(headMarkersVector));
@@ -238,7 +242,6 @@ private:
 
                 // std::cout << "vector types: " << eigVecs.col(0)  << typeid(eigVecs.col(0)).name() << "\n";
                 findQuaternion(std::move(eigVals), std::move(eigVecs));
-                updatePose = false;
             }
         }
     }
