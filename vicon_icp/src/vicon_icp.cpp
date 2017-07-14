@@ -26,6 +26,7 @@
 #include <Eigen/Eigenvalues>
 
 using namespace Eigen;
+#define OUT (std::cout << __o__ << std::endl;)
 
 class Receiver
 {
@@ -110,7 +111,6 @@ private:
         spinner.stop();
         rotoTransThread.detach();
         running = false;
-        // ROS_INFO("Got here again");
     }
 
     void callback(const vicon_bridge::MarkersConstPtr& markers_msg)
@@ -176,26 +176,21 @@ private:
 
         for(; running && ros::ok() ;)
         {    
-            if(count == 1)         //store away zero pose of head
+            if(count == 2)         //store away zero pose of head
             {
                 std::lock_guard<std::mutex> lock(mutex);
                 firstHeadMarkersVector = this->headMarkersVector;
                 remove_mean(std::move(firstHeadMarkersVector));
                 //convert from geometry points to eigen
                 point_to_eigen(std::move(firstHeadMarkersVector), std::move(first_face_vec));
-            }
-
+            }            
             if(updatePose)
             {
-                mutex.lock();
-                headMarkersVector = this->headMarkersVector;
-                updatePose = false;                    
-                mutex.unlock();
-                // {
-                //     std::lock_guard<std::mutex> lock(mutex);
-                //     headMarkersVector = this->headMarkersVector;
-                //     updatePose = false;                    
-                // }
+                {
+                    std::lock_guard<std::mutex> lock(mutex);
+                    headMarkersVector = this->headMarkersVector;
+                    updatePose = false;                    
+                }
 
                 //compute center of mass of model and measured point set
                 remove_mean(std::move(headMarkersVector));
@@ -211,8 +206,8 @@ private:
                             first_face_vec[3] * face_vec[3].transpose() ;
                 sigma_px /= num_points;
 
-                // ROS_INFO_STREAM("sigma_px: \n\n" << sigma_px);
-                // ROS_INFO_STREAM("sigma_px^T: \n\n" << sigma_px.transpose());
+                // std::cout<<"\n" << first_face_vec[0] << ", " << first_face_vec[1] << ", " << first_face_vec[2] << ", " << first_face_vec[3] << std::endl;
+                // std::cout << std::endl;
 
                 A_Mat.resize(3, 3);
                 // find the cyclic components of the skew symmetric matric A_{ij} = (sigma_{px} + sigma_{px}^T )_{ij}
@@ -231,8 +226,8 @@ private:
                 Q(3, 0) =  A_Mat(0,1);            Q(3, 1) = temp(2, 0);         Q(3, 2) = temp(2, 1);    Q(3, 3) = temp(2, 2);
 
                 // ROS_INFO_STREAM("Q Matrix: " <<  Q);
-
-                //we now find the maximum eigen value of the matrix Q
+                //
+                // we now find the maximum eigen value of the matrix Q
                 EigenSolver<Matrix4d> eig(Q);
 
                 // Note that eigVal and eigVec are std::complex types. To access their
@@ -258,12 +253,9 @@ private:
               max = valueVectors[i];
               magicIdx = i;
             }
-            // ROS_INFO_STREAM("eigVals: " << valueVectors[i] << " | magicIdx:  " << magicIdx);
         }
         // find the eigen vector with the largest eigen value, This would be the optimal rotation quaternion
         auto optimalEigVec = eigVecs.col(magicIdx);
-        // ROS_INFO_STREAM(" max eigVal = " << max << typeid(max).name() << "\tmagicIdx: " << magicIdx<< "\tmaxEigVec: " << optimalEigVec << "\n");
-        // ROS_INFO_STREAM("EigenVectors: " << eigVecs); // << type(eigVecs).name());
         // compute optimal translation vector
 
         pose_info.translation.x = face_translation.x;
@@ -284,7 +276,7 @@ private:
         Rot.getRPY(roll, pitch, yaw);
         //
         // ROS_INFO_STREAM("pose_info: " << pose_info);
-        ROS_INFO("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f ", pose_info.translation.x, \
+        printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f ", pose_info.translation.x, \
                                                                             pose_info.translation.y, \
                                                                             pose_info.translation.z, \
                                                                             roll, pitch, yaw);
