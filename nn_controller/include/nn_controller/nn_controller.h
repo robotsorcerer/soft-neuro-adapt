@@ -441,7 +441,7 @@ namespace amfc_control
         void ControllerParams(Eigen::VectorXd&& pose_info);
         //transform eigenPose to ensenso::HeadPose format
         void vectorToHeadPose(Eigen::VectorXd&& pose_info, 
-                                          ensenso::HeadPose& eig2Pose);
+                                          geometry_msgs::Pose& eig2Pose);
         //predictor from real-time predictor.lua 
         void pred_subscriber(const geometry_msgs::Pose& pred);
         //loss from real-time predictor.lua 
@@ -454,13 +454,12 @@ namespace amfc_control
         virtual bool configure_predictor_params(
                 nn_controller::predictor_params::Request  &req,
                 nn_controller::predictor_params::Response  &res);
-        void getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info);
         void getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info);
         ros::Time getTime();
         //subscribe to the weights and biases params
         virtual void weights_sub(const std_msgs::Float64MultiArray::ConstPtr& weights_sub);  
         virtual void bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params);       
-        virtual void pose_subscriber(const ensenso::HeadPose& headPose);
+        virtual void pose_subscriber(const geometry_msgs::Pose& headPose);
         virtual void vicon_pose_subscriber(const geometry_msgs::Pose& headPose);
     };
 }

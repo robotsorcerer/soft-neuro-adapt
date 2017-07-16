@@ -7,10 +7,6 @@ include_directories( ${EIGEN3_INCLUDE_DIRS} )
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(Caffe_DIR                     $ENV{CAFFE_ROOT})
-
-OPTION(USE_CAFFE "Enable Caffe support" OFF)
-OPTION(USE_CAFFE_GPU "Enable Caffe GPU support" OFF)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
@@ -19,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   ensenso
-  # Caffe
 )
 
 find_package(Boost COMPONENTS filesystem system serialization
@@ -29,6 +24,7 @@ thread REQUIRED)
 add_message_files(
   FILES
   predictor.msg
+  #valve_control.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -59,24 +55,6 @@ catkin_package(
   LIBRARIES pathfinder
 )
 
-# Include Caffe
-if (USE_CAFFE)
-    # add definitions for the C++ code
-    add_definitions(-DUSE_CAFFE)
-    if (USE_CAFFE_GPU)
-        add_definitions(-DCAFFE_GPU)
-        find_package(CUDA 5.5 REQUIRED)
-        include_directories(${CUDA_INCLUDE_DIRS})
-    else (USE_CAFFE_GPU)
-        add_definitions(-DCPU_ONLY)
-    endif (USE_CAFFE_GPU)
-    # add paths to CAFFE
-    link_directories(${CAFFE_LIBRARY_PATH})  # Should be set to /path/to/caffe/build/lib
-    include_directories(${CAFFE_INCLUDE_PATH})  # Should be set to /path/to/caffe/distribute/include
-    # extra header paths
-    include_directories(${CAFFE_EXTRA_PATH})
-endif (USE_CAFFE)
-
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(include)
@@ -106,10 +84,6 @@ add_dependencies(nn_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPO
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(nn_controller_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-if (USE_CAFFE)
-    target_link_libraries(nn_controller caffe protobuf)
-endif (USE_CAFFE)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(nn_controller

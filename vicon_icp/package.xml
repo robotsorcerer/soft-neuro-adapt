@@ -17,6 +17,8 @@
   <build_depend>tf</build_depend>
   <build_depend>tf_conversions</build_depend>
   <build_depend>vicon_bridge</build_depend>
+  <build_depend>ensenso</build_depend>
+
   <run_depend>cmake_modules</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>geometry_msgs</run_depend>
@@ -25,6 +27,7 @@
   <run_depend>tf</run_depend>
   <run_depend>tf_conversions</run_depend>
   <run_depend>vicon_bridge</run_depend>
+  <run_depend>ensenso</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

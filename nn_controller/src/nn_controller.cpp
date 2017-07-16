@@ -3,7 +3,6 @@
 #include <fstream>
 #include <exception>
 #include <std_msgs/String.h>
-#include <ensenso/HeadPose.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Pose.h>
 #include <std_msgs/Float64MultiArray.h>
@@ -40,28 +39,15 @@ Controller::~Controller()
 {
 }
 
-ros::Time Controller::getTime()
-{
+ros::Time Controller::getTime() {
 	return ros::Time::now();
 }
 
 /*Subscribers*/
-// pose subscriber from ensenso_seg
-void Controller::pose_subscriber(const ensenso::HeadPose& headPose)
-{
+// pose subscriber from ensenso_seg/vicon_sub
+void Controller::vicon_pose_subscriber(const geometry_msgs::Pose& headPose) {
 	getPoseInfo(headPose, pose_info);
 
-	std::lock_guard<std::mutex> pose_locker(pose_mutex);
-	this->pose_info = pose_info;
-	updatePoseInfo  = true;		
-}
-
-// pose subscriber from vicon_sub
-void Controller::vicon_pose_subscriber(const geometry_msgs::Pose& headPose)
-{
-	getPoseInfo(headPose, pose_info);
-
-	// ROS_INFO_STREAM("headPose: " << pose_info);
 	std::lock_guard<std::mutex> pose_locker(pose_mutex);
 	this->pose_info = pose_info;
 	updatePoseInfo  = true;		
@@ -80,8 +66,6 @@ void Controller::bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_para
 
 	this->modelBiases  = modelBiases;
 	updateBiases	   = true;
-
-	// OUT("modelBiases: " << modelBiases.transpose());
 }
 
 //net weights subscriber from sample.lua in RAL/farnn
@@ -102,19 +86,6 @@ void Controller::weights_sub(const std_msgs::Float64MultiArray::ConstPtr& ref_mo
 
 	this->modelWeights = modelWeights;
 	updateWeights = true;
-
-	// OUT("modelWeights: " << modelWeights);
-}
-
-
-void Controller::getPoseInfo(const ensenso::HeadPose& headPose, Eigen::VectorXd pose_info)
-{
-	pose_info << //headPose.x, headPose.y,
-				 headPose.z,// 1,  		//roll to zero
-				 headPose.pitch, headPose.roll; //headPose.yaw;   //setting roll to zero
-	this->pose_info = pose_info;
-	//set ref's non-controlled states to measurement
-	ControllerParams(std::move(pose_info));
 }
 
 void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info)
@@ -134,8 +105,7 @@ bool Controller::configure_predictor_params(
 	nn_controller::predictor_params::Response  &res)
 {
 	Eigen::VectorXd u_control_local;
-	if(updateController)
-	{
+	if(updateController)	{
 		u_control_local = this->u_control;
 		updateController = false;
 	}
@@ -144,8 +114,7 @@ bool Controller::configure_predictor_params(
 	pose_info.resize(3);
 	pose_info = this->pose_info;
 
-	if(updatePoseInfo)
-	{
+	if(updatePoseInfo)	{
 		pose_info = this->pose_info;
 		updatePoseInfo = false;
 	}
@@ -156,7 +125,7 @@ bool Controller::configure_predictor_params(
 	res.u4		=	u_control_local(3);
 	res.u5		=	u_control_local(4);
 	res.u6		=	u_control_local(5);
-	//measurements
+	// measurements
 	res.z		=	pose_info(0);
 	res.pitch	=	pose_info(1);
 	res.yaw		=	pose_info(2);
@@ -171,7 +140,6 @@ void Controller::pred_subscriber(const geometry_msgs::Pose& pred)
 
 	this->pred << pred.position.x, pred.position.y, pred.position.z,
 				  pred.orientation.x, pred.orientation.y, pred.orientation.z;
-
 	updatePred = true;
 }
 
@@ -196,7 +164,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 								 (sigma_y * Ky_hat));
 		Kr_hat_dot = -Gamma_r * ((ref_      * tracking_error.transpose() * P * B * sgnLambda) +
 								 (sigma_r * Kr_hat));
-		// OUT("\nWith sigma modification");
 	}
 	else{
 		// OUT("\nWithout sigma modification")
@@ -242,8 +209,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	//get biases
 	Eigen::VectorXd modelBiases;
 	modelBiases.resize(6);
-	if(updateBiases)
-	{
+	if(updateBiases)	{
 		std::lock_guard<std::mutex> biases_lock (biases_mutex);
 		modelBiases = this->modelBiases;
 		updateBiases = false;
@@ -311,7 +277,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	control_pub_.publish(u_valves);
 	//convert from eigen to headpose
-	ensenso::HeadPose eig2Pose;
+	geometry_msgs::Pose eig2Pose;
 	vectorToHeadPose(std::move(pose_info), eig2Pose);
 	//fallback since rosrio is messing up
 	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), 
@@ -341,11 +307,11 @@ bool Controller::configure_controller(
 	return true;
 }
 
-void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, ensenso::HeadPose& eig2Pose)
+void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Pose& eig2Pose)
 {
-    eig2Pose.z = pose_info(0);
-    eig2Pose.pitch = pose_info(1);
-    eig2Pose.roll = pose_info(2);
+    eig2Pose.position.z = pose_info(0);
+    eig2Pose.orientation.x = pose_info(1);
+    eig2Pose.orientation.y = pose_info(2);
 }
 
 void help()

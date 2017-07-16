@@ -24,6 +24,8 @@
 #include <geometry_msgs/Point.h>
 
 #include <Eigen/Eigenvalues>
+// for sender to RIO
+#include <ensenso/boost_sender.h>
 
 using namespace Eigen;
 #define OUT (std::cout << __o__ << std::endl;)
@@ -47,7 +49,7 @@ private:
     // Delta
     Vector3d Delta;
     // will contain rotationand translation of the head
-    geometry_msgs::Transform pose_info;
+    geometry_msgs::Pose pose_info;
     geometry_msgs::Point face_translation;
 
     ros::NodeHandle nm_;
@@ -58,6 +60,7 @@ private:
 
     // pose vector
     ros::Subscriber sub_markers;
+    ros::Publisher pose_pub; //publisher for translation and euler angles
 
     std::thread rotoTransThread;
     double roll, pitch, yaw;
@@ -65,10 +68,15 @@ private:
     double x, y, z;
     double q1, q2, q3, q4;
 
+    // sender objects 
+    boost::asio::io_service io_service;
+    const std::string multicast_address;
+
 public:
     Receiver()
     :  hardware_threads(std::thread::hardware_concurrency()),
-       spinner(2), count(0), num_points(4), updatePose(false)
+       spinner(2), count(0), num_points(4), updatePose(false),
+       multicast_address("235.255.0.1")
     {
        I3.setIdentity(3, 3);
     }
@@ -100,6 +108,9 @@ private:
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+
+        pose_pub = nm_.advertise<geometry_msgs::Pose>("/mannequine_head/pose/vicon", 1000);
+        ros::Rate looper(30);
         // spawn the threads
         rotoTransThread = std::thread(&Receiver::processRotoTrans, this);
         if(rotoTransThread.joinable())
@@ -117,11 +128,10 @@ private:
     {
         // solve all vicon markers here
         std::vector<geometry_msgs::Point> headMarkersVector;
-        headMarkersVector.resize(4);
-        headMarkersVector[0] = markers_msg -> markers[0].translation;   // fore
-        headMarkersVector[1] = markers_msg -> markers[1].translation;   // left
-        headMarkersVector[2] = markers_msg -> markers[2].translation;   // chin
-        headMarkersVector[3] = markers_msg -> markers[3].translation;   // right
+        headMarkersVector.resize(num_points);
+        for(auto i=0; i < num_points; ++i){
+            headMarkersVector[i] = markers_msg -> markers[i].translation;   // fore
+        }
 
         std::lock_guard<std::mutex> lock(mutex);
         this->headMarkersVector = headMarkersVector;
@@ -153,10 +163,9 @@ private:
 
     void point_to_eigen(std::vector<geometry_msgs::Point>&& pt, std::vector<Vector3d>&& face_vec)
     {
-        face_vec[0] << pt[0].x, pt[0].y, pt[0].z;
-        face_vec[1] << pt[1].x, pt[1].y, pt[1].z;
-        face_vec[2] << pt[2].x, pt[2].y, pt[2].z;
-        face_vec[3] << pt[3].x, pt[3].y, pt[3].z;
+        for(auto i=0; i < num_points; ++i){
+            face_vec[i] << pt[i].x, pt[i].y, pt[i].z;
+        }
 
         // compute average of markers
         face_translation.x = 0.25*(pt[0].x, pt[1].x, pt[2].x, pt[3].x);
@@ -176,7 +185,7 @@ private:
 
         for(; running && ros::ok() ;)
         {    
-            if(count == 2)         //store away zero pose of head
+            if(count == 5)         //store away zero pose of head // count=5 is a stable number
             {
                 std::lock_guard<std::mutex> lock(mutex);
                 firstHeadMarkersVector = this->headMarkersVector;
@@ -241,6 +250,10 @@ private:
         }
     }
 
+    inline void rad2deg(double&& rad) const{
+        rad = (M_PI * rad)/180;
+    }
+
     void findQuaternion(EigenSolver< Matrix4d >::EigenvalueType&& eigVals, EigenSolver< Matrix4d >::EigenvectorsType && eigVecs)
     {
         //create a look-up table of eig vectors and values
@@ -258,28 +271,35 @@ private:
         auto optimalEigVec = eigVecs.col(magicIdx);
         // compute optimal translation vector
 
-        pose_info.translation.x = face_translation.x;
-        pose_info.translation.y = face_translation.y;
-        pose_info.translation.z = face_translation.z;
+        pose_info.position.x = face_translation.x;
+        pose_info.position.y = face_translation.y;
+        pose_info.position.z = face_translation.z;
         
-        pose_info.rotation.x = optimalEigVec[1].real();
-        pose_info.rotation.y = optimalEigVec[2].real();
-        pose_info.rotation.z = optimalEigVec[3].real();
-        pose_info.rotation.w = optimalEigVec[0].real();
+        pose_info.orientation.x = optimalEigVec[1].real();
+        pose_info.orientation.y = optimalEigVec[2].real();
+        pose_info.orientation.z = optimalEigVec[3].real();
+        pose_info.orientation.w = optimalEigVec[0].real();
         
-        tf::Quaternion quart(pose_info.rotation.x, \
-                        pose_info.rotation.y, \
-                        pose_info.rotation.z, \
-                        pose_info.rotation.w);
+        tf::Quaternion quart(pose_info.orientation.x, \
+                        pose_info.orientation.y, \
+                        pose_info.orientation.z, \
+                        pose_info.orientation.w);
         
         tf::Matrix3x3 Rot(quart);
         Rot.getRPY(roll, pitch, yaw);
-        //
-        // ROS_INFO_STREAM("pose_info: " << pose_info);
-        printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f ", pose_info.translation.x, \
-                                                                            pose_info.translation.y, \
-                                                                            pose_info.translation.z, \
+        // convert rads to degrees
+        rad2deg(std::move(roll));
+        rad2deg(std::move(pitch));
+        rad2deg(std::move(yaw));
+
+        // publish the head pose
+        ROS_INFO_STREAM("Publishing pose info as ");
+        pose_pub.publish(pose_info);c
+        printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
+                                                                            pose_info.position.y, \
+                                                                            pose_info.position.z, \
                                                                             roll, pitch, yaw);
+        looper.sleep();
     }
 };
 
