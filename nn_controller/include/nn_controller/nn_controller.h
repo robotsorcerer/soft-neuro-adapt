@@ -19,6 +19,7 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 //boost unused
 #include <boost/scoped_ptr.hpp>
 //controller factory headers
+#include <ensenso/ValveControl.h>
 #include <ensenso/boost_sender.h>
 #include "nn_controller/amfcError.h"
 #include "nn_controller/controller.h"
@@ -317,11 +318,19 @@ namespace amfc_control
 
         /* @brief
         *
+        *  Control torques sent to valves
+        *
+        */
+        ensenso::ValveControl u_valves_;
+
+        /* @brief
+        *
         * At the first iteration, due to the non-availability of the 
         * network prediction, we guess the control scheme to use 
         * since the predictor takes delayed control signals and pose messages
         * as input
         */
+
         Eigen::VectorXd guessControl;
 
         /* @brief
@@ -460,6 +469,5 @@ namespace amfc_control
         virtual void weights_sub(const std_msgs::Float64MultiArray::ConstPtr& weights_sub);  
         virtual void bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params);       
         virtual void pose_subscriber(const geometry_msgs::Pose& headPose);
-        virtual void vicon_pose_subscriber(const geometry_msgs::Pose& headPose);
     };
 }

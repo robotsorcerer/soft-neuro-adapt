@@ -25,7 +25,7 @@ Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool prin
 	initMatrices();	
 	sigma_y = 0.01;
 	sigma_r = 0.01;
-	control_pub_ = n_.advertise<geometry_msgs::Twist>("/mannequine_head/u_valves", 100);
+	control_pub_ = n_.advertise<ensenso::ValveControl>("/mannequine_head/u_valves", 100);
 }
 
 //copy constructor
@@ -45,7 +45,7 @@ ros::Time Controller::getTime() {
 
 /*Subscribers*/
 // pose subscriber from ensenso_seg/vicon_sub
-void Controller::vicon_pose_subscriber(const geometry_msgs::Pose& headPose) {
+void Controller::pose_subscriber(const geometry_msgs::Pose& headPose) {
 	getPoseInfo(headPose, pose_info);
 
 	std::lock_guard<std::mutex> pose_locker(pose_mutex);
@@ -267,21 +267,20 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		midface.close();
 	}
 
-	geometry_msgs::Twist u_valves;
-	u_valves.linear.x  = u_control(0);
-	u_valves.linear.y  = u_control(1);
-	u_valves.linear.z  = u_control(2);
-	u_valves.angular.x = u_control(3);
-	u_valves.angular.y = u_control(4);
-	u_valves.angular.z = u_control(5);
+	u_valves_.left_bladder_pos  = u_control(0);
+	u_valves_.left_bladder_neg  = u_control(1);
+	u_valves_.right_bladder_pos  = u_control(2);
+	u_valves_.right_bladder_neg = u_control(3);
+	u_valves_.base_bladder_pos = u_control(4);
+	u_valves_.base_bladder_neg = u_control(5);
 
-	control_pub_.publish(u_valves);
+	control_pub_.publish(u_valves_);
 	//convert from eigen to headpose
 	geometry_msgs::Pose eig2Pose;
 	vectorToHeadPose(std::move(pose_info), eig2Pose);
 	//fallback since rosrio is messing up
 	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), 
-	        	  u_valves, ref_, eig2Pose);
+	        	  u_valves_, ref_, eig2Pose);
 	++counter;
 }
 
@@ -358,10 +357,7 @@ int main(int argc, char** argv)
 
     ros::Subscriber sub_weights = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::weights_sub, &c );
     ros::Subscriber sub_bias  = n.subscribe("/mannequine_pred/net_biases", 100, &Controller::bias_sub, &c);
-	// if(useVicon)
-		ros::Subscriber sub_vicon = n.subscribe("/mannequine_head/pose", 100, &Controller::vicon_pose_subscriber, &c);	
-	// else
-		// ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
+	ros::Subscriber sub_vicon = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
 	//subscribe to real -time predictor parameters
 	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::pred_subscriber, &c);
 	ros::Subscriber sub_loss = n.subscribe("/mannequine_pred/net_loss", 100, &Controller::loss_subscriber, &c);

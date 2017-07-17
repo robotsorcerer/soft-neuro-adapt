@@ -71,12 +71,13 @@ private:
     // sender objects 
     boost::asio::io_service io_service;
     const std::string multicast_address;
+    ros::Rate looper;
 
 public:
     Receiver()
     :  hardware_threads(std::thread::hardware_concurrency()),
        spinner(2), count(0), num_points(4), updatePose(false),
-       multicast_address("235.255.0.1")
+       multicast_address("235.255.0.1"), looper(30)
     {
        I3.setIdentity(3, 3);
     }
@@ -110,7 +111,6 @@ private:
         }
 
         pose_pub = nm_.advertise<geometry_msgs::Pose>("/mannequine_head/pose/vicon", 1000);
-        ros::Rate looper(30);
         // spawn the threads
         rotoTransThread = std::thread(&Receiver::processRotoTrans, this);
         if(rotoTransThread.joinable())
@@ -294,7 +294,7 @@ private:
 
         // publish the head pose
         ROS_INFO_STREAM("Publishing pose info as ");
-        pose_pub.publish(pose_info);c
+        pose_pub.publish(pose_info);
         printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
                                                                             pose_info.position.y, \
                                                                             pose_info.position.z, \
