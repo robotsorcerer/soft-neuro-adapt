@@ -67,24 +67,24 @@ This launches the [adaptive model-following control algorithm](/nn_controller), 
 		
 #### The [Ensenso](https://github.com/lakehanne/ensenso) option.
 
-	`cd` inside the ensenso package and follow the README instructions therein. When done, do this in terminal
+cd inside the ensenso package and follow the README instructions therein. When done, do this in terminal
 
-	```bash
-		rosrun ensenso ensenso_bridge
-	```
-	```bash
-		rosrun ensenso ensenso_seg
-	```bash
-	
-	This should open up the face scene and segment out the face as well as compute the cartesian coordinates of the face centroid as well as Euler angles that represent the orientation of the face with respect to the scene.
+```bash
+	rosrun ensenso ensenso_bridge
+```
+```bash
+	rosrun ensenso ensenso_seg
+```bash
 
-	The pose tuple of the face is broadcast on the topic `/mannequine_head/pose`. To generate the adaptive gains, we would need to bring up the [nn_controller node](/nn_controller). Do this,
+This should open up the face scene and segment out the face as well as compute the cartesian coordinates of the face centroid as well as Euler angles that represent the orientation of the face with respect to the scene.
 
-	```bash
-		 Terminal 3:$ rosrun nn_controller nn_controller ref_z  ref_pitch ref_roll 
-	```
+The pose tuple of the face is broadcast on the topic `/mannequine_head/pose`. To generate the adaptive gains, we would need to bring up the [nn_controller node](/nn_controller). Do this,
 
-	Where <ref_x> represents the desired trajectory we want to raise the head. Otherwise, you could fill out the 3-DOF reference positions in the [controller launch file](/nn_controller/launch/controller.launch)
+```bash
+	 Terminal 3:$ rosrun nn_controller nn_controller ref_z  ref_pitch ref_roll 
+```
+
+Where <ref_x> represents the desired trajectory we want to raise the head. Otherwise, you could fill out the 3-DOF reference positions in the [controller launch file](/nn_controller/launch/controller.launch)
 
 ### Neural Network Function Aproximator
 

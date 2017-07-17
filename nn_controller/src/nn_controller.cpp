@@ -276,11 +276,10 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	control_pub_.publish(u_valves_);
 	//convert from eigen to headpose
-	geometry_msgs::Pose eig2Pose;
-	vectorToHeadPose(std::move(pose_info), eig2Pose);
+	vectorToHeadPose(std::move(pose_info), pose_);
 	//fallback since rosrio is messing up
 	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), 
-	        	  u_valves_, ref_, eig2Pose);
+	        	  u_valves_, ref_, pose_);
 	++counter;
 }
 

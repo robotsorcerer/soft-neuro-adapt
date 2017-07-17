@@ -8,7 +8,7 @@
 	<arg name="subject_name"    value="Superdude"  />
 	<arg name="segment_name"    default="head" />
 	<arg name="save"   default="false" />
-	<arg name="print"  default="true" />
+	<arg name="print"  default="false" />
 	<arg name="respawn" default="true" />
 	<arg name="sim"   default="false" />
 	<!-- Native Gram-Schmidt: use vicon_listener-->

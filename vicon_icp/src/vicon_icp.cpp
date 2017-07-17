@@ -54,7 +54,7 @@ private:
 
     ros::NodeHandle nm_;
     std::mutex mutex;
-    bool updatePose, running;
+    bool updatePose, running, print_;
     ros::AsyncSpinner spinner;
     unsigned long const hardware_threads;
 
@@ -71,13 +71,12 @@ private:
     // sender objects 
     boost::asio::io_service io_service;
     const std::string multicast_address;
-    ros::Rate looper;
 
 public:
-    Receiver()
+    Receiver(bool print)
     :  hardware_threads(std::thread::hardware_concurrency()),
-       spinner(2), count(0), num_points(4), updatePose(false),
-       multicast_address("235.255.0.1"), looper(30)
+       spinner(2), count(0), num_points(4), updatePose(false), print_(print),
+       multicast_address("235.255.0.1")
     {
        I3.setIdentity(3, 3);
     }
@@ -293,12 +292,15 @@ private:
         rad2deg(std::move(yaw));
 
         // publish the head pose
-        ROS_INFO_STREAM("Publishing pose info as ");
         pose_pub.publish(pose_info);
-        printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
+        if(print_){            
+            ROS_INFO_STREAM("Publishing pose info as ");
+            printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
                                                                             pose_info.position.y, \
                                                                             pose_info.position.z, \
                                                                             roll, pitch, yaw);
+        }
+        ros::Rate looper(30);
         looper.sleep();
     }
 };
@@ -312,7 +314,11 @@ int main(int argc, char** argv)
 
     ROS_INFO_STREAM("Started node " << ros::this_node::getName().c_str());
 
-    Receiver rcvr;
+    bool print;
+    if(!ros::param::get("/vicon_icp/print", print))
+        ROS_DEBUG("could not retrieve [%d] from ros parameter server",  print);
+
+    Receiver rcvr(print);
     rcvr.run();
 
     ros::shutdown();
