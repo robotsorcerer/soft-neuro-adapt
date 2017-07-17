@@ -45,27 +45,31 @@ PyPI installable using:
 
 Please see my [blog post](http://lakehanne.github.io/QP-Layer-MRAS).
 
-### Vision processing
+##### Vision processing
 
-You could use the vicon system or the ensenso package.
+You could use the vicon system or the ensenso package. Follow these steps to get up and running
 
-* The Vicon System
-  * My clone of the [vicon package](https://github.com/lakehanne/superchicko/tree/indigo-devel/vicon).
+* Clone this code: git clone <this package name> --recursive
 
-	Clone the vicon fork at the address above and follow the readme instructions there. 
+If you did not clone the package recursively as shown above, you can initialize the `ensenso` and `vicon` submodules as follows:
 
-	With the vicon system, you get a more accurate world representation. We would want four markers on the face in a rhombic manner (preferrably named `fore`, `left` , `right`, and `chin` to conform with the direction cosines/vicon icp codes that extracts the facial pose with respect to the scene); make sure the `subject` and `segment` are appropriately named `Superdude/head` in `Nexus`. We would also want four markers on the base panel from which the rotation of the face with respect to the panel frame is computed (call these markers `tabfore`, `tabright`, `tableft` and `tabchin` respectively). Make sure the `subject` and `segment` are named `Panel/rigid` in `Nexus`. In terminal, bring up the vicon system.
+* Initialize the ensenso and vicon submodules: `git init submodules`
+* Update submodules: `git submodules update`
+
+Then compile the codebase with either `catkin_make` or `catkin build`.
+
+* The Vicon System Option
+ * cd inside the vicon directory and follow the readme instructions there. 
+
+   With the vicon system, you get a more accurate world representation. We would want four markers on the face in a rhombic manner (preferrably named `fore`, `left` , `right`, and `chin` to conform with the direction cosines/vicon icp codes that extracts the facial pose with respect to the scene); make sure the `subject` and `segment` are appropriately named `Superdude/head` in `Nexus`. We would also want four markers on the base panel from which the rotation of the face with respect to the panel frame is computed (call these markers `tabfore`, `tabright`, `tableft` and `tabchin` respectively). Make sure the `subject` and `segment` are named `Panel/rigid` in `Nexus`. In terminal, bring up the vicon system.
+	
+<pre class="terminal"><code> Terminal$:	rosrun vicon_bridge vicon.launch</pre></code>
+
+This launches the [adaptive model-following control algorithm](/nn_controller), [icp computation](/vicon_icp) of head rotation about the table frame and the vicon ros subscriber node.
 		
-	<pre class="terminal"><code> Terminal$:	rosrun vicon_bridge vicon.launch</pre></code>
+##### The [Ensenso](https://github.com/lakehanne/ensenso) option.
 
-	This launches the [adaptive model-following control algorithm](/nn_controller), drection_cosines computation of head rotation about the table frame and the vicon ros subscriber node.
-		
-* The [Ensenso package](https://github.com/lakehanne/ensenso).
-	* Clone this code: git clone <this package name>
-	* Initialize the ensenso and vicon submodules: `git init submodules`
-	* Update submodules: `git submodules update`
-
-	cd inside the ensenso package and follow the README instructions therein. When done, do this in terminal
+	`cd` inside the ensenso package and follow the README instructions therein. When done, do this in terminal
 
 	<pre class="terminal"><code> Terminal 1$	rosrun ensenso ensenso_bridge </pre></code>
 	<pre class="terminal"><code> Terminal 2$:	rosrun ensenso ensenso_seg </pre></code>
@@ -76,17 +80,17 @@ You could use the vicon system or the ensenso package.
 
 	<pre class="terminal"><code> Terminal 3:$ rosrun nn_controller nn_controller ref_z  ref_pitch ref_roll </code></pre>
 
-	Where <ref_x> represents the desired trajectory we want to raise the head.
+	Where <ref_x> represents the desired trajectory we want to raise the head. Otherwise, you could fill out the 3-DOF reference positions in the [controller launch file](/nn_controller/launch/controller.launch)
 
-- 	Neural Network Function Aproximator
+* Neural Network Function Aproximator
 
-	Previously written in Torch7 as the [farnn](/farnn) package, this portion of the codebase has been migrated to [pyrnn](/pyrnn) in the recently released [pytorch](pytorch) deep nets framework to take advantage of python libraries, cvx and quadratic convex programming for contraints-based quadratic programming (useful for our adaptive controller).
+ Previously written in Torch7 as the [farnn](/farnn) package, this portion of the codebase has been migrated to [pyrnn](/pyrnn) in the recently released [pytorch](pytorch) deep nets framework to take advantage of python libraries, cvx and quadratic convex programming for contraints-based adaptive quadratic programming (useful for our adaptive controller).
 
-	- farnn
-
+ * farnn
+	
 	Running `farnn` would consist of `roscd ing` into the `farnn src` folder and running `th real_time_predictor.lua` command while the [nn_controller](/nn_controller) is running).
 
-	- pyrnn
+ * pyrnn
 
 	`roscd` into `pyrnn src` folder and do `./main.py`
 
