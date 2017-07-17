@@ -69,14 +69,20 @@ This launches the [adaptive model-following control algorithm](/nn_controller), 
 
 	`cd` inside the ensenso package and follow the README instructions therein. When done, do this in terminal
 
-	<pre class="terminal"><code> Terminal 1$	rosrun ensenso ensenso_bridge </pre></code>
-	<pre class="terminal"><code> Terminal 2$:	rosrun ensenso ensenso_seg </pre></code>
+	```bash
+		rosrun ensenso ensenso_bridge
+	```
+	```bash
+		rosrun ensenso ensenso_seg
+	```bash
 	
 	This should open up the face scene and segment out the face as well as compute the cartesian coordinates of the face centroid as well as Euler angles that represent the orientation of the face with respect to the scene.
 
 	The pose tuple of the face is broadcast on the topic `/mannequine_head/pose`. To generate the adaptive gains, we would need to bring up the [nn_controller node](/nn_controller). Do this,
 
-	<pre class="terminal"><code> Terminal 3:$ rosrun nn_controller nn_controller ref_z  ref_pitch ref_roll </code></pre>
+	```bash
+		 Terminal 3:$ rosrun nn_controller nn_controller ref_z  ref_pitch ref_roll 
+	```
 
 	Where <ref_x> represents the desired trajectory we want to raise the head. Otherwise, you could fill out the 3-DOF reference positions in the [controller launch file](/nn_controller/launch/controller.launch)
 
