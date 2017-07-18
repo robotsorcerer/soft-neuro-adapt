@@ -216,24 +216,10 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	*/
 	Eigen::VectorXd laggedVector;
 	laggedVector.resize(6);
-	// laggedVector << pose_info(0), pose_info(1), pose_info(2),
-	// 				u_control(0) - u_control(1),
-	// 				u_control(2) - u_control(3), 
-	// 				u_control(4) - u_control(5);
-	//calculate network out	
 	Eigen::VectorXd wgtsPred;
 	wgtsPred.resize(6); //will be regressor vector from neural network
-	// wgtsPred = modelWeights*laggedVector+modelBiases;
-
-	// if((pred(0) || pred(1) || pred(2) || pred(3) || pred(4) || pred(5)) > 100){
-	// 	u_control = (Ky_hat.transpose() * pose_info) + 
-	// 				(Kr_hat.transpose() * ref_);
-	// }
-	// else{	
-		// OUT("With Net Error");	
-		u_control = (Ky_hat.transpose() * pose_info) + 
-					(Kr_hat.transpose() * ref_)  + pred; // + wgtsPred;  //
-	// }
+	u_control = (Ky_hat.transpose() * pose_info) + 
+				(Kr_hat.transpose() * ref_)  + pred; // + wgtsPred;  //
 
 	u_control = u_control.cwiseAbs();
 	std::lock_guard<std::mutex> lock(mutex);
@@ -249,8 +235,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 		OUT("tracking_error: " << tracking_error.transpose());
 		OUT("Control Law: " << u_control.transpose());
-		// OUT("u w/o net: " << ((Ky_hat.transpose() * pose_info) + 
-		// 			(Kr_hat.transpose() * ref_)).transpose());
 	}
 	resetController = true;
 
@@ -309,11 +293,11 @@ void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Po
 
 void help()
 {
-	OUT("\t\tAdd the 3DOF desired trajectory separated by a single space");
-	OUT("\t\tLike so: rosrun nn_controller nn_controller <z> <pitch> <yaw>" << 
-			 "\t\t[<print> <useSigma> <save>]");
-	OUT("\t\twhere the last three arguments are optional");
-	OUT("\t\tto print, use \"1\" in place of <print> etc");
+	OUT("Add the 3DOF desired trajectory separated by a single space");
+	OUT("Like so: rosrun nn_controller nn_controller <z> <pitch> <yaw>" << 
+			 "\n[<print> <useSigma> <save>]");
+	OUT("where the last three arguments are optional");
+	OUT("to print, use \"1\" in place of <print> etc");
 }
 
 int main(int argc, char** argv)

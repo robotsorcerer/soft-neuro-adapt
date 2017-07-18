@@ -4,17 +4,21 @@
 '''
     Olalekan Ogunmolu 
     July 2017
+
+    This code subscribes to vicon/ensenso messages, parameterizes 
+    the lagged input vector to the neural network and then sends 
+    control torques to the valves.
 '''
+
 from __future__ import print_function
 import os
 import sys
 import time
-import model
 import argparse
 from itertools import count
 
-# try: import setGPU
-# except ImportError: pass
+try: import setGPU
+except ImportError: pass
 
 import torch
 import torch.nn as nn
@@ -44,9 +48,15 @@ import roslib
 roslib.load_manifest('pyrnn')
 import matplotlib.pyplot as plt
 
+import model
+import early_stopping as es
 from ensenso.msg import ValveControl
 from geometry_msgs.msg import Pose
+from std_msgs.msg import Float64MultiArray #as Float64MultiArray
+from std_msgs.msg import MultiArrayDimension as MultiDim
 
+torch.set_default_tensor_type('torch.DoubleTensor')
+npr.seed(1)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -74,11 +84,6 @@ def main():
     args = parser.parse_args()
     print(args) if args.verbose else None
 
-    models_dir = 'models'
-    if not models_dir in os.listdir(os.getcwd()):
-        os.mkdir(models_dir)   # path to store models
-    args.models_dir = os.getcwd() + '/' + models_dir
-
     if args.display:        
         plt.xlabel('time')
         plt.ylabel('mean square loss')
@@ -86,103 +91,160 @@ def main():
         plt.ioff()
         plt.show()
 
-    nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
-
-    #Global Hyperparams
-    numLayers = 1
-    inputSize, sequence_length = 9, 9
-    noutputs, batchSize = 6, args.batchSize
-
-    # QP Hyperparameters
-    '''
-    6 valves = nz = 6
-    no equality contraints neq = 0
-    due to double sided inequliaties and introduction of
-    slack variables, nineq = 12
-    QPenalty is arbitrarily chosen. Ideally, set to 1
-    '''
-    nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
-    net = model.LSTMModel(nz, neq, nineq, QPenalty,
-                          inputSize, nHidden, batchSize, noutputs, numLayers)
-
-    if args.toGPU:
-        net = net.cuda()
-
-    npr.seed(1)
+    models_dir = 'models'
+    if not models_dir in os.listdir(os.getcwd()):
+        os.mkdir(models_dir)   # path to store models
+    args.models_dir = os.getcwd() + '/' + models_dir
 
     if args.sim:
         trainX, trainY, testX, testY = split_data("data/data.mat")
         train_in, train_out, test_in, train_out = split_data("data/data.mat")
 
-    optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
-    train(args, net, optimizer)
+    network = Net(args)
+    network.train()
 
-def net_weights_pub():
-    
+class Net(object):    
+    """
+        Trains the adaptive model following control neural network
+    """
+    def __init__(self, args):        
+        super(Net, self).__init__()
+        self.args = args
 
-def train(args, net, optimizer):
-    batchSize = args.batchSize
-    iter,lr = 0, args.rnnLR
-    num_epochs =  args.maxIter    
+        #Global Hyperparams
+        noutputs, batchSize = 6, args.batchSize
+        numLayers, inputSize, sequence_length = 1, 9, 9
+        nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
 
-    l = Listener(Pose, ValveControl)
-    for epoch in count(1): #range(num_epochs):            
+        # QP Hyperparameters
+        '''
+        6 valves = nz = 6
+        no equality contraints neq = 0
+        due to double sided inequliaties and introduction of
+        slack variables, nineq = 12
+        QPenalty is arbitrarily chosen. Ideally, set to 1
+        '''
+        nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
+        self.net = model.LSTMModel(nz, neq, nineq, QPenalty,
+                              inputSize, nHidden, batchSize, noutputs, numLayers)
 
-        inputs, labels = exportsToTensor(l.pose_export, l.controls_export)
+        # handler for class publisher
+        self.weights_pub = rospy.Publisher('/mannequine_pred/net_weights', Float64MultiArray, queue_size=10)
+        self.biases_pub = rospy.Publisher('/mannequine_pred/net_biases', Float64MultiArray, queue_size=10)
 
-        inputs = inputs.cuda() if args.toGPU else None            
-        labels = labels.cuda() if args.toGPU else None
+        # GPU object mover
+        self.net = self.net.cuda() if args.toGPU else self.net
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.args.rnnLR)  
+        self.listen = Listener(Pose, ValveControl)  # listener that retrieves message from ros publisher
+        self.scheduler = es.EarlyStop(self.optimizer, 'min')
+        
+    def exportsToTensor(self, pose, controls):
+        seqLength, outputSize = 5, 6
+        inputs = torch.Tensor([[
+                                controls.get('lo', 0), controls.get('bo', 0),
+                                controls.get('bi', 0), controls.get('li', 0),
+                                controls.get('ro', 0), controls.get('ri', 0),
+                                pose.get('z', 0), pose.get('pitch', 0),
+                                pose.get('yaw', 0)
+                            ]])
+        inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
+
+        #will be [torch.FloatTensor of size 1x3]
+        targets = (torch.Tensor([[
+                                pose.get('z', 0), pose.get('z', 0),
+                                pose.get('pitch', 0), pose.get('pitch', 0),
+                                pose.get('roll', 0), pose.get('roll', 0)
+                                ]])).expand(seqLength, 1, outputSize)
+        targets = Variable(targets)
+
+        return inputs, targets
+
+    def validate(self):
+
+        inputs, labels = self.exportsToTensor(self.listen.pose_export, self.listen.controls_export)
+
+        inputs = inputs.cuda() if self.args.toGPU else None            
+        labels = labels.cuda() if self.args.toGPU else None
 
         # Forward 
-        optimizer.zero_grad()
-        outputs = net(inputs)
+        self.optimizer.zero_grad()
+        outputs = self.net(inputs)
 
         # Backward 
-        loss    = net.criterion(outputs, labels)
-        loss.backward()
+        val_loss    = self.net.criterion(outputs, labels)
+        val_loss.backward()
 
         # Optimize
-        optimizer.step()
+        self.optimizer.step()
 
-        if args.display:# show some plots
-            plt.draw()
-            plt.plot(epoch, loss.data[0], 'r--')
-            plt.ion()
+        return val_loss
 
-        if (epoch % 5) == 0:
-            print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
-                epoch, epoch+batchSize, inputs.size(2),
-                float(epoch)/inputs.size(2)*100,
-            loss.data[0]))
-        if loss.data[0] < 0.02:
-            break
-        if rospy.is_shutdown():
-            os._exit()
+    def tensorToMultiArray(self, tensor, string):
+        msg = Float64MultiArray()  # note this. Float64Multi is a class. It needs be instantiated as a bound instance
+        msg.data = tensor.resize_(torch.numel(tensor))
+        for i in range(tensor.dim()):
+            dim_desc = MultiDim
+            dim_desc.size = tensor.size(i)
+            dim_desc.stride = tensor.stride(i)
+            dim_desc.label = string
+    #         msg.layout.dim.append(dim_desc)
+        return msg
 
-    torch.save(net.state_dict(), args.models_dir + '/' + 'lstm_net_' + str(args.maxIter) + '.pkl') if args.save else None
-        
 
-def exportsToTensor(pose, controls):
-    seqLength, outputSize = 5, 6
-    # print('controls: ', controls)
-    inputs = torch.Tensor([[
-                            controls.get('lo', 0), controls.get('bo', 0),
-                            controls.get('bi', 0), controls.get('li', 0),
-                            controls.get('ro', 0), controls.get('ri', 0),
-                            pose.get('z', 0), pose.get('pitch', 0),
-                            pose.get('yaw', 0)
-                        ]])
-    inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
+    def train(self):
+        # weights_list, bias_list = [], []
+        for epoch in count(1): #range(num_epochs):            
 
-    #will be [torch.FloatTensor of size 1x3]
-    targets = (torch.Tensor([[
-                            pose.get('z', 0), pose.get('z', 0),
-                            pose.get('pitch', 0), pose.get('pitch', 0),
-                            pose.get('roll', 0), pose.get('roll', 0)
-                            ]])).expand(seqLength, 1, outputSize)
-    targets = Variable(targets)
+            inputs, labels = self.exportsToTensor(self.listen.pose_export, self.listen.controls_export)
 
-    return inputs, targets
+            inputs = inputs.cuda() if self.args.toGPU else None            
+            labels = labels.cuda() if self.args.toGPU else None
+
+            # Forward 
+            self.optimizer.zero_grad()
+            outputs = self.net(inputs)
+
+            # Backward 
+            loss    = self.net.criterion(outputs, labels)
+            loss.backward()
+
+            # Optimize
+            self.optimizer.step()
+
+            # TODO: Not correctly implemented
+            if self.args.display:# show some plots
+                plt.draw()
+                plt.plot(epoch, loss.data[0], 'r--')
+                plt.ion()
+
+            # validate the loss
+            val_loss  = self.validate()
+            # Implement early stopping. Note that step should be called after validate()
+            self.scheduler.step(val_loss)
+
+            net_biases =  self.net.fc.bias.data.cpu()
+            net_weights = self.net.fc.weight.data.cpu()
+            # publish net weights and biases
+            biases_msg = self.tensorToMultiArray(net_biases, 'biases')
+            weights_msg = self.tensorToMultiArray(net_weights, 'weights')
+
+            # publish the weights
+            self.biases_pub.publish(biases_msg)
+            self.weights_pub.publish(weights_msg)
+
+            # print('val_loss: ', val_loss.data[0])
+            if (epoch % 5) == 0:
+                print('Epoch: {} [{}/{} ({:.0f}%)]\ttrain loss: {:.4f} \tval loss: {:.4f}'.format(
+                    epoch, epoch+self.args.batchSize, inputs.size(2),
+                    float(epoch)/inputs.size(2)*100,
+                loss.data[0], val_loss.data[0]))
+            if loss.data[0] < 0.02:
+                break
+            if rospy.is_shutdown():
+                os._exit()
+
+        torch.save(self.net.state_dict(), self.args.models_dir + '/' + 'lstm_net_' + str(self.args.maxIter) + '.pkl') if self.args.save else None
+
 
 if __name__ == '__main__':
-        main()
+    main()

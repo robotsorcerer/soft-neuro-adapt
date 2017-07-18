@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 from qpth.qp import QPFunction
+torch.set_default_tensor_type('torch.DoubleTensor')
 
 class LSTMModel(nn.Module):
     '''
