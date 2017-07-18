@@ -95,14 +95,14 @@ class LSTMModel(nn.Module):
         nBatch = x.size(0)
         # Forward propagate RNN layer 1
         out, _ = self.lstm1(x)
-        out = self.drop(out)
+        # out = self.drop(out)
 
         # Forward propagate RNN layer 2
         out, _ = self.lstm2(out)
 
         # Forward propagate RNN layer 2
         out, _ = self.lstm3(out)
-        out = self.drop(out)
+        # out = self.drop(out)
 
         # Decode hidden state of last time step
         out = self.fc(out[:, -1, :])

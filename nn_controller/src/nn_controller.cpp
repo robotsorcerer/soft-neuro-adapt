@@ -330,15 +330,15 @@ int main(int argc, char** argv)
 	try{		
 		//supply values from the cmd line or retrieve them 
 		//from the ros parameter server
-		n.getParam("z", ref(0))	;    	//ref z
-		n.getParam("pitch", ref(1));	//ref pitch
-		n.getParam("roll", ref(2));	    //ref roll
+		n.getParam("/nn_controller/Reference/z", ref(0));    	//ref z
+		n.getParam("/nn_controller/Reference/", ref(1));	//ref pitch
+		n.getParam("/nn_controller/Reference/", ref(2));	    //ref roll
 		// if(atoi(argv[4]) == 1)
-		n.getParam("print", print);
+		n.getParam("/nn_controller/Utils/print", print);
 		// if(atoi(argv[5]) == 1)
-		n.getParam("useSigma", useSigma);
+		n.getParam("/nn_controller/Utils/useSigma", useSigma);
 		// if(atoi(argv[6]) == 1)
-		save = n.getParam("save", save);
+		save = n.getParam("/nn_controller/Utils/save", save);
 	}
 	catch(std::exception& e){
 		e.what();

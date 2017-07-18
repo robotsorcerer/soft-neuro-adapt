@@ -8,8 +8,10 @@
 from __future__ import print_function
 import os
 import sys
+import time
 import model
 import argparse
+from itertools import count
 
 # try: import setGPU
 # except ImportError: pass
@@ -40,6 +42,7 @@ sys.excepthook = ultratb.FormattedTB(mode='Verbose',
 import rospy
 import roslib
 roslib.load_manifest('pyrnn')
+import matplotlib.pyplot as plt
 
 from ensenso.msg import ValveControl
 from geometry_msgs.msg import Pose
@@ -53,8 +56,8 @@ def main():
     parser.add_argument('--data', type=str, default='data')
     parser.add_argument('--gpu', type=int,  default=0)
     parser.add_argument('--noutputs', type=int, default=3)
-    parser.add_argument('--display', type=int,  default=1)
-    parser.add_argument('--verbose', type=bool, default=True)
+    parser.add_argument('--display', type=int,  default=0)
+    parser.add_argument('--verbose', type=bool, default=False)
     parser.add_argument('--toGPU', type=bool,    default=True)
     parser.add_argument('--maxIter', type=int,  default=1000)
     parser.add_argument('--silent', type=bool,  default=True)
@@ -69,11 +72,19 @@ def main():
     parser.add_argument('--Qpenalty', type=float, default=0.1)
     parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
     args = parser.parse_args()
+    print(args) if args.verbose else None
 
     models_dir = 'models'
     if not models_dir in os.listdir(os.getcwd()):
         os.mkdir(models_dir)   # path to store models
     args.models_dir = os.getcwd() + '/' + models_dir
+
+    if args.display:        
+        plt.xlabel('time')
+        plt.ylabel('mean square loss')
+        plt.grid(True)
+        plt.ioff()
+        plt.show()
 
     nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
 
@@ -106,13 +117,16 @@ def main():
     optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
     train(args, net, optimizer)
 
+def net_weights_pub():
+    
+
 def train(args, net, optimizer):
     batchSize = args.batchSize
     iter,lr = 0, args.rnnLR
     num_epochs =  args.maxIter    
 
     l = Listener(Pose, ValveControl)
-    for epoch in range(num_epochs):            
+    for epoch in count(1): #range(num_epochs):            
 
         inputs, labels = exportsToTensor(l.pose_export, l.controls_export)
 
@@ -130,17 +144,27 @@ def train(args, net, optimizer):
         # Optimize
         optimizer.step()
 
+        if args.display:# show some plots
+            plt.draw()
+            plt.plot(epoch, loss.data[0], 'r--')
+            plt.ion()
+
         if (epoch % 5) == 0:
             print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
-                epoch, epoch+batchSize, inputs.size(0),
-                float(iter+batchSize)/inputs.size(0)*100,
+                epoch, epoch+batchSize, inputs.size(2),
+                float(epoch)/inputs.size(2)*100,
             loss.data[0]))
+        if loss.data[0] < 0.02:
+            break
+        if rospy.is_shutdown():
+            os._exit()
 
     torch.save(net.state_dict(), args.models_dir + '/' + 'lstm_net_' + str(args.maxIter) + '.pkl') if args.save else None
         
 
 def exportsToTensor(pose, controls):
     seqLength, outputSize = 5, 6
+    # print('controls: ', controls)
     inputs = torch.Tensor([[
                             controls.get('lo', 0), controls.get('bo', 0),
                             controls.get('bi', 0), controls.get('li', 0),

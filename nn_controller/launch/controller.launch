@@ -1,18 +1,14 @@
-<launch>
-	<arg name="z"    	value="195.1345689"  />
-	<arg name="pitch"    value="25.0963156" />	 <!-- we have no yaw -->
-	<arg name="roll"         value="27.5006214"  />
-	<arg name="useVicon" value="true"/>
+<?xml version="1.0"?>
 
-	
-	<!-- then launch nn_controller -->
+<launch>
+	<arg name="useVicon" value="true"/>
+		
 	<group if="$(arg useVicon)" >
 		<include file="$(find vicon_icp)/launch/vicon_icp.launch" />
 
-		<node pkg="nn_controller" type="nn_controller" name="nn_controller" output="screen" args="$(arg z) $(arg pitch)" respawn="false"></node>
-			<param name="z" type="double" value="$(arg z)" />
-			<param name="pitch" type="double" value="$(arg pitch)" />
-			<param name="roll" type="double" value="$(arg roll)" />
+		<node pkg="nn_controller" type="nn_controller" name="nn_controller" output="screen" respawn="false">
+			<rosparam command="load" file="$(find nn_controller)/config/traj.yaml" />
+		</node>
 	</group>
 
 </launch>
