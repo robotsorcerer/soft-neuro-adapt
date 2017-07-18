@@ -128,7 +128,7 @@ bool Controller::configure_predictor_params(
 	// measurements
 	res.z		=	pose_info(0);
 	res.pitch	=	pose_info(1);
-	res.yaw		=	pose_info(2);
+	res.roll		=	pose_info(2);
 
 	return true;
 }
@@ -137,7 +137,6 @@ void Controller::pred_subscriber(const geometry_msgs::Pose& pred)
 {
 	std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
 	this->pred.resize(6);
-
 	this->pred << pred.position.x, pred.position.y, pred.position.z,
 				  pred.orientation.x, pred.orientation.y, pred.orientation.z;
 	updatePred = true;
@@ -166,7 +165,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 								 (sigma_r * Kr_hat));
 	}
 	else{
-		// OUT("\nWithout sigma modification")
 		Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
 		Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
 	}
@@ -185,21 +183,19 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	//retrieve net predictions
 	Eigen::VectorXd pred;
 	pred.resize(6);
-	if(!updatePred)
-	{
+	if(!updatePred)	{
 		pred << pose_info(0), pose_info(0), 
 				pose_info(1), pose_info(1),
 				pose_info(2), pose_info(2);
 	}
-	else
-	{
+	else	{
 		std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
 		updatePred = false;
 		pred = this->pred;
 	}
 
-	//Get model biases and weights in real time
-	//get weights
+	// Get model biases and weights in real time
+	// get weights
 	Eigen::Matrix<double, 6, 6> modelWeights;
 	if(updateWeights){
 		std::lock_guard<std::mutex> weights_lock (weights_mutex);
@@ -258,8 +254,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	}
 	resetController = true;
 
-	if(save)
-	{
+	if(save) {
 		std::ofstream midface;
 		midface.open("ref_pose.csv", std::ofstream::out | std::ofstream::app);
 		midface << ref_(0) <<"\t" <<ref_(1) << "\t" << ref_(2) << "\t" <<
@@ -337,7 +332,7 @@ int main(int argc, char** argv)
 		//from the ros parameter server
 		n.getParam("z", ref(0))	;    	//ref z
 		n.getParam("pitch", ref(1));	//ref pitch
-		n.getParam("roll", ref(2));	    //ref yaw
+		n.getParam("roll", ref(2));	    //ref roll
 		// if(atoi(argv[4]) == 1)
 		n.getParam("print", print);
 		// if(atoi(argv[5]) == 1)
@@ -360,8 +355,7 @@ int main(int argc, char** argv)
 	//subscribe to real -time predictor parameters
 	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::pred_subscriber, &c);
 	ros::Subscriber sub_loss = n.subscribe("/mannequine_pred/net_loss", 100, &Controller::loss_subscriber, &c);
-	ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", 
-										&Controller::configure_controller, &c);
+	ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", &Controller::configure_controller, &c);
 	ros::spin();
 
 	ros::shutdown();

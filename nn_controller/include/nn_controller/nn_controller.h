@@ -390,17 +390,17 @@ namespace amfc_control
             idealBiases.resize(6);
             idealBiases << 54.3523, 1.1706, 10.6537,  0.1493, -0.2866, -0.8298;
 
-            //control law that will be used in first iteration
+            // control law that will be used in first iteration
             guessControl.resize(6);
             guessControl.setRandom(6,1);
 
-            //initialize Kr_hat and Ky_hat to dummy values for sigma modification
+            // initialize Kr_hat and Ky_hat to dummy values for sigma modification
             Kr_hat.setIdentity(n,m);
             Ky_hat.setIdentity(n,m);
 
-            //network penalizing constant
+            // network penalizing constant
             alpha.resize(6);
-            // TODO: Why these values?
+            // TODO: Why these values? Is this value still necessary for Dakota valves?
             alpha << 0.1, 1e-1,1,1e-1,1e-1,1e-1;  
         }
 

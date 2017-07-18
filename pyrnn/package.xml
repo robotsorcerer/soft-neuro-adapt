@@ -5,6 +5,10 @@
   <description>The pyrnn package</description>
   <maintainer email="patlekano@gmail.com">ogunmolu</maintainer>
   <license>MIT</license>
+  
+  <run_depend>ensenso</run_depend>
+  <build_depend>ensenso</build_depend>
+
   <buildtool_depend>catkin</buildtool_depend>
 
 

@@ -1,31 +1,26 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import argparse
-import csv
+'''
+    Olalekan Ogunmolu 
+    July 2017
+'''
 import os
-import shutil
-# from tqdm import tqdm
+import sys
+import model
+import argparse
 
-try: import setGPU
-except ImportError: pass
+# try: import setGPU
+# except ImportError: pass
 
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 import torch.optim as optim
+from torch.autograd import Variable
 
 import numpy as np
 import numpy.random as npr
 
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-plt.style.use('bmh')
-
-import setproctitle
-
-import model
 import sys
 sys.path.insert(0, "utils")
 sys.path.insert(1, "ros")
@@ -42,13 +37,14 @@ sys.excepthook = ultratb.FormattedTB(mode='Verbose',
      color_scheme='Linux', call_pdb=1)
 
 import rospy
-from geometry_msgs.msg import Twist
+import roslib
+roslib.load_manifest('pyrnn')
+
+from ensenso.msg import ValveControl
 from geometry_msgs.msg import Pose
 
-def print_header(msg):
-    print('===>', msg)
 
-def main(epoch, trainX, trainY):
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-cuda', action='store_true')
     parser.add_argument('--eps', type=float, default=1e-4)
@@ -58,39 +54,32 @@ def main(epoch, trainX, trainY):
     parser.add_argument('--noutputs', type=int, default=3)
     parser.add_argument('--display', type=int,  default=1)
     parser.add_argument('--verbose', type=bool, default=True)
-    parser.add_argument('--cuda', type=bool,    default=True)
-    parser.add_argument('--maxIter', type=int,  default=10000)
+    parser.add_argument('--toGPU', type=bool,    default=True)
+    parser.add_argument('--maxIter', type=int,  default=1000)
     parser.add_argument('--silent', type=bool,  default=True)
     parser.add_argument('--sim', type=bool,  default=False)
     parser.add_argument('--useVicon', type=bool, default=True)
-    parser.add_argument('--save', type=str, default='save')
-    parser.add_argument('--squash', type=bool,default= True)
+    parser.add_argument('--save', type=bool, default='true')
     parser.add_argument('--model', type=str,default= 'lstm')
     parser.add_argument('--qpenalty', type=float, default=0.1)
     parser.add_argument('--real_net', type=bool,default=True, help='use real-time network approximator')
     parser.add_argument('--seed', type=int,default=123)
     parser.add_argument('--rnnLR', type=float,default=5e-3)
+    parser.add_argument('--Qpenalty', type=float, default=0.1)
     parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
-    subparsers = parser.add_subparsers(dest='model')
-    subparsers.required = True
-
-    optnetP = subparsers.add_parser('lstm')
-    optnetP.add_argument('--Qpenalty', type=float, default=0.1)
     args = parser.parse_args()
 
-    t = '{}'.format(args.model)
-    if args.model == 'lstm':
-        t += '.Qpenalty={}'.format(args.Qpenalty)
-    setproctitle.setproctitle('lekan.soft-robot.' + t)
+    models_dir = 'models'
+    if not models_dir in os.listdir(os.getcwd()):
+        os.mkdir(models_dir)   # path to store models
+    args.models_dir = os.getcwd() + '/' + models_dir
 
     nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
 
     #Global Hyperparams
-    inputSize = 9
-    numLayers = 2
-    sequence_length = 9
-    noutputs = 6
-    batchSize = args.batchSize
+    numLayers = 1
+    inputSize, sequence_length = 9, 9
+    noutputs, batchSize = 6, args.batchSize
 
     # QP Hyperparameters
     '''
@@ -101,23 +90,11 @@ def main(epoch, trainX, trainY):
     QPenalty is arbitrarily chosen. Ideally, set to 1
     '''
     nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
-
     net = model.LSTMModel(nz, neq, nineq, QPenalty,
                           inputSize, nHidden, batchSize, noutputs, numLayers)
 
-    if args.cuda:
+    if args.toGPU:
         net = net.cuda()
-
-    ('Building model')
-
-    t = '{}'.format('optnet')
-    if args.save is None:
-        args.save = os.path.join(args.work, t)
-
-    save = args.save
-    if os.path.isdir(save):
-        shutil.rmtree(save)
-        os.makedirs(save)
 
     npr.seed(1)
 
@@ -126,40 +103,43 @@ def main(epoch, trainX, trainY):
         train_in, train_out, test_in, train_out = split_data("data/data.mat")
 
     optimizer = optim.SGD(net.parameters(), lr=args.rnnLR)
+    train(args, net, optimizer)
 
-    train(args, net, epoch, optimizer, trainX, trainY)
-
-def train(args, net, epoch, optimizer, trainX, trainY):
+def train(args, net, optimizer):
     batchSize = args.batchSize
     iter,lr = 0, args.rnnLR
-    num_epochs = 500
+    num_epochs =  args.maxIter    
 
-    inputs = trainX
-    labels = trainY
+    l = Listener(Pose, ValveControl)
+    for epoch in range(num_epochs):            
 
-    if args.cuda:
-        inputs = inputs.cuda()
-        labels = labels.cuda()
+        inputs, labels = exportsToTensor(l.pose_export, l.controls_export)
 
-    # Forward + Backward + Optimize
-    optimizer.zero_grad()
-    outputs = net(inputs)
+        inputs = inputs.cuda() if args.toGPU else None            
+        labels = labels.cuda() if args.toGPU else None
 
-    loss    = net.criterion(outputs, labels)
-    loss.backward()
-    optimizer.step()
+        # Forward 
+        optimizer.zero_grad()
+        outputs = net(inputs)
 
-    if (epoch % 10) == 0:
-        print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
-            epoch, epoch+batchSize, trainX.size(0),
-            float(iter+batchSize)/trainX.size(0)*100,
+        # Backward 
+        loss    = net.criterion(outputs, labels)
+        loss.backward()
+
+        # Optimize
+        optimizer.step()
+
+        if (epoch % 5) == 0:
+            print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.4f}'.format(
+                epoch, epoch+batchSize, inputs.size(0),
+                float(iter+batchSize)/inputs.size(0)*100,
             loss.data[0]))
 
+    torch.save(net.state_dict(), args.models_dir + '/' + 'lstm_net_' + str(args.maxIter) + '.pkl') if args.save else None
+        
+
 def exportsToTensor(pose, controls):
-
-    seqLength = 5
-    outputSize = 6
-
+    seqLength, outputSize = 5, 6
     inputs = torch.Tensor([[
                             controls.get('lo', 0), controls.get('bo', 0),
                             controls.get('bi', 0), controls.get('li', 0),
@@ -167,28 +147,17 @@ def exportsToTensor(pose, controls):
                             pose.get('z', 0), pose.get('pitch', 0),
                             pose.get('yaw', 0)
                         ]])
-    inputs = Variable(
-                     (torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9))
-                     )
+    inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
 
     #will be [torch.FloatTensor of size 1x3]
     targets = (torch.Tensor([[
                             pose.get('z', 0), pose.get('z', 0),
                             pose.get('pitch', 0), pose.get('pitch', 0),
-                            pose.get('yaw', 0), pose.get('yaw', 0)
+                            pose.get('roll', 0), pose.get('roll', 0)
                             ]])).expand(seqLength, 1, outputSize)
     targets = Variable(targets)
+
     return inputs, targets
 
 if __name__ == '__main__':
-
-    l = Listener(Pose, Twist)
-    r = rospy.Rate(10)
-    epoch = 0
-    while not rospy.is_shutdown():
-
-        trainX, trainY = exportsToTensor(l.pose_export, l.controls_export)
-        epoch += 1
-        main(epoch, trainX, trainY)
-        r.sleep()
-        pass
+        main()

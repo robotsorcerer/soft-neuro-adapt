@@ -9,4 +9,5 @@ float64 u5
 float64 u6
 float64 z
 float64 pitch
+float64 roll
 float64 yaw

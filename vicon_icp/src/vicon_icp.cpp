@@ -109,7 +109,7 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
-        pose_pub = nm_.advertise<geometry_msgs::Pose>("/mannequine_head/pose/vicon", 1000);
+        pose_pub = nm_.advertise<geometry_msgs::Pose>("/mannequine_head/pose", 1000);
         // spawn the threads
         rotoTransThread = std::thread(&Receiver::processRotoTrans, this);
         if(rotoTransThread.joinable())

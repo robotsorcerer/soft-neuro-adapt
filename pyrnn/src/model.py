@@ -1,21 +1,13 @@
-# /usr/bin/env python3
+# /usr/bin/env python2
 # coding=utf-8
 import torch
 
 import torch.nn as nn
-import torch.optim as optim
-
 import torch.nn.functional as F
+import torch.optim as optim
 from torch.autograd import Variable
-from torch.nn.parameter import Parameter
-
-import torch.cuda
-import numpy as np
-import numpy.random as npr
 
 from qpth.qp import QPFunction
-
-import matplotlib.pyplot as plt
 
 class LSTMModel(nn.Module):
     '''
@@ -94,11 +86,10 @@ class LSTMModel(nn.Module):
         self.criterion = nn.MSELoss(size_average=False)
 
         #define recurrent and linear layers
-        self.lstm1  = nn.LSTM(inputSize,nHidden[0],num_layers=numLayers)
-        self.lstm2  = nn.LSTM(nHidden[0],nHidden[1],num_layers=numLayers)
-        self.lstm3  = nn.LSTM(nHidden[1],nHidden[2],num_layers=numLayers)
+        self.lstm1  = nn.LSTM(inputSize,nHidden[0], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
+        self.lstm2  = nn.LSTM(nHidden[0],nHidden[1], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
+        self.lstm3  = nn.LSTM(nHidden[1],nHidden[2], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
         self.fc     = nn.Linear(nHidden[2], noutputs)
-        self.drop   = nn.Dropout(0.3)
 
     def forward(self, x):
         nBatch = x.size(0)
