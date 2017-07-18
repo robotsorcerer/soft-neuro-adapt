@@ -99,55 +99,79 @@ void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorX
 	ControllerParams(std::move(pose_info));
 }
 
-//real-time predictor inputs service request response ::DEPRECATED
-bool Controller::configure_predictor_params(
-	nn_controller::predictor_params::Request  &req,
-	nn_controller::predictor_params::Response  &res)
-{
-	Eigen::VectorXd u_control_local;
-	if(updateController)	{
-		u_control_local = this->u_control;
-		updateController = false;
-	}
+// ::DEPRECATED
+//real-time predictor inputs service request response 
+// bool Controller::configure_predictor_params(
+// 	nn_controller::predictor_params::Request  &req,
+// 	nn_controller::predictor_params::Response  &res)
+// {
+// 	Eigen::VectorXd u_control_local;
+// 	if(updateController)	{
+// 		u_control_local = this->u_control;
+// 		updateController = false;
+// 	}
 	
-	Eigen::Vector3d pose_info;
-	pose_info.resize(3);
-	pose_info = this->pose_info;
+// 	Eigen::Vector3d pose_info;
+// 	pose_info.resize(3);
+// 	pose_info = this->pose_info;
 
-	if(updatePoseInfo)	{
-		pose_info = this->pose_info;
-		updatePoseInfo = false;
-	}
+// 	if(updatePoseInfo)	{
+// 		pose_info = this->pose_info;
+// 		updatePoseInfo = false;
+// 	}
 
-	res.u1 		=	u_control_local(0);
-	res.u2 		=	u_control_local(1);
-	res.u3		=	u_control_local(2);
-	res.u4		=	u_control_local(3);
-	res.u5		=	u_control_local(4);
-	res.u6		=	u_control_local(5);
-	// measurements
-	res.z		=	pose_info(0);
-	res.pitch	=	pose_info(1);
-	res.roll		=	pose_info(2);
+// 	res.u1 		=	u_control_local(0);
+// 	res.u2 		=	u_control_local(1);
+// 	res.u3		=	u_control_local(2);
+// 	res.u4		=	u_control_local(3);
+// 	res.u5		=	u_control_local(4);
+// 	res.u6		=	u_control_local(5);
+// 	// measurements
+// 	res.z		=	pose_info(0);
+// 	res.pitch	=	pose_info(1);
+// 	res.roll		=	pose_info(2);
 
-	return true;
-}
+// 	return true;
+// }
 
-void Controller::pred_subscriber(const geometry_msgs::Pose& pred)
-{
-	std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
-	this->pred.resize(6);
-	this->pred << pred.position.x, pred.position.y, pred.position.z,
-				  pred.orientation.x, pred.orientation.y, pred.orientation.z;
-	updatePred = true;
-}
+// ::DEPRECATED
+// void Controller::loss_subscriber(const std_msgs::Float64& net_loss)
+// {
+// 	std::lock_guard<std::mutex> net_loss_locker(net_loss_mutex);
+// 	this->loss = net_loss.data;
+// 	updateNetLoss = true;
+// }
 
-void Controller::loss_subscriber(const std_msgs::Float64& net_loss)
-{
-	std::lock_guard<std::mutex> net_loss_locker(net_loss_mutex);
-	this->loss = net_loss.data;
-	updateNetLoss = true;
-}
+// ::DEPRECATED
+// bool Controller::configure_controller(
+// 	nn_controller::controller::Request  &req,
+// 	nn_controller::controller::Response  &res)
+// {
+// 	Eigen::VectorXd u_control_local;
+// 	if(updateController)
+// 	{
+// 		u_control_local = this->u_control;
+// 		updateController = false;
+// 	}
+
+// 	res.left_in 	=	u_control_local(0);
+// 	res.left_out 	=	u_control_local(1);
+// 	res.right_in	=	u_control_local(2);
+// 	res.right_out	=	u_control_local(3);
+// 	res.base_in		=	u_control_local(4);
+// 	res.base_out	=	u_control_local(5);
+
+// 	return true;
+// }
+// ::DEPRECATED
+// void Controller::pred_subscriber(const geometry_msgs::Pose& pred)
+// {
+// 	std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
+// 	this->pred.resize(6);
+// 	this->pred << pred.position.x, pred.position.y, pred.position.z,
+// 				  pred.orientation.x, pred.orientation.y, pred.orientation.z;
+// 	updatePred = true;
+// }
 
 void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
@@ -178,9 +202,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	stepper.do_step([](const state& x, state & dxdt, const double t)->void{
 		dxdt = x;
 	}, Kr_hat_dot, counter, Kr_hat, 0.01);
-	//will be [3x1]. We are integrating the second part of the rhs soln to the 
-	//linear ref_ model
-	//retrieve net predictions
+
 	Eigen::VectorXd pred;
 	pred.resize(6);
 	if(!updatePred)	{
@@ -196,7 +218,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	// Get model biases and weights in real time
 	// get weights
-	Eigen::Matrix<double, 6, 6> modelWeights;
+	Eigen::Matrix<double, 6, 6> modelWeights;  // has 36 members
 	if(updateWeights){
 		std::lock_guard<std::mutex> weights_lock (weights_mutex);
 		modelWeights = this->modelWeights;
@@ -230,7 +252,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	if(print)
 	{	
 		OUT("\nref_: " 			<< ref_.transpose());
-		OUT("pose: " 		 << pose_info.transpose());
+		OUT("pose (z, pitch, roll): " 		 << pose_info.transpose());
 		OUT("pred: " << pred.transpose());
 
 		OUT("tracking_error: " << tracking_error.transpose());
@@ -260,28 +282,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), 
 	        	  u_valves_, ref_, pose_);
 	++counter;
-}
-
-//currently unused
-bool Controller::configure_controller(
-	nn_controller::controller::Request  &req,
-	nn_controller::controller::Response  &res)
-{
-	Eigen::VectorXd u_control_local;
-	if(updateController)
-	{
-		u_control_local = this->u_control;
-		updateController = false;
-	}
-
-	res.left_in 	=	u_control_local(0);
-	res.left_out 	=	u_control_local(1);
-	res.right_in	=	u_control_local(2);
-	res.right_out	=	u_control_local(3);
-	res.base_in		=	u_control_local(4);
-	res.base_out	=	u_control_local(5);
-
-	return true;
 }
 
 void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Pose& eig2Pose)
@@ -335,11 +335,11 @@ int main(int argc, char** argv)
 
     ros::Subscriber sub_weights = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::weights_sub, &c );
     ros::Subscriber sub_bias  = n.subscribe("/mannequine_pred/net_biases", 100, &Controller::bias_sub, &c);
-	ros::Subscriber sub_vicon = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
+	ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
+	// ros::Subscriber sub_loss = n.subscribe("/mannequine_pred/net_loss", 100, &Controller::loss_subscriber, &c);
+	// ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", &Controller::configure_controller, &c);
 	//subscribe to real -time predictor parameters
-	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::pred_subscriber, &c);
-	ros::Subscriber sub_loss = n.subscribe("/mannequine_pred/net_loss", 100, &Controller::loss_subscriber, &c);
-	ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", &Controller::configure_controller, &c);
+	// ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::pred_subscriber, &c);
 	ros::spin();
 
 	ros::shutdown();

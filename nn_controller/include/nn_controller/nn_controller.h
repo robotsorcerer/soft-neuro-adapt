@@ -429,17 +429,17 @@ namespace amfc_control
         void vectorToHeadPose(Eigen::VectorXd&& pose_info, 
                                           geometry_msgs::Pose& eig2Pose);
         //predictor from real-time predictor.lua 
-        void pred_subscriber(const geometry_msgs::Pose& pred);
         //loss from real-time predictor.lua 
-        void loss_subscriber(const std_msgs::Float64& net_loss);
-        //controller service
-        virtual bool configure_controller(
-            nn_controller::controller::Request  &req,
-            nn_controller::controller::Response  &res);
+        // void loss_subscriber(const std_msgs::Float64& net_loss);
+        // void pred_subscriber(const geometry_msgs::Pose& pred);
+        // //controller service ::DEPRECATED
+        // virtual bool configure_controller(
+        //     nn_controller::controller::Request  &req,
+        //     nn_controller::controller::Response  &res);
         //predictor params for pretrained model
-        virtual bool configure_predictor_params(
-                nn_controller::predictor_params::Request  &req,
-                nn_controller::predictor_params::Response  &res);
+        // virtual bool configure_predictor_params(
+        //         nn_controller::predictor_params::Request  &req,
+        //         nn_controller::predictor_params::Response  &res);
         void getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info);
         ros::Time getTime();
         //subscribe to the weights and biases params
