@@ -172,8 +172,7 @@ private:
         }
     }
 
-    void point_to_eigen(std::vector<geometry_msgs::Point>&& pt, std::vector<Vector3d>&& face_vec)
-    {
+    void point_to_eigen(std::vector<geometry_msgs::Point>&& pt, std::vector<Vector3d>&& face_vec)    {
         for(auto i=0; i < num_points; ++i){
             face_vec[i] << pt[i].x, pt[i].y, pt[i].z;
         }
@@ -181,8 +180,7 @@ private:
 
 
     // this closely follows pg 243 of the ICP paper by Besl and McKay
-    void processRotoTrans()
-    {
+    void processRotoTrans()    {
         std::vector<geometry_msgs::Point> headMarkersVector;
         headMarkersVector.resize(num_points);
         firstHeadMarkersVector.resize(num_points);
@@ -210,7 +208,7 @@ private:
 
         this->mu_p.resize(3); 
         this->mu_x.resize(3);
-        remove_mean(std::move(firstHeadMarkersVector), std::move(this->mu_p));
+        remove_mean(std::move(firstHeadMarkersVector), std::move(this->mu_x));  // mu_x is the model point set
         //convert from geometry points to eigen
         point_to_eigen(std::move(firstHeadMarkersVector), std::move(first_face_vec));
 
@@ -226,7 +224,7 @@ private:
                 }
 
                 //compute center of mass of model and measured point set
-                remove_mean(std::move(headMarkersVector), std::move(this->mu_x));
+                remove_mean(std::move(headMarkersVector), std::move(this->mu_p));  // mu_p is the measured point set
                 //convert from geometry points to eigen
                 face_vec.resize(num_points);
                 point_to_eigen(std::move(headMarkersVector), std::move(face_vec));
@@ -304,13 +302,15 @@ private:
         rotation_matrix.resize(3, 3);
         rotation_matrix(0, 0) = std::pow(q0, 2) + std::pow(q1, 2) - std::pow(q2, 2) - std::pow(q3, 2);
         rotation_matrix(0, 1) = 2 * (q1*q2 - q0*q3);
-        rotation_matrix(0, 2) = 2 * (q1*q3 - q0*q2);
-        rotation_matrix(1, 0) = 2 * (q1*q3 + q0*q3);
+        rotation_matrix(0, 2) = 2 * (q1*q3 + q0*q2);
+        rotation_matrix(1, 0) = 2 * (q1*q2 + q0*q3);
         rotation_matrix(1, 1) = std::pow(q0, 2) + std::pow(q2, 2) - std::pow(q1, 2) - std::pow(q3, 2);
         rotation_matrix(1, 2) = 2 * (q2*q3 + q0*q1);
         rotation_matrix(2, 0) = 2 * (q1*q3 + q0*q2);
         rotation_matrix(2, 1) = 2 * (q2*q3 + q0*q1);
         rotation_matrix(2, 2) = std::pow(q0, 2) + std::pow(q3, 2) - std::pow(q1, 2) - std::pow(q2, 2);
+
+        ROS_INFO_STREAM("\nrotation matrix\n" << rotation_matrix);
 
         // compute optimal translation vector
         translation_vec_optim.x = (this->mu_x - rotation_matrix * this->mu_p)(0);
@@ -331,6 +331,7 @@ private:
             yaw = std::atan2(std::sin(roll) * rotation_matrix(0,2) - std::cos(roll) * rotation_matrix(1,2), 
                             std::cos(roll)*rotation_matrix(1,1) - std::sin(roll)*rotation_matrix(0,1));            
         }
+        printf("roll: %.3f | pitch: %.3f | yaw: %.3f \n", roll, pitch, yaw);
 
         // form quaternion from euler angles
         tf::Quaternion quat = tf::createQuaternionFromRPY(roll, pitch, yaw);
@@ -352,11 +353,9 @@ private:
         // publish the head pose
         pose_pub.publish(pose_info);
         if(print_){            
-            // ROS_INFO("roll: [%.2f], pitch: [%.2f], yaw: [%.2f] ", roll, pitch, yaw );
             printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
-                                                                            pose_info.position.y, \
-                                                                            pose_info.position.z, \
-                                                                            roll, pitch, yaw);
+                                                                            pose_info.position.y, pose_info.position.z, \
+                                                                            pose_info.orientation.x, pose_info.orientation.y, pose_info.orientation.z);
         }
         ros::Rate looper(30);
         looper.sleep();
