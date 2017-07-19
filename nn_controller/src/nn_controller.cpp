@@ -315,8 +315,8 @@ int main(int argc, char** argv)
 		//supply values from the cmd line or retrieve them 
 		//from the ros parameter server
 		n.getParam("/nn_controller/Reference/z", ref(0));    	//ref z
-		n.getParam("/nn_controller/Reference/", ref(1));	//ref pitch
-		n.getParam("/nn_controller/Reference/", ref(2));	    //ref roll
+		n.getParam("/nn_controller/Reference/pitch", ref(1));	//ref pitch
+		n.getParam("/nn_controller/Reference/roll", ref(2));	    //ref roll
 		// if(atoi(argv[4]) == 1)
 		n.getParam("/nn_controller/Utils/print", print);
 		// if(atoi(argv[5]) == 1)
