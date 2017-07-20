@@ -293,6 +293,7 @@ private:
         }
         // find the eigen vector with the largest eigen value, This would be the optimal rotation quaternion
         auto optimalEigVec = eigVecs.col(magicIdx);
+        ROS_INFO_STREAM("optimal eig vec: " << optimalEigVec);
         // Form optimal rotation quaternion components
         double q0 = optimalEigVec[0].real();
         double q1 = optimalEigVec[1].real();

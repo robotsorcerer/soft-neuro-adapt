@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # coding=utf-8
-
 '''
     Olalekan Ogunmolu 
     July 2017
@@ -44,12 +43,18 @@ sys.excepthook = ultratb.FormattedTB(mode='Verbose',
      color_scheme='Linux', call_pdb=1)
 
 import rospy
+import rospkg
 import roslib
+import threading
 roslib.load_manifest('pyrnn')
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 
 import model
 import early_stopping as es
+# sys.path.append('/'.join(str.split(__file__, '/')[:-2]))
+# from pyrnn.src.utils import model
+# from pyrnn.src.utils import early_stopping as es
 from ensenso.msg import ValveControl
 from geometry_msgs.msg import Pose
 from std_msgs.msg import Float64MultiArray #as Float64MultiArray
@@ -66,7 +71,7 @@ def main():
     parser.add_argument('--data', type=str, default='data')
     parser.add_argument('--gpu', type=int,  default=0)
     parser.add_argument('--noutputs', type=int, default=3)
-    parser.add_argument('--display', type=int,  default=0)
+    parser.add_argument('--display', type=int,  default=1)
     parser.add_argument('--verbose', type=bool, default=False)
     parser.add_argument('--toGPU', type=bool,    default=True)
     parser.add_argument('--maxIter', type=int,  default=1000)
@@ -84,12 +89,13 @@ def main():
     args = parser.parse_args()
     print(args) if args.verbose else None
 
-    if args.display:        
-        plt.xlabel('time')
-        plt.ylabel('mean square loss')
-        plt.grid(True)
-        plt.ioff()
-        plt.show()
+    # if args.display:  
+    #     plt.ioff()
+    #     plt.show()
+
+    #     plt.xlabel('time')
+    #     plt.ylabel('mean square loss')
+    #     plt.grid(True)
 
     models_dir = 'models'
     if not models_dir in os.listdir(os.getcwd()):
@@ -193,6 +199,14 @@ class Net(object):
 
     def train(self):
         # weights_list, bias_list = [], []
+        global plt
+        plt.ioff()
+        plt.xlabel('time')
+        plt.ylabel('mean square loss')
+        fig, ax = plt.subplots()  
+        ax.legend(loc='lower right')
+
+        ros_rate = rospy.Rate(30) # Rate 30 Hz
         for epoch in count(1): #range(num_epochs):            
 
             inputs, labels = self.exportsToTensor(self.listen.pose_export, self.listen.controls_export)
@@ -211,12 +225,6 @@ class Net(object):
             # Optimize
             self.optimizer.step()
 
-            # TODO: Not correctly implemented
-            if self.args.display:# show some plots
-                plt.draw()
-                plt.plot(epoch, loss.data[0], 'r--')
-                plt.ion()
-
             # validate the loss
             val_loss  = self.validate()
             # Implement early stopping. Note that step should be called after validate()
@@ -232,7 +240,16 @@ class Net(object):
             self.biases_pub.publish(biases_msg)
             self.weights_pub.publish(weights_msg)
 
-            # print('val_loss: ', val_loss.data[0])
+            # TODO: Not correctly implemented
+            plt.ion()
+            if self.args.display:# show some plots
+                line1, = ax.plot(val_loss.data[0], 'b--', linewidth=2.5, label='validation loss')
+                line2, = ax.plot(loss.data[0], 'r--', linewidth=2.5, label="training loss")
+                plt.draw()
+                plt.grid(True)
+            
+            ros_rate.sleep()
+
             if (epoch % 5) == 0:
                 print('Epoch: {} [{}/{} ({:.0f}%)]\ttrain loss: {:.4f} \tval loss: {:.4f}'.format(
                     epoch, epoch+self.args.batchSize, inputs.size(2),
