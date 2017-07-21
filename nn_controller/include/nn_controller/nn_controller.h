@@ -122,8 +122,11 @@ namespace amfc_control
         *  Am is [3x3]: the state-mapping matrix of the reference model
         *
         *  Bm is [3x3]: the input-mapping matrix of the reference model
+        *
+        * B is [3 x 6]
         */
-        Eigen::MatrixXd P, B, Am, Bm; 
+        Eigen::Matrix3d P, Am, Bm; 
+        Eigen::MatrixXd B;
         /*@brief
         *
         * Gamma_y and Gamma_r are matrices of adaptation gains 
@@ -296,6 +299,12 @@ namespace amfc_control
         ensenso::ValveControl u_valves_;
 
         /* @brief
+        *  control law retrieved from the neural network
+        *
+        */
+        Eigen::VectorXd net_control;
+
+        /* @brief
         *
         * At the first iteration, due to the non-availability of the 
         * network prediction, we guess the control scheme to use 
@@ -309,6 +318,11 @@ namespace amfc_control
         * computed pose that we send to rio
         */
         geometry_msgs::Pose pose_;
+
+        /* @brief
+        * std::vector that stores previous values of ym
+        */
+        std::vector<Eigen::Vector3d> prev_ym;
 
         /* @brief
         *
@@ -327,8 +341,8 @@ namespace amfc_control
         */
         void initMatrices()        {   
             n = 3; m = 6; 
-            Am.setIdentity(n, n);
-            Bm.setIdentity(n, n);       //note from B*Lambda*Kr^T
+            Am.setIdentity(n, n);   // Hurwitz matrix
+            Bm.setIdentity(n, n);       //note from B*Lambda*Kr^T eq.10
             B.setZero(n, m);        //R^{3 x 6}
             Gamma_y.setIdentity(n, n); //will be 3 X 3 matrix
             Gamma_r.setIdentity(n, n); //will be 3 X 3 matrix
@@ -351,8 +365,8 @@ namespace amfc_control
 
             OUT("sgnLambda: " << sgnLambda);
 
-            P.setIdentity(n, n); // R ^{n x n}
-            expAmk.setIdentity(n, n);
+            P.setIdentity(n, n); // R ^{n x n}  // from lyapunov equation
+            expAmk.setIdentity(n, n);  // from ym = (expAm*k ) * Bm r
             expAmk_tau.setIdentity(n,n);
 
             modelBiases.resize(6);
@@ -368,7 +382,7 @@ namespace amfc_control
             pose_info.resize(3);
 
             //gamma scaling factor for adaptive gains
-            k = 1e-12/8;
+            k =  1e-6; //1e-12/8;
 
             Gamma_y *= k;// * Gamma_y.diagonal();
             Gamma_r *= k;// * Gamma_r.diagonal();
@@ -425,6 +439,8 @@ namespace amfc_control
         * u_control will be 6x1
         */
         void ControllerParams(Eigen::VectorXd&& pose_info);
+        // subscribe to neural net component of control law
+        void net_control_subscriber(const ensenso::ValveControl& net_control_law);
         //transform eigenPose to ensenso::HeadPose format
         void vectorToHeadPose(Eigen::VectorXd&& pose_info, 
                                           geometry_msgs::Pose& eig2Pose);

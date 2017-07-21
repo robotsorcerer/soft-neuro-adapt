@@ -7,10 +7,7 @@
 
 	<arg name="subject_name"    value="Superdude"  />
 	<arg name="segment_name"    default="head" />
-	<arg name="save"   default="false" />
-	<arg name="print"  default="true" />
 	<arg name="respawn" default="true" />
-	<arg name="sim"   default="false" />
 	<!-- Native Gram-Schmidt: use vicon_listener-->
 	<arg name="icp"   default="true" />
 	<arg name="direction_cosines" default="false" />
@@ -26,9 +23,7 @@
 	</node>
 
 	<group if="$(arg icp)">
-		<node pkg="vicon_icp" type="vicon_icp" name="vicon_icp" output="screen"  args="$(arg subject_name) $(arg segment_name)" respawn="false">
-			<param name="save" value="$(arg save)" type="bool"/>
-			<param name="print" value="$(arg print)" type="bool"/>
+		<node pkg="vicon_icp" type="vicon_icp" name="vicon_icp" output="screen"  args="$(arg subject_name) $(arg segment_name)" respawn="$(arg respawn)">
 			<rosparam command="load" file="$(find vicon_icp)/config/base_pose.yaml" />
 		</node>
 	</group>

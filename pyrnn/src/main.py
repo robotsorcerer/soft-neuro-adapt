@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
 # coding=utf-8
 '''
-    Olalekan Ogunmolu 
+    Olalekan Ogunmolu
     July 2017
 
-    This code subscribes to vicon/ensenso messages, parameterizes 
-    the lagged input vector to the neural network and then sends 
+    This code subscribes to vicon/ensenso messages, parameterizes
+    the lagged input vector to the neural network and then sends
     control torques to the valves.
 '''
 
@@ -14,20 +14,22 @@ import os
 import sys
 import time
 import argparse
+import threading
 from itertools import count
+from datetime import datetime
 
-try: import setGPU
-except ImportError: pass
+import numpy as np
+import numpy.random as npr
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 
-import numpy as np
-import numpy.random as npr
+try: import setGPU
+except ImportError: pass
 
-import sys
+
 sys.path.insert(0, "utils")
 sys.path.insert(1, "ros")
 
@@ -44,9 +46,7 @@ sys.excepthook = ultratb.FormattedTB(mode='Verbose',
 
 import rospy
 import rospkg
-import roslib
 import threading
-roslib.load_manifest('pyrnn')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
@@ -63,58 +63,12 @@ from std_msgs.msg import MultiArrayDimension as MultiDim
 torch.set_default_tensor_type('torch.DoubleTensor')
 npr.seed(1)
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--no-cuda', action='store_true')
-    parser.add_argument('--eps', type=float, default=1e-4)
-    parser.add_argument('--batchSize', type=int, default=1)
-    parser.add_argument('--data', type=str, default='data')
-    parser.add_argument('--gpu', type=int,  default=0)
-    parser.add_argument('--noutputs', type=int, default=3)
-    parser.add_argument('--display', type=int,  default=1)
-    parser.add_argument('--verbose', type=bool, default=False)
-    parser.add_argument('--toGPU', type=bool,    default=True)
-    parser.add_argument('--maxIter', type=int,  default=1000)
-    parser.add_argument('--silent', type=bool,  default=True)
-    parser.add_argument('--sim', type=bool,  default=False)
-    parser.add_argument('--useVicon', type=bool, default=True)
-    parser.add_argument('--save', type=bool, default='true')
-    parser.add_argument('--model', type=str,default= 'lstm')
-    parser.add_argument('--qpenalty', type=float, default=0.1)
-    parser.add_argument('--real_net', type=bool,default=True, help='use real-time network approximator')
-    parser.add_argument('--seed', type=int,default=123)
-    parser.add_argument('--rnnLR', type=float,default=5e-3)
-    parser.add_argument('--Qpenalty', type=float, default=0.1)
-    parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
-    args = parser.parse_args()
-    print(args) if args.verbose else None
-
-    # if args.display:  
-    #     plt.ioff()
-    #     plt.show()
-
-    #     plt.xlabel('time')
-    #     plt.ylabel('mean square loss')
-    #     plt.grid(True)
-
-    models_dir = 'models'
-    if not models_dir in os.listdir(os.getcwd()):
-        os.mkdir(models_dir)   # path to store models
-    args.models_dir = os.getcwd() + '/' + models_dir
-
-    if args.sim:
-        trainX, trainY, testX, testY = split_data("data/data.mat")
-        train_in, train_out, test_in, train_out = split_data("data/data.mat")
-
-    network = Net(args)
-    network.train()
-
-class Net(object):    
+class Net(Listener):
     """
         Trains the adaptive model following control neural network
     """
-    def __init__(self, args):        
-        super(Net, self).__init__()
+    def __init__(self, args):
+        Listener.__init__(self, Pose, ValveControl)
         self.args = args
 
         #Global Hyperparams
@@ -131,52 +85,53 @@ class Net(object):
         QPenalty is arbitrarily chosen. Ideally, set to 1
         '''
         nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
-        self.net = model.LSTMModel(nz, neq, nineq, QPenalty,
+        self.net = model.LSTMModel(args, nz, neq, nineq, QPenalty,
                               inputSize, nHidden, batchSize, noutputs, numLayers)
 
         # handler for class publisher
         self.weights_pub = rospy.Publisher('/mannequine_pred/net_weights', Float64MultiArray, queue_size=10)
         self.biases_pub = rospy.Publisher('/mannequine_pred/net_biases', Float64MultiArray, queue_size=10)
+        self.net_control_law_pub = rospy.Publisher('/mannequine_pred/preds', ValveControl, queue_size=10)
 
         # GPU object mover
         self.net = self.net.cuda() if args.toGPU else self.net
-        self.optimizer = optim.SGD(self.net.parameters(), lr=self.args.rnnLR)  
-        self.listen = Listener(Pose, ValveControl)  # listener that retrieves message from ros publisher
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.args.rnnLR)
+        # self.listen = Listener(Pose, ValveControl)  # listener that retrieves message from ros publisher
         self.scheduler = es.EarlyStop(self.optimizer, 'min')
-        
+
     def exportsToTensor(self, pose, controls):
         seqLength, outputSize = 5, 6
         inputs = torch.Tensor([[
-                                controls.get('lo', 0), controls.get('bo', 0),
-                                controls.get('bi', 0), controls.get('li', 0),
-                                controls.get('ro', 0), controls.get('ri', 0),
-                                pose.get('z', 0), pose.get('pitch', 0),
-                                pose.get('yaw', 0)
-                            ]])
+                                 controls.get('li', 0), controls.get('lo', 0), controls.get('ri', 0), 
+                                 controls.get('ro', 0), controls.get('bi', 0), controls.get('bo', 0),
+                                 pose.get('z', 0), pose.get('pitch', 0), pose.get('yaw', 0)
+                             ]])
+        # inputs = torch.Tensor([[
+        #                         controls['li'], controls['lo'], controls['bi'], controls['bo'],
+        #                         controls['ri'], controls['ro'], pose['z'], pose['pitch'], pose['yaw']
+        #                        ]])
         inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
 
         #will be [torch.FloatTensor of size 1x3]
         targets = (torch.Tensor([[
-                                pose.get('z', 0), pose.get('z', 0),
-                                pose.get('pitch', 0), pose.get('pitch', 0),
-                                pose.get('roll', 0), pose.get('roll', 0)
+                                pose['z'], pose['z'], pose['pitch'], pose['pitch'],
+                                pose['roll'], pose['roll']
                                 ]])).expand(seqLength, 1, outputSize)
         targets = Variable(targets)
 
         return inputs, targets
 
     def validate(self):
+        inputs, labels = self.exportsToTensor(self.get_pose(), self.get_controls())
 
-        inputs, labels = self.exportsToTensor(self.listen.pose_export, self.listen.controls_export)
-
-        inputs = inputs.cuda() if self.args.toGPU else None            
+        inputs = inputs.cuda() if self.args.toGPU else None
         labels = labels.cuda() if self.args.toGPU else None
 
-        # Forward 
+        # Forward
         self.optimizer.zero_grad()
         outputs = self.net(inputs)
 
-        # Backward 
+        # Backward
         val_loss    = self.net.criterion(outputs, labels)
         val_loss.backward()
 
@@ -198,27 +153,25 @@ class Net(object):
 
 
     def train(self):
-        # weights_list, bias_list = [], []
-        global plt
         plt.ioff()
         plt.xlabel('time')
         plt.ylabel('mean square loss')
-        fig, ax = plt.subplots()  
+        fig, ax = plt.subplots()
         ax.legend(loc='lower right')
 
-        ros_rate = rospy.Rate(30) # Rate 30 Hz
-        for epoch in count(1): #range(num_epochs):            
+        for epoch in count(1): #range(num_epochs):
 
-            inputs, labels = self.exportsToTensor(self.listen.pose_export, self.listen.controls_export)
+            self.listen()
+            inputs, labels = self.exportsToTensor(self.get_pose(), self.get_controls())
 
-            inputs = inputs.cuda() if self.args.toGPU else None            
+            inputs = inputs.cuda() if self.args.toGPU else None
             labels = labels.cuda() if self.args.toGPU else None
 
-            # Forward 
+            # Forward
             self.optimizer.zero_grad()
             outputs = self.net(inputs)
 
-            # Backward 
+            # Backward
             loss    = self.net.criterion(outputs, labels)
             loss.backward()
 
@@ -236,32 +189,87 @@ class Net(object):
             biases_msg = self.tensorToMultiArray(net_biases, 'biases')
             weights_msg = self.tensorToMultiArray(net_weights, 'weights')
 
+            # sample from the output of the trained network and update the control trajectories
+            idx = npr.randint(0, outputs.size(0))  # randomly pick a row index in the QP layer weights
+            control_action = outputs[idx,:].data  # convert Variable to data
+            control_msg = ValveControl()   # Control Message to valves
+            control_msg.stamp = rospy.Time.now();       control_msg.seq = epoch
+            control_msg.left_bladder_pos = control_action[0]; control_msg.left_bladder_neg = control_action[1]
+            control_msg.right_bladder_pos = control_action[2]; control_msg.right_bladder_neg = control_action[3]
+            control_msg.base_bladder_pos = control_action[4]; control_msg.base_bladder_neg = control_action[5]
+
             # publish the weights
             self.biases_pub.publish(biases_msg)
             self.weights_pub.publish(weights_msg)
+            self.net_control_law_pub.publish(control_msg)
 
-            # TODO: Not correctly implemented
+            # TODO: GUI Not correctly implemented
             plt.ion()
             if self.args.display:# show some plots
                 line1, = ax.plot(val_loss.data[0], 'b--', linewidth=2.5, label='validation loss')
                 line2, = ax.plot(loss.data[0], 'r--', linewidth=2.5, label="training loss")
                 plt.draw()
                 plt.grid(True)
-            
-            ros_rate.sleep()
 
             if (epoch % 5) == 0:
-                print('Epoch: {} [{}/{} ({:.0f}%)]\ttrain loss: {:.4f} \tval loss: {:.4f}'.format(
-                    epoch, epoch+self.args.batchSize, inputs.size(2),
-                    float(epoch)/inputs.size(2)*100,
-                loss.data[0], val_loss.data[0]))
+                print('Epoch: {}  | \ttrain loss: {:.4f}  | \tval loss: {:.4f}'.format(
+                    epoch, loss.data[0], val_loss.data[0]))
+                lr = 1./epoch
+
+                self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
             if loss.data[0] < 0.02:
                 break
             if rospy.is_shutdown():
                 os._exit()
 
-        torch.save(self.net.state_dict(), self.args.models_dir + '/' + 'lstm_net_' + str(self.args.maxIter) + '.pkl') if self.args.save else None
+        torch.save(self.net.state_dict(), self.args.models_dir + '/' + 'lstm_net_' +  \
+                datetime.strftime(datetime.now(), '%m-%d-%y_%H::%M') + '.pkl') if self.args.save else None
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--no-cuda', action='store_true')
+    parser.add_argument('--eps', type=float, default=1e-4)
+    parser.add_argument('--batchSize', type=int, default=1)
+    parser.add_argument('--data', type=str, default='data')
+    parser.add_argument('--gpu', type=int,  default=0)
+    parser.add_argument('--noutputs', type=int, default=3)
+    parser.add_argument('--display', type=int,  default=0)
+    parser.add_argument('--verbose', type=bool, default=False)
+    parser.add_argument('--toGPU', type=bool,    default=True)
+    parser.add_argument('--maxIter', type=int,  default=1000)
+    parser.add_argument('--silent', type=bool,  default=True)
+    parser.add_argument('--sim', type=bool,  default=False)
+    parser.add_argument('--useVicon', type=bool, default=True)
+    parser.add_argument('--save', type=bool, default='true')
+    parser.add_argument('--model', type=str,default= 'lstm')
+    parser.add_argument('--qpenalty', type=float, default=0.1)
+    parser.add_argument('--real_net', type=bool,default=True, help='use real-time network approximator')
+    parser.add_argument('--seed', type=int,default=123)
+    parser.add_argument('--rnnLR', type=float,default=5e-3)
+    parser.add_argument('--Qpenalty', type=float, default=0.1)
+    parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
+    args = parser.parse_args()
+    print(args) if args.verbose else None
+
+    models_dir = 'models'
+    if not models_dir in os.listdir(os.getcwd()):
+        os.mkdir(models_dir)   # path to store models
+    args.models_dir = os.getcwd() + '/' + models_dir
+
+    if args.sim:
+        trainX, trainY, testX, testY = split_data("data/data.mat")
+        train_in, train_out, test_in, train_out = split_data("data/data.mat")
+
+
+    rospy.init_node('pose_control_listener', anonymous=True)
+    rate = rospy.Rate(30)
+    try:
+        while not rospy.is_shutdown():     
+            network = Net(args)    
+            network.train()  
+            rate.sleep()
+    except KeyboardInterrupt:
+        print("shutting down ros")
 
 if __name__ == '__main__':
-    main()
+    main()     

@@ -38,12 +38,17 @@ class Listener(object):
       # print '\nself.controls_export', self.controls_export
 
     def listen(self):
-      rospy.init_node('pose_control_listener', anonymous=True)    
+      # rospy.init_node('pose_control_listener', anonymous=True)      
 
       rospy.Subscriber('/mannequine_head/pose', Pose, self.pose_callback)
       rospy.Subscriber('/mannequine_head/u_valves', ValveControl, self.control_callback)
-      
       # rospy.spin()
+    
+    def get_pose(self):
+      return self.pose_export
+
+    def get_controls(self):
+      return self.controls_export
 
     def __getattr__(self, controls_export):
       if hasattr(self.controls_export, controls_export):

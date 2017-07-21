@@ -30,7 +30,7 @@ class LSTMModel(nn.Module):
     QP Layer:
         nz = 6, neq = 0, nineq = 12, QPenalty = 0.1
     '''
-    def __init__(self, nz, neq, nineq, Qpenalty, inputSize, nHidden,
+    def __init__(self, args, nz, neq, nineq, Qpenalty, inputSize, nHidden,
                  batchSize, noutputs=3, numLayers=2):
 
         super(LSTMModel, self).__init__()
@@ -45,14 +45,26 @@ class LSTMModel(nn.Module):
         self.nz = nz
         self.nHidden = nHidden
 
-        self.Q = Variable(Qpenalty*torch.eye(nx).cuda())
-        self.p = Variable(torch.zeros(nx).cuda())
-        G = torch.eye(nineq, nx)
+        self.args = args
+
+        self.Q = Variable(Qpenalty*torch.eye(nx))
+        self.p = Variable(torch.zeros(nx))
+
+        if args.toGPU:
+            self.Q = self.Q.cuda()
+            self.p = self.p.cuda()
+
+        G = torch.eye(nineq, nx);         G = G.cuda() if args.toGPU else G
+
         for i in range(nz):
-            G[i][i] *= -1
-        self.G = Variable(G.cuda())
-        self.h = Variable(torch.ones(nineq).cuda())
-        e = Variable(torch.Tensor().cuda())
+            G[i][i] *= 1
+        self.G = Variable(G)
+
+        self.h = torch.ones(nineq);       self.h = self.h.cuda() if args.toGPU else self.h
+        self.h = Variable(self.h)
+
+        e = torch.Tensor();               e = e.cuda() if args.toGPU else e
+        self.e = Variable(e)
 
         def qp_layer(x):
             '''
@@ -71,20 +83,20 @@ class LSTMModel(nn.Module):
             p = x.view(nBatch, -1)
             G = self.G
             h = self.h
-            e = Variable(torch.Tensor().cuda())
-            x = QPFunction()(Q, p, G, h, e, e).cuda()
+            e = self.e
+            x = QPFunction()(Q, p, G, h, e, e); x = x.cuda() if self.args.toGPU else x
             return x
         self.qp_layer = qp_layer
 
         # Backprop Through Time (Recurrent Layer) Params
-        self.cost = nn.MSELoss(size_average=False)
-        self.noutputs = noutputs
+        self.cost       = nn.MSELoss(size_average=False)
+        self.noutputs   = noutputs
         self.num_layers = numLayers
-        self.inputSize = inputSize
-        self.nHidden = nHidden
-        self.batchSize = batchSize
-        self.noutputs = noutputs
-        self.criterion = nn.MSELoss(size_average=False)
+        self.inputSize  = inputSize
+        self.nHidden    = nHidden
+        self.batchSize  = batchSize
+        self.noutputs   = noutputs
+        self.criterion  = nn.MSELoss(size_average=False)
 
         #define recurrent and linear layers
         self.lstm1  = nn.LSTM(inputSize,nHidden[0], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)

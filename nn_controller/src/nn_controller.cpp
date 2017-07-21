@@ -53,8 +53,17 @@ void Controller::pose_subscriber(const geometry_msgs::Pose& headPose) {
 	updatePoseInfo  = true;		
 }
 
-void Controller::bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params)
-{
+void Controller::net_control_subscriber(const ensenso::ValveControl& net_control_law){
+	Eigen::VectorXd net_control;
+	net_control.resize(6);
+
+	net_control << net_control_law.left_bladder_pos, net_control_law.left_bladder_neg,
+				   net_control_law.right_bladder_pos, net_control_law.right_bladder_neg, 
+				   net_control_law.base_bladder_pos, net_control_law.base_bladder_neg;
+	this->net_control = net_control;				   
+}
+
+void Controller::bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params){
 	std::vector<double> model_params = bias_params->data;
 	Eigen::VectorXd modelBiases;
 	modelBiases.resize(6);
@@ -90,8 +99,7 @@ void Controller::weights_sub(const std_msgs::Float64MultiArray::ConstPtr& ref_mo
 
 void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info)
 {
-	pose_info << //headPose.x, headPose.y,
-				 headPose.position.z,// 1,  		//roll to zero
+	pose_info << headPose.position.z,// 1,  		//roll to zero
 				 headPose.orientation.x, headPose.orientation.y; //headPose.yaw;   //setting roll to zero
 	
 	this->pose_info = pose_info;
@@ -99,99 +107,31 @@ void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorX
 	ControllerParams(std::move(pose_info));
 }
 
-// ::DEPRECATED
-//real-time predictor inputs service request response 
-// bool Controller::configure_predictor_params(
-// 	nn_controller::predictor_params::Request  &req,
-// 	nn_controller::predictor_params::Response  &res)
-// {
-// 	Eigen::VectorXd u_control_local;
-// 	if(updateController)	{
-// 		u_control_local = this->u_control;
-// 		updateController = false;
-// 	}
-	
-// 	Eigen::Vector3d pose_info;
-// 	pose_info.resize(3);
-// 	pose_info = this->pose_info;
-
-// 	if(updatePoseInfo)	{
-// 		pose_info = this->pose_info;
-// 		updatePoseInfo = false;
-// 	}
-
-// 	res.u1 		=	u_control_local(0);
-// 	res.u2 		=	u_control_local(1);
-// 	res.u3		=	u_control_local(2);
-// 	res.u4		=	u_control_local(3);
-// 	res.u5		=	u_control_local(4);
-// 	res.u6		=	u_control_local(5);
-// 	// measurements
-// 	res.z		=	pose_info(0);
-// 	res.pitch	=	pose_info(1);
-// 	res.roll		=	pose_info(2);
-
-// 	return true;
-// }
-
-// ::DEPRECATED
-// void Controller::loss_subscriber(const std_msgs::Float64& net_loss)
-// {
-// 	std::lock_guard<std::mutex> net_loss_locker(net_loss_mutex);
-// 	this->loss = net_loss.data;
-// 	updateNetLoss = true;
-// }
-
-// ::DEPRECATED
-// bool Controller::configure_controller(
-// 	nn_controller::controller::Request  &req,
-// 	nn_controller::controller::Response  &res)
-// {
-// 	Eigen::VectorXd u_control_local;
-// 	if(updateController)
-// 	{
-// 		u_control_local = this->u_control;
-// 		updateController = false;
-// 	}
-
-// 	res.left_in 	=	u_control_local(0);
-// 	res.left_out 	=	u_control_local(1);
-// 	res.right_in	=	u_control_local(2);
-// 	res.right_out	=	u_control_local(3);
-// 	res.base_in		=	u_control_local(4);
-// 	res.base_out	=	u_control_local(5);
-
-// 	return true;
-// }
-// ::DEPRECATED
-// void Controller::pred_subscriber(const geometry_msgs::Pose& pred)
-// {
-// 	std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
-// 	this->pred.resize(6);
-// 	this->pred << pred.position.x, pred.position.y, pred.position.z,
-// 				  pred.orientation.x, pred.orientation.y, pred.orientation.z;
-// 	updatePred = true;
-// }
-
 void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 {	
-	tracking_error.resize(3);
-	expAmk *= std::exp(Am(0,0)*counter);	
-	//Bm is initialized to identity
-	ym = Bm * expAmk * ref_ ;  //take laplace transform of ref model
-	//compute tracking error, e = y - y_m
-	tracking_error = pose_info - ym;
-
-	if(useSigma){		
-		Ky_hat_dot = -Gamma_y * ((pose_info * tracking_error.transpose() * P * B * sgnLambda) +
-								 (sigma_y * Ky_hat));
-		Kr_hat_dot = -Gamma_r * ((ref_      * tracking_error.transpose() * P * B * sgnLambda) +
-								 (sigma_r * Kr_hat));
+	// Am = -0.782405        -0        -0
+	//       -0          -0.782405     -0
+    //       -0              -0    -0.782405
+	// Bm = [1 0 0; 0 1 0; 0 0 1]
+	// ref_ = [z, roll, pitch ] given by user
+	Am.resize(3,3); 	Bm.resize(3,3); 	ym.resize(3); 	tracking_error.resize(3);
+		
+	if(counter == 0){
+		ym = pose_info;
+		prev_ym.push_back(ym);
 	}
 	else{
-		Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
-		Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
+		ym = Bm * ref_  + Am * prev_ym.back(); //take laplace transform of ref model
+		prev_ym.pop_back();
 	}
+	prev_ym.push_back(ym);
+	//compute tracking error, e = y - y_m
+	tracking_error = pose_info - ym;
+	// ROS_INFO_STREAM("\nym: " << ym.transpose() << "\n ref_: \n" << ref_.transpose() << "\n pose_info: \n" << pose_info.transpose() );
+
+	Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
+	Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
+
 	//use boost ode solver
 	runge_kutta_dopri5<state,double,state,double,vector_space_algebra> stepper;
 	//use reference for the derivative
@@ -206,7 +146,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	Eigen::VectorXd pred;
 	pred.resize(6);
 	if(!updatePred)	{
-		pred << pose_info(0), pose_info(0), 
+		pred << pose_info(0), pose_info(0), // note the scaling since two valves do one job in equal but opposite direction
 				pose_info(1), pose_info(1),
 				pose_info(2), pose_info(2);
 	}
@@ -224,6 +164,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		modelWeights = this->modelWeights;
 		updateWeights = false;
 	}
+
 	//get biases
 	Eigen::VectorXd modelBiases;
 	modelBiases.resize(6);
@@ -236,26 +177,23 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	/*
 	* Calculate Control Law
 	*/
-	Eigen::VectorXd laggedVector;
-	laggedVector.resize(6);
-	Eigen::VectorXd wgtsPred;
-	wgtsPred.resize(6); //will be regressor vector from neural network
 	u_control = (Ky_hat.transpose() * pose_info) + 
-				(Kr_hat.transpose() * ref_)  + pred; // + wgtsPred;  //
+				(Kr_hat.transpose() * ref_)  + this->net_control; 
 
-	u_control = u_control.cwiseAbs();
+	u_control = u_control; //.cwiseAbs();
 	std::lock_guard<std::mutex> lock(mutex);
 	{
 		this->u_control = u_control;
 	}
 
-	if(print)
-	{	
+	if(print)	{	
 		OUT("\nref_: " 			<< ref_.transpose());
 		OUT("pose (z, pitch, roll): " 		 << pose_info.transpose());
-		OUT("pred: " << pred.transpose());
-
+		OUT("ym (z, pitch, roll): " 		 << ym.transpose());
 		OUT("tracking_error: " << tracking_error.transpose());
+		OUT("pred (z, z, pitch, pitch, roll, roll): " << pred.transpose());
+
+		OUT("net_control: " << net_control.transpose());
 		OUT("Control Law: " << u_control.transpose());
 	}
 	resetController = true;
@@ -270,15 +208,15 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	u_valves_.left_bladder_pos  = u_control(0);
 	u_valves_.left_bladder_neg  = u_control(1);
-	u_valves_.right_bladder_pos  = u_control(2);
+	u_valves_.right_bladder_pos = u_control(2);
 	u_valves_.right_bladder_neg = u_control(3);
-	u_valves_.base_bladder_pos = u_control(4);
-	u_valves_.base_bladder_neg = u_control(5);
+	u_valves_.base_bladder_pos  = u_control(4);
+	u_valves_.base_bladder_neg  = u_control(5);
 
 	control_pub_.publish(u_valves_);
-	//convert from eigen to headpose
+	// convert from eigen to headpose
 	vectorToHeadPose(std::move(pose_info), pose_);
-	//fallback since rosrio is messing up
+	// fallback since rosrio is messing up
 	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), 
 	        	  u_valves_, ref_, pose_);
 	++counter;
@@ -336,10 +274,8 @@ int main(int argc, char** argv)
     ros::Subscriber sub_weights = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::weights_sub, &c );
     ros::Subscriber sub_bias  = n.subscribe("/mannequine_pred/net_biases", 100, &Controller::bias_sub, &c);
 	ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
-	// ros::Subscriber sub_loss = n.subscribe("/mannequine_pred/net_loss", 100, &Controller::loss_subscriber, &c);
-	// ros::ServiceServer control_serv = n.advertiseService("/mannequine_head/controller", &Controller::configure_controller, &c);
-	//subscribe to real -time predictor parameters
-	// ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::pred_subscriber, &c);
+	// subscribe to real -time control law
+	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::net_control_subscriber, &c);
 	ros::spin();
 
 	ros::shutdown();

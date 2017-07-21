@@ -293,7 +293,7 @@ private:
         }
         // find the eigen vector with the largest eigen value, This would be the optimal rotation quaternion
         auto optimalEigVec = eigVecs.col(magicIdx);
-        ROS_INFO_STREAM("optimal eig vec: " << optimalEigVec);
+        // ROS_INFO_STREAM("optimal eig vec: " << optimalEigVec);
         // Form optimal rotation quaternion components
         double q0 = optimalEigVec[0].real();
         double q1 = optimalEigVec[1].real();
@@ -306,12 +306,12 @@ private:
         rotation_matrix(0, 2) = 2 * (q1*q3 + q0*q2);
         rotation_matrix(1, 0) = 2 * (q1*q2 + q0*q3);
         rotation_matrix(1, 1) = std::pow(q0, 2) + std::pow(q2, 2) - std::pow(q1, 2) - std::pow(q3, 2);
-        rotation_matrix(1, 2) = 2 * (q2*q3 + q0*q1);
-        rotation_matrix(2, 0) = 2 * (q1*q3 + q0*q2);
+        rotation_matrix(1, 2) = 2 * (q2*q3 - q0*q1);
+        rotation_matrix(2, 0) = 2 * (q1*q3 - q0*q2);
         rotation_matrix(2, 1) = 2 * (q2*q3 + q0*q1);
         rotation_matrix(2, 2) = std::pow(q0, 2) + std::pow(q3, 2) - std::pow(q1, 2) - std::pow(q2, 2);
 
-        ROS_INFO_STREAM("\nrotation matrix\n" << rotation_matrix);
+        // ROS_INFO_STREAM("\nrotation matrix\n" << rotation_matrix);
 
         // compute optimal translation vector
         translation_vec_optim.x = (this->mu_x - rotation_matrix * this->mu_p)(0);
@@ -321,18 +321,19 @@ private:
         // define tf matrix to hold xalculated eigen matrix
         if(std::fabs(rotation_matrix(0,0)) < 0.001 & std::fabs(rotation_matrix(1, 0)) < .001){
             //singularity
-            roll  = 0;
+            roll  = 0 + 3.0;
             pitch = std::atan2(-rotation_matrix(2,0), rotation_matrix(0,0));
             yaw   = std::atan2(-rotation_matrix(1,2), rotation_matrix(1,1));
         }
         else{
-            roll = std::atan2(rotation_matrix(1,0), rotation_matrix(0,0));
+            roll = std::atan2(rotation_matrix(1,0), rotation_matrix(0,0)) + 3.0;
             pitch = std::atan2(-rotation_matrix(2,0), 
                                 std::cos(roll) * rotation_matrix(0,0) + std::sin(roll) * rotation_matrix(1,0));
             yaw = std::atan2(std::sin(roll) * rotation_matrix(0,2) - std::cos(roll) * rotation_matrix(1,2), 
                             std::cos(roll)*rotation_matrix(1,1) - std::sin(roll)*rotation_matrix(0,1));            
         }
-        printf("roll: %.3f | pitch: %.3f | yaw: %.3f \n", roll, pitch, yaw);
+        if(print_)
+            printf("roll: %.3f | pitch: %.3f | yaw: %.3f \n", roll, pitch, yaw);
 
         // form quaternion from euler angles
         tf::Quaternion quat = tf::createQuaternionFromRPY(roll, pitch, yaw);
@@ -354,9 +355,11 @@ private:
         // publish the head pose
         pose_pub.publish(pose_info);
         if(print_){            
-            printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
-                                                                            pose_info.position.y, pose_info.position.z, \
-                                                                            pose_info.orientation.x, pose_info.orientation.y, pose_info.orientation.z);
+            // printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
+            //                                                                 pose_info.position.y, pose_info.position.z, \
+            //                                                                 pose_info.orientation.x, pose_info.orientation.y, pose_info.orientation.z);
+            printf("z: %.3f | roll: %.3f | pitch: %.3f \n", pose_info.position.z, \
+                                                            pose_info.orientation.x, pose_info.orientation.y);
         }
         ros::Rate looper(30);
         looper.sleep();
@@ -373,8 +376,8 @@ int main(int argc, char** argv)
     ROS_INFO_STREAM("Started node " << ros::this_node::getName().c_str());
 
     bool print;
-    if(!ros::param::get("/vicon_icp/print", print))
-        ROS_DEBUG("could not retrieve [%d] from ros parameter server",  print);
+    if(!ros::param::get("/vicon_icp/Utils/print", print))
+        ROS_DEBUG("could not retrieve print param value from ros parameter server");
 
     Receiver rcvr(print);
     rcvr.run();
