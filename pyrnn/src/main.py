@@ -106,10 +106,6 @@ class Net(Listener):
                                  controls.get('ro', 0), controls.get('bi', 0), controls.get('bo', 0),
                                  pose.get('z', 0), pose.get('pitch', 0), pose.get('yaw', 0)
                              ]])
-        # inputs = torch.Tensor([[
-        #                         controls['li'], controls['lo'], controls['bi'], controls['bo'],
-        #                         controls['ri'], controls['ro'], pose['z'], pose['pitch'], pose['yaw']
-        #                        ]])
         inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
 
         #will be [torch.FloatTensor of size 1x3]
@@ -122,17 +118,17 @@ class Net(Listener):
         return inputs, targets
 
     def validate(self):
-        inputs, labels = self.exportsToTensor(self.get_pose(), self.get_controls())
+        inputs, targets = self.exportsToTensor(self.get_pose(), self.get_controls())
 
         inputs = inputs.cuda() if self.args.toGPU else None
-        labels = labels.cuda() if self.args.toGPU else None
+        targets = targets.cuda() if self.args.toGPU else None
 
         # Forward
         self.optimizer.zero_grad()
         outputs = self.net(inputs)
 
         # Backward
-        val_loss    = self.net.criterion(outputs, labels)
+        val_loss    = self.net.criterion(outputs, targets)
         val_loss.backward()
 
         # Optimize
@@ -162,17 +158,17 @@ class Net(Listener):
         for epoch in count(1): #range(num_epochs):
 
             self.listen()
-            inputs, labels = self.exportsToTensor(self.get_pose(), self.get_controls())
+            inputs, targets = self.exportsToTensor(self.get_pose(), self.get_controls())
 
             inputs = inputs.cuda() if self.args.toGPU else None
-            labels = labels.cuda() if self.args.toGPU else None
+            targets = targets.cuda() if self.args.toGPU else None
 
             # Forward
             self.optimizer.zero_grad()
             outputs = self.net(inputs)
 
             # Backward
-            loss    = self.net.criterion(outputs, labels)
+            loss    = self.net.criterion(outputs, targets)
             loss.backward()
 
             # Optimize
@@ -242,7 +238,7 @@ def main():
     parser.add_argument('--useVicon', type=bool, default=True)
     parser.add_argument('--save', type=bool, default='true')
     parser.add_argument('--model', type=str,default= 'lstm')
-    parser.add_argument('--qpenalty', type=float, default=0.1)
+    parser.add_argument('--qpenalty', type=float, default=1.0)
     parser.add_argument('--real_net', type=bool,default=True, help='use real-time network approximator')
     parser.add_argument('--seed', type=int,default=123)
     parser.add_argument('--rnnLR', type=float,default=5e-3)

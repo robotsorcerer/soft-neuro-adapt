@@ -53,11 +53,26 @@ class LSTMModel(nn.Module):
         if args.toGPU:
             self.Q = self.Q.cuda()
             self.p = self.p.cuda()
+        """
+        # G will be a matrix defined so:
+        G = [ 1  0 0 0 0 0]
+            [ 0  1 0 0 0 0]
+            [ 0  0 1 0 0 0]
+            [ 0  0 0 1 0 0]
+            [ 0  0 0 0 1 0]
+            [ 0  0 0 0 0 1]
+            [-1  0 0 0 0 0]
+            [ 0 -1 0 0 0 0]
+            [ 0 0 -1 0 0 0]
+            [ 0 0 0 -1 0 0]
+            [ 0 0 0 0 -1 0]
+            [ 0 0 0 0 0 -1]
 
+        """
         G = torch.eye(nineq, nx);         G = G.cuda() if args.toGPU else G
 
         for i in range(nz):
-            G[i][i] *= 1
+            G[i][i] *= -1
         self.G = Variable(G)
 
         self.h = torch.ones(nineq);       self.h = self.h.cuda() if args.toGPU else self.h
@@ -73,8 +88,8 @@ class LSTMModel(nn.Module):
               p:  A (nBatch, nz) or (nz) Tensor.
               G:  A (nBatch, nineq, nz) or (nineq, nz) Tensor.
               h:  A (nBatch, nineq) or (nineq) Tensor.
-              A:  A (nBatch, neq, nz) or (neq, nz) Tensor.
-              b:  A (nBatch, neq) or (neq) Tensor.
+              A:  A (nBatch, neq, nz) or (neq, nz) Tensor. None in this case.
+              b:  A (nBatch, neq) or (neq) Tensor. None in this case.
 
             Returns: \hat z: a (nBatch, nz) Tensor.
             '''
@@ -121,8 +136,8 @@ class LSTMModel(nn.Module):
         out = self.fc(out[:, -1, :])
 
         #Now add QP Layer
-        out = out.view(nBatch, -1)
+        # out = out.view(nBatch, -1)
 
-        out = self.qp_layer(out)
+        # out = self.qp_layer(out)
 
         return out
