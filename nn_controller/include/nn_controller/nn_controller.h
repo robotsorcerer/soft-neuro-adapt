@@ -61,6 +61,12 @@ namespace amfc_control
     {
     private:
         /* @brief
+        *   paths used to store ref and saved paths
+        */
+        boost::filesystem::path nn_controller_path_;
+        std::stringstream ss;
+
+        /* @brief
         *
         *  sigma modification to ensure lyapunov function stays negative along 
         *  the trajectories of the error dynamics of the system
@@ -277,22 +283,6 @@ namespace amfc_control
 
         /* @brief
         *
-        * network weights ~= ideal model weights used in initializing
-        * the controller
-        *
-        */
-        Eigen::Matrix<double, 6,6> idealModelWeights;
-        
-        /* @brief
-        *
-        * network biases ~= ideal model biases used in initializing
-        * the controller
-        *
-        */
-        Eigen::VectorXd idealBiases;
-
-        /* @brief
-        *
         *  Control torques sent to valves
         *
         */
@@ -323,6 +313,8 @@ namespace amfc_control
         * std::vector that stores previous values of ym
         */
         std::vector<Eigen::Vector3d> prev_ym;
+
+        // std::vector<Eigen::VectorXd> prev_Ky_hat, prev_Kr_hat;
 
         /* @brief
         *
@@ -373,44 +365,30 @@ namespace amfc_control
 
             P *= -1705./2668*1000; //-11503./180; //
             Am *= -1334./1705;
+            // set Bm to -Am in order to enforce unity dc fain from r to ym
+            Bm = -Am;
 
             //initialize B so that we have the difference between voltages to each IAB
-            B(0,0) = 1; B(0, 1) = 1;
-            B(1,2) = 1; B(1, 3) = 1;
-            B(2,4) = 1; B(2, 5) = 1;
+            B(0,0) = 1; B(0, 1) = -1;
+            B(1,2) = 1; B(1, 3) = -1;
+            B(2,4) = 1; B(2, 5) = -1;
 
             pose_info.resize(3);
 
             //gamma scaling factor for adaptive gains
-            k =  1e-6; //1e-12/8;
+            // k =  1e-6; //1e-12/8;
+            k =  1e-9; //1e-12/8;
 
             Gamma_y *= k;// * Gamma_y.diagonal();
             Gamma_r *= k;// * Gamma_r.diagonal();
-
-            /*Initialize weights from previously trained model to usebefore
-            // we converge in the online approximator*/
-            idealModelWeights << 3.7133e+01, -1.4934e+00,  3.8134e+01,
-                                 2.9362e+01, -3.4522e+01, -3.3090e+01,
-                                 1.7951e+00, -1.7639e-01,  2.4107e+00,  
-                                 2.7318e+00, -3.7043e+00, -1.1980e+00,
-                                 7.1878e+00, -1.3644e+00,  6.5950e+00,  
-                                 5.8266e+00, -6.5263e+00, -8.3548e+00,
-                                 3.9877e-01,  1.0487e+00, -2.2137e-01,  
-                                 6.7413e-01,  8.9013e-04, -2.7893e-01,
-                                 1.0266e+00,  3.7444e+00,  1.4412e+00,  
-                                 7.9007e-01,  9.8485e-01,  5.4271e-01,
-                                 8.4146e-01, -6.5101e-01,  9.8610e-01, 
-                                 -3.1613e-01, -6.4775e-01, -2.3919e-01;
-            idealBiases.resize(6);
-            idealBiases << 54.3523, 1.1706, 10.6537,  0.1493, -0.2866, -0.8298;
 
             // control law that will be used in first iteration
             guessControl.resize(6);
             guessControl.setRandom(6,1);
 
             // initialize Kr_hat and Ky_hat to dummy values for sigma modification
-            Kr_hat.setIdentity(n,m);
-            Ky_hat.setIdentity(n,m);
+            Kr_hat.setZero(n,m);
+            Ky_hat.setZero(n,m);
 
             // network penalizing constant
             alpha.resize(6);

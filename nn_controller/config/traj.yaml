@@ -1,7 +1,8 @@
 Reference:
-    z: 35.8693
-    pitch: 0.24554
-    roll:  2.50567
+    z: 805.530
+    pitch: 1.03
+    roll: 1.03
 Utils:
     print: true
     save: true
+    filename: /ref_pose.csv

@@ -118,22 +118,25 @@ class LSTMModel(nn.Module):
         self.lstm2  = nn.LSTM(nHidden[0],nHidden[1], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
         self.lstm3  = nn.LSTM(nHidden[1],nHidden[2], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
         self.fc     = nn.Linear(nHidden[2], noutputs)
+        self.sl     = F.softmax
 
     def forward(self, x):
         nBatch = x.size(0)
         # Forward propagate RNN layer 1
         out, _ = self.lstm1(x)
-        # out = self.drop(out)
 
         # Forward propagate RNN layer 2
         out, _ = self.lstm2(out)
 
         # Forward propagate RNN layer 2
         out, _ = self.lstm3(out)
-        # out = self.drop(out)
 
         # Decode hidden state of last time step
         out = self.fc(out[:, -1, :])
+
+        # classifiy probabilities
+        # out = F.softmax(out)
+        # out = self.sl(out)
 
         #Now add QP Layer
         # out = out.view(nBatch, -1)
