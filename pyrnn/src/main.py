@@ -109,6 +109,17 @@ class Net(Listener):
         self.filename = 'train_data.txt'    # filename of training data
         npr.seed(1)
 
+        # save params
+        save = self.args.save
+        if self.args.save is None:
+            t = os.path.join(os.getcwd(), save)
+        if os.path.isdir(save):
+            shutil.move(save, save + ".old" + '_' +  datetime.strftime(datetime.now(), '%m-%d-%y_%H-%M')  )
+        os.makedirs(save)
+
+        self.save = save
+
+
     def exportsToTensor(self, pose, controls):
         seqLength, outputSize = 5, 6
         inputs = torch.Tensor([[
@@ -159,14 +170,6 @@ class Net(Listener):
 
 
     def train(self):
-        # save params
-        save = self.args.save
-        if args.save is None:
-            t = os.path.join(os.getcwd(), save)
-        if os.path.isdir(save):
-            shutil.rmtree(save)
-        os.makedirs(save)
-
         #plot params
         plt.ioff()
         plt.xlabel('time')
@@ -185,8 +188,6 @@ class Net(Listener):
             # Forward
             self.optimizer.zero_grad()
             outputs = self.net(inputs)
-            # print('outputs, \n',  outputs)
-            # print('sample: ', outputs.multinomial())
 
             # Backward
             loss    = self.net.criterion(outputs, targets)
@@ -218,6 +219,7 @@ class Net(Listener):
             control_msg.left_bladder_pos = control_action[0]; control_msg.left_bladder_neg = control_action[1];
             control_msg.right_bladder_pos = control_action[2]; control_msg.right_bladder_neg = control_action[3];
             control_msg.base_bladder_pos = control_action[4]; control_msg.base_bladder_neg = control_action[5];
+            # print('control_law_msg: ', control_msg)
 
             # publish the weights
             self.biases_pub.publish(biases_msg)
@@ -226,9 +228,9 @@ class Net(Listener):
 
             # save train and val loss
             fields = ['epoch', 'train_loss/val_loss']
-            trainF = open(os.path.join(save, 'train_csv'), 'w')
+            trainF = open(os.path.join(self.save, 'train_csv'), 'a') 
             trainW = csv.writer(trainF)
-            trainW.writerow([loss.data[0], val.data[0]])
+            trainW.writerow([epoch, loss.data[0], val_loss.data[0]])
             trainF.flush()
 
             # TODO: GUI Not correctly implemented
@@ -251,19 +253,12 @@ class Net(Listener):
 
             if rospy.is_shutdown():
                 os._exit()
-
-        torch.save(self.net.state_dict(), self.args.models_dir + '/' + 'lstm_net_' +  \
-                datetime.strftime(datetime.now(), '%m-%d-%y_%H::%M') + '.pkl') if self.args.save else None
+        model_filename =  'lstm_net_' +  \
+                datetime.strftime(datetime.now(), '%m-%d-%y_%H::%M') + '.pkl'
+        print("saving model file as: ", model_filename)
+        torch.save(self.net.state_dict(), self.args.models_dir + '/' + model_filename) if self.args.save else None
 
     def test(self):
-        # save params
-        # save = self.args.save
-        # if args.save is None:
-        #     t = os.path.join('results', models)
-        # if os.path.isdir(save):
-        #     shutil.rmtree(save)
-        # os.makedirs(save)
-
         #plot params
         plt.ioff()
         plt.xlabel('time')
@@ -290,11 +285,6 @@ class Net(Listener):
             # Optimize
             self.optimizer.step()
 
-            # validate the loss
-            val_loss  = self.validate()
-            # Implement early stopping. Note that step should be called after validate()
-            self.scheduler.step(val_loss)
-
             net_biases =  self.net.fc.bias.data.cpu()
             net_weights = self.net.fc.weight.data.cpu()
             # publish net weights and biases
@@ -315,12 +305,12 @@ class Net(Listener):
             self.weights_pub.publish(weights_msg)
             self.net_control_law_pub.publish(control_msg)
 
-            # save train and val loss
-            # fields = ['epoch', 'train_loss', 'val_loss']
-            # trainF = open(os.path.join(save, 'train_csv'), 'w')
-            # trainW = csv.writer(trainF)
-            # trainW.writerow(loss.data[0], val.data[0])
-            # trainF.flush()
+            # save test loss
+            fields = ['epoch', 'test_loss']
+            testF = open(os.path.join(self.save, 'test_csv'), 'a')
+            testW = csv.writer(testF)
+            testW.writerow([epoch, loss.data[0]])
+            testF.flush()
 
             # TODO: GUI Not correctly implemented
             if self.args.display:# show some plots
@@ -330,8 +320,8 @@ class Net(Listener):
                 plt.draw()
                 plt.grid(True)
 
-            print('Epoch: {}  | \ttrain loss: {:.4f}  | \tval loss: {:.4f}'.format(
-                epoch, loss.data[0], val_loss.data[0]))            
+            print('Epoch: {}  | \ttest loss: {:.4f} '.format(
+                epoch, loss.data[0]))            
             if self.args.adaptLR and ((epoch % 100) == 0):
                 lr = 1./epoch 
                 self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
@@ -351,9 +341,10 @@ def main():
     parser.add_argument('--toGPU', type=bool,    default=True)
     parser.add_argument('--maxIter', type=int,  default=1000)
     parser.add_argument('--silent', type=bool,  default=True)
-    parser.add_argument('--adaptLR', type=bool,  default=False)
+    parser.add_argument('--adaptLR', type=bool,  default=True)
     parser.add_argument('--sim', type=bool,  default=False)
     parser.add_argument('--useVicon', type=bool, default=True)
+    parser.add_argument('--lastLayer', type=str, default='linear')
     parser.add_argument('--save', type=str, default='results')
     parser.add_argument('--test', action='store_true', default=False)
     parser.add_argument('--model', type=str,default= 'lstm_net_07-21-17_16::09.pkl')
@@ -381,8 +372,9 @@ def main():
     rospy.init_node('pose_control_listener', anonymous=True)
     rate = rospy.Rate(30)
     try:
-        while not rospy.is_shutdown():     
+        if not rospy.is_shutdown():     
             network = Net(args)    
+
             if not args.test:
                 network.train()  
             else:

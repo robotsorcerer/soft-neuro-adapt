@@ -104,21 +104,26 @@ class LSTMModel(nn.Module):
         self.qp_layer = qp_layer
 
         # Backprop Through Time (Recurrent Layer) Params
-        self.cost       = nn.MSELoss(size_average=False)
         self.noutputs   = noutputs
         self.num_layers = numLayers
         self.inputSize  = inputSize
         self.nHidden    = nHidden
         self.batchSize  = batchSize
         self.noutputs   = noutputs
-        self.criterion  = nn.MSELoss(size_average=False)
 
         #define recurrent and linear layers
         self.lstm1  = nn.LSTM(inputSize,nHidden[0], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
         self.lstm2  = nn.LSTM(nHidden[0],nHidden[1], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
         self.lstm3  = nn.LSTM(nHidden[1],nHidden[2], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
-        self.fc     = nn.Linear(nHidden[2], noutputs)
-        self.sl     = F.softmax
+        if args.lastLayer=='linear':
+            self.fc     = nn.Linear(nHidden[2], noutputs)
+            self.criterion  = nn.MSELoss(size_average=False)
+        elif args.lastLayer=='softmax':
+            self.fc     = F.softmax
+            self.criterion  = nn.CrossEntropyLoss()
+        else:
+            print('unknown network in last layer')
+            os._exit()
 
     def forward(self, x):
         nBatch = x.size(0)
@@ -131,12 +136,8 @@ class LSTMModel(nn.Module):
         # Forward propagate RNN layer 2
         out, _ = self.lstm3(out)
 
-        # Decode hidden state of last time step
+        # Decode hidden state of last time step        
         out = self.fc(out[:, -1, :])
-
-        # classifiy probabilities
-        # out = F.softmax(out)
-        # out = self.sl(out)
 
         #Now add QP Layer
         # out = out.view(nBatch, -1)
