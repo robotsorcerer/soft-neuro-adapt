@@ -1,7 +1,9 @@
 Reference:
-    z: 805.530
-    pitch: 1.03
-    roll: 1.03
+    z: 265.161    
+    pitch: 1.017125
+    roll: -1.0134219
+Control:
+    with_net: false   
 Utils:
     print: true
     save: true

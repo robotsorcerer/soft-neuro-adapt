@@ -61,6 +61,14 @@ namespace amfc_control
     {
     private:
         /* @brief
+        *
+        * compute control law with robust adaptive estimated net params 
+        *
+        */        
+        bool with_net_;
+
+        /* @brief
+        *
         *   paths used to store ref and saved paths
         */
         boost::filesystem::path nn_controller_path_;

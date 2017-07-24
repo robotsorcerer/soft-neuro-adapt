@@ -123,16 +123,17 @@ class Net(Listener):
     def exportsToTensor(self, pose, controls):
         seqLength, outputSize = 5, 6
         inputs = torch.Tensor([[
-                                 controls.get('li', 0), controls.get('lo', 0), controls.get('ri', 0), 
-                                 controls.get('ro', 0), controls.get('bi', 0), controls.get('bo', 0),
+                                 controls.get('li', 0), controls.get('lo', 0), 
+                                 controls.get('bi', 0), controls.get('bo', 0), 
+                                 controls.get('ri', 0), controls.get('ro', 0), 
                                  pose.get('z', 0), pose.get('pitch', 0), pose.get('yaw', 0)
                              ]])
         inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
 
         #will be [torch.FloatTensor of size 1x3]
         targets = (torch.Tensor([[
-                                 pose.get('z', 0), pose.get('z', 0), pose.get('pitch', 0), 
-                                 pose.get('pitch', 0), pose.get('roll', 0), pose.get('roll', 0),
+                                 pose.get('z', 0), pose.get('z', 0)/2.0, pose.get('pitch', 0), 
+                                 pose.get('pitch', 0)/2.0, pose.get('roll', 0), pose.get('roll', 0)/2.0,
                              ]])).expand(seqLength, 1, outputSize)
         targets = Variable(targets)
 
@@ -217,8 +218,8 @@ class Net(Listener):
             control_msg = ValveControl()   # Control Message to valves
             control_msg.stamp = rospy.Time.now();       control_msg.seq = epoch
             control_msg.left_bladder_pos = control_action[0]; control_msg.left_bladder_neg = control_action[1];
-            control_msg.right_bladder_pos = control_action[2]; control_msg.right_bladder_neg = control_action[3];
-            control_msg.base_bladder_pos = control_action[4]; control_msg.base_bladder_neg = control_action[5];
+            control_msg.base_bladder_pos = control_action[2]; control_msg.base_bladder_neg = control_action[3];
+            control_msg.right_bladder_pos = control_action[4]; control_msg.right_bladder_neg = control_action[5];
             # print('control_law_msg: ', control_msg)
 
             # publish the weights

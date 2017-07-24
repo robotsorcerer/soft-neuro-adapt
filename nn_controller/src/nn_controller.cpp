@@ -26,6 +26,8 @@ Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool prin
 	initMatrices();	
 	sigma_y = 0.01;
 	sigma_r = 0.01;
+	ros::param::get("/nn_controller/Control/with_net", with_net_);
+	pathfinder::getROSPackagePath("nn_controller", nn_controller_path_);
 	control_pub_ = n_.advertise<ensenso::ValveControl>("/mannequine_head/u_valves", 100);
 }
 
@@ -180,8 +182,14 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	/*
 	* Calculate Control Law
 	*/
-	u_control = (Ky_hat.transpose() * pose_info) + 
-				(Kr_hat.transpose() * ref_) + this->net_control; 
+	if(with_net_){
+		u_control = (Ky_hat.transpose() * pose_info) + 
+					(Kr_hat.transpose() * ref_) + this->net_control; 
+	}
+	else{
+		u_control = (Ky_hat.transpose() * pose_info) + 
+					(Kr_hat.transpose() * ref_); 	
+	}
 
 	u_control(0) /= 322;
 	u_control(1) /= 322;
@@ -195,7 +203,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	std::string filename;
 	ros::param::get("/nn_controller/Utils/filename", filename);
 
-	pathfinder::getROSPackagePath("nn_controller", nn_controller_path_);
 	ss << nn_controller_path_.c_str() << filename;
 	std::string ref_pose_file = ss.str();
 
@@ -226,15 +233,14 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	if(print)	{	
 		OUT("\nref_: " 			<< ref_.transpose());
-		OUT("y  (z, pitch, roll): " 		 << pose_info.transpose());
 		OUT("ym (z, pitch, roll): " 		 << ym.transpose());
+		OUT("y  (z, pitch, roll): " 		 << pose_info.transpose());
 		OUT("e  (y-ym): " << tracking_error.transpose());
 		OUT("pred (z, z, pitch, pitch, roll, roll): " << pred.transpose());
 		OUT("net_control: " << net_control.transpose());
 		OUT("Control Law: " << u_control.transpose());
 		ROS_INFO_STREAM("\nKr_hat^T: \n" << Kr_hat.transpose());
 		ROS_INFO_STREAM("\nKy_hat^T: \n" << Ky_hat.transpose());
-
 	}
 	++counter;
 }
@@ -246,14 +252,14 @@ void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Po
     eig2Pose.orientation.y = pose_info(2);
 }
 
-void help()
-{
-	OUT("Add the 3DOF desired trajectory separated by a single space");
-	OUT("Like so: rosrun nn_controller nn_controller <z> <pitch> <yaw>" << 
-			 "\n[<print> <useSigma> <save>]");
-	OUT("where the last three arguments are optional");
-	OUT("to print, use \"1\" in place of <print> etc");
-}
+// void help()
+// {
+// 	OUT("Add the 3DOF desired trajectory separated by a single space");
+// 	OUT("Like so: rosrun nn_controller nn_controller <z> <pitch> <yaw>" << 
+// 			 "\n[<print> <useSigma> <save>]");
+// 	OUT("where the last three arguments are optional");
+// 	OUT("to print, use \"1\" in place of <print> etc");
+// }
 
 int main(int argc, char** argv)
 { 
@@ -261,7 +267,7 @@ int main(int argc, char** argv)
 	ros::NodeHandle n;
 	bool print, useSigma, save, useVicon(true);
 
-	help();
+	// help();
 
 	Eigen::Vector3d ref;
 	ref.resize(3);
