@@ -105,10 +105,8 @@ class Net(Listener):
         # GPU object mover
         self.net = self.net.cuda() if args.toGPU else self.net
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.args.rnnLR)
-        # self.listen = Listener(Pose, ValveControl)  # listener that retrieves message from ros publisher
         self.scheduler = es.EarlyStop(self.optimizer, 'min')
-        # filename of training data
-        # self.filename = train_data.txt
+        self.filename = 'train_data.txt'    # filename of training data
         npr.seed(1)
 
     def exportsToTensor(self, pose, controls):
@@ -125,10 +123,6 @@ class Net(Listener):
                                  pose.get('z', 0), pose.get('z', 0), pose.get('pitch', 0), 
                                  pose.get('pitch', 0), pose.get('roll', 0), pose.get('roll', 0),
                              ]])).expand(seqLength, 1, outputSize)
-        # targets = (torch.Tensor([[
-        #                         pose['z'], pose['z'], pose['pitch'], pose['pitch'],
-        #                         pose['roll'], pose['roll']
-        #                         ]])).expand(seqLength, 1, outputSize)
         targets = Variable(targets)
 
         return inputs, targets
@@ -166,12 +160,12 @@ class Net(Listener):
 
     def train(self):
         # save params
-        # save = self.args.save
-        # if args.save is None:
-        #     t = os.path.join('results', models)
-        # if os.path.isdir(save):
-        #     shutil.rmtree(save)
-        # os.makedirs(save)
+        save = self.args.save
+        if args.save is None:
+            t = os.path.join(os.getcwd(), save)
+        if os.path.isdir(save):
+            shutil.rmtree(save)
+        os.makedirs(save)
 
         #plot params
         plt.ioff()
@@ -231,11 +225,11 @@ class Net(Listener):
             self.net_control_law_pub.publish(control_msg)
 
             # save train and val loss
-            # fields = ['epoch', 'train_loss', 'val_loss']
-            # trainF = open(os.path.join(save, 'train_csv'), 'w')
-            # trainW = csv.writer(trainF)
-            # trainW.writerow(loss.data[0], val.data[0])
-            # trainF.flush()
+            fields = ['epoch', 'train_loss/val_loss']
+            trainF = open(os.path.join(save, 'train_csv'), 'w')
+            trainW = csv.writer(trainF)
+            trainW.writerow([loss.data[0], val.data[0]])
+            trainF.flush()
 
             # TODO: GUI Not correctly implemented
             if self.args.display:# show some plots
@@ -360,7 +354,7 @@ def main():
     parser.add_argument('--adaptLR', type=bool,  default=False)
     parser.add_argument('--sim', type=bool,  default=False)
     parser.add_argument('--useVicon', type=bool, default=True)
-    parser.add_argument('--save', type=bool, default='True')
+    parser.add_argument('--save', type=str, default='results')
     parser.add_argument('--test', action='store_true', default=False)
     parser.add_argument('--model', type=str,default= 'lstm_net_07-21-17_16::09.pkl')
     parser.add_argument('--qpenalty', type=float, default=1.0)
