@@ -26,6 +26,8 @@ Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool prin
 	initMatrices();	
 	sigma_y = 0.01;
 	sigma_r = 0.01;
+	std::string filename;
+	ros::param::get("/nn_controller/Utils/filename", filename);
 	ros::param::get("/nn_controller/Control/with_net", with_net_);
 	pathfinder::getROSPackagePath("nn_controller", nn_controller_path_);
 	control_pub_ = n_.advertise<ensenso::ValveControl>("/mannequine_head/u_valves", 100);
@@ -190,6 +192,35 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		u_control = (Ky_hat.transpose() * pose_info) + 
 					(Kr_hat.transpose() * ref_); 	
 	}
+	/*
+	Here are the rules that govern the bladders
+	l_i --> Roll+	r_i -->Roll-
+	l_o --> Roll-   r_o -->Roll+
+	b_i --> Pitch+, Z+   b_o -->Pitch-, Z-
+	u_{o+} is a suitable controller magnitude; u_+ is a +ve input
+	------------------------------------------------------------
+	DOF     |  Control Law
+	------------------------------------------------------------
+	Roll+   |  if f_{li} = u_{+}:
+			|	f_{ri} = 0, f_{lo} = 0 or u_{o+}
+			| 	f_{ro} = u_{o+} or 0
+	------------------------------------------------------------
+	Roll-   | if f_{ri} = u_{+}:
+			|  	f_{li} = 0; f_{ro} = 0  or u_{o+}
+	------------------------------------------------------------
+	Pitch+  | if f_{bi} = u_{+}
+			|    f_{bo} = u_{o+} and f_{li} =f_{ri} = u_{head+}
+	------------------------------------------------------------
+	Pitch-  | f_{bo} = u_{max-}
+			| f_{bi} = 0 or < f_{bo}
+	------------------------------------------------------------
+	Z+      | f_{li} = f_{ri} = u_{head+}
+			| f_{bi} = u_{+} f_{bo} = u_{o+}
+	------------------------------------------------------------
+	Z-      | f_{bo} = u_{-}
+			| f_{bi} = 0 or f_{bo}
+
+	*/
 
 	u_control(0) /= 322;
 	u_control(1) /= 322;
@@ -199,9 +230,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	}
 
 	resetController = true;
-
-	std::string filename;
-	ros::param::get("/nn_controller/Utils/filename", filename);
 
 	ss << nn_controller_path_.c_str() << filename;
 	std::string ref_pose_file = ss.str();
