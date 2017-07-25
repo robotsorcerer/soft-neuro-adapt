@@ -50,61 +50,62 @@ ros::Time Controller::getTime() {
 /*Subscribers*/
 // pose subscriber from ensenso_seg/vicon_sub
 void Controller::pose_subscriber(const geometry_msgs::Pose& headPose) {
+	Eigen::VectorXd pose_info;
 	getPoseInfo(headPose, pose_info);
 
 	std::lock_guard<std::mutex> pose_locker(pose_mutex);
-	this->pose_info = pose_info;
+	this->pose_info_ = pose_info;
 	updatePoseInfo  = true;		
 }
 
 void Controller::net_control_subscriber(const ensenso::ValveControl& net_control_law){
 	Eigen::VectorXd net_control;
-	net_control.resize(6);
+	net_control.resize(n);
 
-	net_control << net_control_law.left_bladder_pos, net_control_law.left_bladder_neg,
-				   net_control_law.right_bladder_pos, net_control_law.right_bladder_neg, 
-				   net_control_law.base_bladder_pos, net_control_law.base_bladder_neg;
-	this->net_control = net_control;				   
+	net_control <<  net_control_law.left_bladder, 	// left
+					net_control_law.base_bladder, 	// base
+					net_control_law.right_bladder;	// right
+	update_net_control_ = true;					
+	this->net_control_ = net_control;				   
 }
 
 void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info)
 {
-	pose_info << headPose.position.z,// 1,  		//roll to zero
-				 headPose.orientation.x, headPose.orientation.y; //headPose.yaw;   //setting roll to zero
+	pose_info << headPose.orientation.x, // roll = [left and right]
+				 headPose.position.z, 	// base  = [base actuator]	
+				  headPose.orientation.y; // pitch = [right actuator]
 	
-	this->pose_info = pose_info;
+	this->pose_info_ = pose_info;
 	//set ref's non-controlled states to measurement
-	ControllerParams(std::move(pose_info));
+	ControllerParams();
 }
 
-void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
+void Controller::ControllerParams()
 {	
 	// Am = -0.782405        -0        -0
 	//       -0          -0.782405     -0
     //       -0              -0    -0.782405
 	// Bm = [1 0 0; 0 1 0; 0 0 1]
 	// ref_ = [z, roll, pitch ] given by user
-	Am.resize(3,3); 	Bm.resize(3,3); 	ym.resize(3); 	ym_dot.resize(3); tracking_error.resize(3);
-	if(counter == 0){
-		ym = pose_info;
-	}
-	ym_dot = Am * ym + Bm * ref_;
+	Am.resize(n, n); 	Bm.resize(n, m); 	ym.resize(n); 	ym_dot.resize(n); tracking_error_.resize(n);
+	
+	Eigen::VectorXd pose_info = this->pose_info_;
 
 	if(counter == 0){
 		ym = pose_info;		
+		ym_dot = Am * ym + Bm * ref_;
 		prev_ym.push_back(ym);
 	}
 	else{
 		ym_dot = Am * prev_ym.back() + Bm * ref_;
 		ym = prev_ym.back() + 0.01 * ym_dot;
 	}
-	prev_ym.push_back(ym);
 	//compute tracking error, e = y - y_m
-	tracking_error = pose_info - ym;
-	// //use boost ode solver
+	tracking_error_ = pose_info - ym;
+	// //use boost ode solver for Ky_hat and Kr_hat
 	runge_kutta_dopri5<state,double,state,double,vector_space_algebra> stepper;
-	Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
-	Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
+	Ky_hat_dot = -Gamma_y * pose_info * tracking_error_.transpose() * P * B  * sgnLambda;
+	Kr_hat_dot = -Gamma_r * ref_      * tracking_error_.transpose() * P * B  * sgnLambda;
 
 	//use reference for the derivative
 	stepper.do_step([](const state& x, state & dxdt, const double t)->void{
@@ -115,24 +116,24 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		dxdt = x;
 	}, Kr_hat_dot, counter, Kr_hat, 0.01);
 
-	Eigen::VectorXd pred;
-	pred.resize(6);
-	if(!updatePred)	{
-		pred << pose_info(0), pose_info(0), // note the scaling since two valves do one job in equal but opposite directions
-				pose_info(1), pose_info(1),
-				pose_info(2), pose_info(2);
+	Eigen::VectorXd net_control;
+	net_control.resize(m);
+	if(!update_net_control_)	{
+		net_control << pose_info(0), // roll = [left and right actuator]
+					   pose_info(1), // base  = [base actuator]
+					   pose_info(2); // pitch = [right actuator]
 	}
 	else	{
 		std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
-		updatePred = false;
-		pred = this->pred;
+		update_net_control_ = false;
+		net_control = this->net_control_;
 	}
 	/*
 	* Calculate Control Law
 	*/
 	if(with_net_){
 		u_control = (Ky_hat.transpose() * pose_info) + 
-					(Kr_hat.transpose() * ref_) + this->net_control; 
+					(Kr_hat.transpose() * ref_) + net_control_; 
 	}
 	else{
 		u_control = (Ky_hat.transpose() * pose_info) + 
@@ -179,31 +180,28 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	// 	else
 	// 		u_control[i] = u_control[i];
 	// }
-	// changed the order here because I rearranged hardware two days before cam ready
-	u_valves_.left_bladder_pos  = u_control(0);
-	u_valves_.left_bladder_neg  = u_control(1);
-	u_valves_.right_bladder_pos = u_control(2);
-	u_valves_.right_bladder_neg = u_control(3);
-	u_valves_.base_bladder_pos  = u_control(4);
-	u_valves_.base_bladder_neg  = u_control(5);		
+	u_valves_.left_bladder  = u_control(0); // roll actuator +ve
+	u_valves_.base_bladder  = u_control(1);	// base actuator
+	u_valves_.right_bladder = u_control(2);	// roll actuator -ve
 
-	// bool roll_pos, roll_neg, pitch_pos, pitch_neg, z_pos, z_neg;
-	// if(ros::param::get("/nn_controller/DOF/ROLL_POS", roll_pos))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
-	// if(ros::param::get("/nn_controller/DOF/ROLL_NEG", roll_neg))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_NEG;
-	// if(ros::param::get("/nn_controller/DOF/PITCH_POS", pitch_pos))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_POS;
-	// if(ros::param::get("/nn_controller/DOF/PITCH_NEG", pitch_neg))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_NEG;
-	// if(ros::param::get("/nn_controller/DOF/Z_POS", z_pos))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::Z_POS;
-	// if(ros::param::get("/nn_controller/DOF/Z_NEG", z_neg))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::Z_NEG;
-	// // this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
+	bool roll_pos, roll_neg, pitch_pos, pitch_neg, z_pos, z_neg, all;
+	if(ros::param::get("/nn_controller/DOF/ROLL_POS", roll_pos))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
+	if(ros::param::get("/nn_controller/DOF/ROLL_NEG", roll_neg))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_NEG;
+	if(ros::param::get("/nn_controller/DOF/PITCH_POS", pitch_pos))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_POS;
+	if(ros::param::get("/nn_controller/DOF/PITCH_NEG", pitch_neg))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_NEG;
+	if(ros::param::get("/nn_controller/DOF/Z_POS", z_pos))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::Z_POS;
+	if(ros::param::get("/nn_controller/DOF/Z_NEG", z_neg))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::Z_NEG;
+	if(ros::param::get("/nn_controller/DOF/ALL", all))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::ALL;
 
 	switch (this->dof_motion_type_){
-		case DOF_MOTION_ENUM::ROLL_POS:  // controlled principlally by left inlet torque
+		case DOF_MOTION_ENUM::ROLL_POS:  	// controlled principlally by left inlet torque
 			u_valves_.right_bladder_pos = 0; //std::fabs(u_valves_.right_bladder_pos);  // right inlet has to be zero
 			u_valves_.right_bladder_neg = std::fabs(u_valves_.right_bladder_neg); // right outlet has to be positive
 			u_valves_.left_bladder_neg  = 0; //std::fabs(u_valves_.left_bladder_neg); // left outlet has to be positive
@@ -230,6 +228,12 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		case DOF_MOTION_ENUM::Z_NEG: // this is controlled principally by the base bladder outlet
 			u_valves_.base_bladder_pos = 0;  // we should not excite base outlet bladder
 			break;
+
+		case DOF_MOTION_ENUM::ALL:
+			if(u_valves_.left_bladder>0)
+				u_valves_.right_bladder = 0;
+			if (u_valves_.right_bladder > 0)
+				u_valves_.left_bladder = 0;			
 	}
 
 	if(save) {
@@ -255,7 +259,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		OUT("\nref_: " 			<< ref_.transpose());
 		OUT("y  (z, roll, pitch): " 		 << pose_info.transpose());
 		OUT("ym (z, roll, pitch): " 		 << ym.transpose());
-		OUT("e  (y-ym): " << tracking_error.transpose());
+		OUT("e  (y-ym): " << tracking_error_.transpose());
 		OUT("pred (z, z, pitch, pitch, roll, roll): " << pred.transpose());
 		OUT("net_control: " << net_control.transpose());
 		OUT("Control Law: " << u_control.transpose());

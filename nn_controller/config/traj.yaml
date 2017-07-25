@@ -11,9 +11,10 @@ Utils:
 # DoF being controlled
 DOF:
 # could be one of the following: 
-    roll_pos: true
+    roll_pos: false
     roll_neg: false
     pitch_pos: false
     pitch_neg: false
     z_pos: false
     z_neg: false
+    all: true

@@ -1,5 +1,8 @@
 time stamp
 uint64 seq
+float64 left_bladder
+float64 base_bladder
+float64 right_bladder
 float64 left_bladder_pos
 float64 left_bladder_neg
 float64 right_bladder_pos

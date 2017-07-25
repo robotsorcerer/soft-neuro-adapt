@@ -64,6 +64,7 @@ namespace amfc_control
         PITCH_NEG=3,
         Z_POS=4,
         Z_NEG=5,
+        ALL=6
     };
 
     /*
@@ -112,7 +113,7 @@ namespace amfc_control
         *   and the actual head pose
         *
         */
-        Eigen::VectorXd tracking_error;
+        Eigen::VectorXd tracking_error_;
 
         /* @brief
         *
@@ -161,7 +162,7 @@ namespace amfc_control
         * B is [3 x 6]
         */
         Eigen::Matrix3d P, Am, Bm; 
-        Eigen::MatrixXd B;
+        Eigen::Matrix3d B;
         /*@brief
         *
         * Gamma_y and Gamma_r are matrices of adaptation gains 
@@ -195,9 +196,9 @@ namespace amfc_control
 
         /* @brief
         *
-        *   pose_info is the returned measurement from the sensor
+        *   pose_info_ is the returned measurement from the sensor
         */
-        Eigen::VectorXd pose_info;
+        Eigen::VectorXd pose_info_;
 
         /* @brief
         *
@@ -230,13 +231,6 @@ namespace amfc_control
         *   vector used to penalize network predictions
         */
         Eigen::VectorXd alpha;
-
-        /* @brief
-        *
-        *   convenience data structures for creating delayed data
-        */
-        std::queue<Eigen::VectorXd> pose_queue, tracking_error_queue,
-                                    Ky_hat_queue, ref_queue, Kr_hat_queue;
         
         /* @brief
         *
@@ -244,19 +238,7 @@ namespace amfc_control
         *
         */
         nn_controller::predictor pred_;
-        
-        /* @brief
-        *
-        *   neural net  weights
-        */
-        Eigen::Matrix<double, 6, 6> modelWeights;
-        
-        /* @brief
-        *
-        *   neural net  biases
-        */
-        Eigen::VectorXd modelBiases;
-        
+                
         /* @brief
         *
         * boost asio api for streaming pose, ref and valve controllers
@@ -298,7 +280,7 @@ namespace amfc_control
         *
         */                    
         bool updatePoseInfo, print, updateController, updateWeights, 
-             updateBiases, resetController, updateNetLoss, updatePred,
+             updateBiases, resetController, updateNetLoss, update_net_control_,
              save;
 
         /* @brief 
@@ -321,7 +303,7 @@ namespace amfc_control
         *  control law retrieved from the neural network
         *
         */
-        Eigen::VectorXd net_control;
+        Eigen::VectorXd net_control_;
 
         /* @brief
         *
@@ -350,6 +332,7 @@ namespace amfc_control
         */
         template <typename T> 
         int sgn(T val)         {
+            // std::cout << "T(0): " << T(0) << std::endl;
             return (T(0) >  val) - (val > T(0));
         }
 
@@ -359,10 +342,10 @@ namespace amfc_control
         *   reference model matrices
         */
         void initMatrices()        {   
-            n = 3; m = 6; 
+            n = 3; m = 3; 
             Am.setIdentity(n, n);   // Hurwitz matrix
-            Bm.setIdentity(n, n);       //note from B*Lambda*Kr^T eq.10
-            B.setZero(n, m);        //R^{3 x 6}
+            Bm.setIdentity(n, m);       //note from B*Lambda*Kr^T eq.10
+            B.setIdentity(n, m);        //R^{3 x 6}
             Gamma_y.setIdentity(n, n); //will be 3 X 3 matrix
             Gamma_r.setIdentity(n, n); //will be 3 X 3 matrix
             //Lambda models controlundertainties by an R^{nxn} diagonal matrix
@@ -383,10 +366,6 @@ namespace amfc_control
             OUT("sgnLambda: " << sgnLambda);
 
             P.setIdentity(n, n); // R ^{n x n}  // from lyapunov equation
-            expAmk.setIdentity(n, n);  // from ym = (expAm*k ) * Bm r
-            expAmk_tau.setIdentity(n,n);
-
-            modelBiases.resize(6);
 
             P *= -1705./2668*1000; //-11503./180; //
             Am *= -1334./1705;
@@ -394,11 +373,9 @@ namespace amfc_control
             Bm = -Am;
 
             //initialize B so that we have the difference between voltages to each IAB
-            B(0,0) = 1; B(0, 1) = -1;
-            B(1,2) = 1; B(1, 3) = -1;
-            B(2,4) = 1; B(2, 5) = -1;
+            B.setIdentity(n,m);
 
-            pose_info.resize(3);
+            pose_info_.resize(3);
 
             //gamma scaling factor for adaptive gains
             k =  1e-1; //1e-12/8;
@@ -431,25 +408,11 @@ namespace amfc_control
         * phi(x) will be lagged params 3x1
         * u_control will be 6x1
         */
-        void ControllerParams(Eigen::VectorXd&& pose_info);
-        // subscribe to neural net component of control law
+        void ControllerParams();
         void net_control_subscriber(const ensenso::ValveControl& net_control_law);
-        //transform eigenPose to ensenso::HeadPose format
-        void vectorToHeadPose(Eigen::VectorXd&& pose_info, 
+        void vectorToHeadPose(Eigen::VectorXd&& pose_info_, 
                                           geometry_msgs::Pose& eig2Pose);
-        //predictor from real-time predictor.lua 
-        //loss from real-time predictor.lua 
-        // void loss_subscriber(const std_msgs::Float64& net_loss);
-        // void pred_subscriber(const geometry_msgs::Pose& pred);
-        // //controller service ::DEPRECATED
-        // virtual bool configure_controller(
-        //     nn_controller::controller::Request  &req,
-        //     nn_controller::controller::Response  &res);
-        //predictor params for pretrained model
-        // virtual bool configure_predictor_params(
-        //         nn_controller::predictor_params::Request  &req,
-        //         nn_controller::predictor_params::Response  &res);
-        void getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info);
+        void getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info_);
         ros::Time getTime();      
         virtual void pose_subscriber(const geometry_msgs::Pose& headPose);
     };
