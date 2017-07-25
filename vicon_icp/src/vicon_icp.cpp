@@ -11,6 +11,7 @@
 #include "ros/ros.h"
 #include <ros/spinner.h>
 #include "std_msgs/String.h"
+#include "tf_conversions/tf_eigen.h"
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>  //for bt Quaternion
 #include <geometry_msgs/Transform.h>
@@ -28,7 +29,7 @@
 #include <ensenso/boost_sender.h>
 
 using namespace Eigen;
-#define OUT (std::cout << __o__ << std::endl;)
+#define OUT(__o__) std::cout<< __o__ << std::endl;
 
 //used to retrieve value from the ros param server
 double get(
@@ -211,11 +212,6 @@ private:
             }
         }
 
-
-
-        // for(auto elem : firstHeadMarkersVector)
-        //     ROS_INFO_STREAM("firstHeadMarkersVector: " << elem);
-
         this->mu_p.resize(3); 
         this->mu_x.resize(3);
         remove_mean(std::move(firstHeadMarkersVector), std::move(this->mu_x));  // mu_x is the model point set
@@ -227,6 +223,9 @@ private:
        
             if(updatePose)
             {
+
+                // ROS_INFO_STREAM("model point set: " << this->mu_x(0) << " | " <<  this->mu_x(1) << " | " << this->mu_x(2));
+                // ROS_INFO_STREAM("measured point set: " << this->mu_p(0) << " | " <<  this->mu_p(1) << " | " << this->mu_p(2));
                 {
                     std::lock_guard<std::mutex> lock(mutex);
                     headMarkersVector = this->headMarkersVector;
@@ -270,7 +269,6 @@ private:
                 Q(3, 0) =  A_Mat(0,1);            Q(3, 1) = temp(2, 0);         Q(3, 2) = temp(2, 1);    Q(3, 3) = temp(2, 2);
 
                 // we now find the maximum eigen value of the matrix Q
-                // ROS_INFO_STREAM("\nQ: \n" << Q);
                 EigenSolver<Matrix4d> eig(Q);
 
                 // Note that eigVal and eigVec are std::complex types. To access their
@@ -285,7 +283,7 @@ private:
     }
 
     inline void rad2deg(double&& rad) {
-        rad = (M_PI * rad)/180;
+        rad = (rad * 180.0)/M_PI;
     }
 
     void findQuaternion(EigenSolver< Matrix4d >::EigenvalueType&& eigVals, EigenSolver< Matrix4d >::EigenvectorsType && eigVecs)
@@ -310,15 +308,36 @@ private:
         double q2 = optimalEigVec[2].real();
         double q3 = optimalEigVec[3].real();
 
-
         tf::Quaternion quart(q0, q1, q2, q3);
         tf::Matrix3x3 Rot(quart);
         Rot.getRPY(roll, pitch, yaw);
+        tf::matrixTFToEigen (Rot, rotation_matrix);
 
+        // OUT("\nrotation matrix tf3x3: \n" << rotation_matrix);
         // convert rads to degrees
         rad2deg(std::move(roll));
         rad2deg(std::move(pitch));
         rad2deg(std::move(yaw));
+
+        Vector3d optimal_trans = this->mu_p - /*rotation_matrix **/ this->mu_x;
+        pose_info.position.x = optimal_trans(0); 
+        pose_info.position.y = optimal_trans(1);
+        pose_info.position.z = optimal_trans(2); 
+        // ROS_INFO_STREAM("optimal trans check: " << this->mu_x - rotation_matrix * this->mu_p);
+
+        pose_info.orientation.x = roll-50;
+        pose_info.orientation.y = pitch+36;
+        pose_info.orientation.z = yaw;
+        pose_info.orientation.w = 1;
+
+        // publish the head pose
+        pose_pub.publish(pose_info);
+        if(print_){            
+            printf("z: %.3f | roll: %.3f | pitch: %.3f \n", pose_info.position.z, \
+                                                            pose_info.orientation.x, pose_info.orientation.y);
+        }
+        ros::Rate looper(30);
+        looper.sleep();
 
         // // calculate rotation matrix
         // rotation_matrix.resize(3, 3);
@@ -334,16 +353,6 @@ private:
 
         // ROS_INFO_STREAM("\nrotation matrix\n" << rotation_matrix);
 
-        // compute optimal translation vector
-        translation_vec_optim.x = (this->mu_x - rotation_matrix * this->mu_p)(0);
-        translation_vec_optim.y = (this->mu_x - rotation_matrix * this->mu_p)(1);
-        translation_vec_optim.z = (this->mu_x - rotation_matrix * this->mu_p)(2);
-
-
-        // translation_vec_optim.x = -(this->mu_x -  this->mu_p)(0);
-        // translation_vec_optim.y = -(this->mu_x -  this->mu_p)(1);
-        // translation_vec_optim.z = -(this->mu_x -  this->mu_p)(2);
-
         // define tf matrix to hold xalculated eigen matrix
         // if(std::fabs(rotation_matrix(0,0)) < 0.001 & std::fabs(rotation_matrix(1, 0)) < .001){
         //     //singularity
@@ -357,35 +366,10 @@ private:
         //                         std::cos(roll) * rotation_matrix(0,0) + std::sin(roll) * rotation_matrix(1,0));
         //     yaw = std::atan2(std::sin(roll) * rotation_matrix(0,2) - std::cos(roll) * rotation_matrix(1,2), 
         //                     std::cos(roll)*rotation_matrix(1,1) - std::sin(roll)*rotation_matrix(0,1));            
-        // }
-        if(print_)
-            printf("roll: %.3f | pitch: %.3f | yaw: %.3f \n", roll, pitch, yaw);
-        
+        // }        
 
         // form quaternion from euler angles
-        tf::Quaternion quat = tf::createQuaternionFromRPY(roll, pitch, yaw);
-
-        pose_info.position.x = translation_vec_optim.x; 
-        pose_info.position.y = translation_vec_optim.y;
-        pose_info.position.z = translation_vec_optim.z; 
-
-        pose_info.orientation.x = roll;
-        pose_info.orientation.y = pitch;
-        pose_info.orientation.z = yaw;
-        pose_info.orientation.w = 1;
-        
-
-        // publish the head pose
-        pose_pub.publish(pose_info);
-        if(print_){            
-            // printf("x: %.3f | y: %.3f | z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.x, \
-            //                                                                 pose_info.position.y, pose_info.position.z, \
-            //                                                                 pose_info.orientation.x, pose_info.orientation.y, pose_info.orientation.z);
-            printf("z: %.3f | roll: %.3f | pitch: %.3f \n", pose_info.position.z, \
-                                                            pose_info.orientation.x, pose_info.orientation.y);
-        }
-        ros::Rate looper(30);
-        looper.sleep();
+        // tf::Quaternion quat = tf::createQuaternionFromRPY(roll, pitch, yaw);
     }
 };
 

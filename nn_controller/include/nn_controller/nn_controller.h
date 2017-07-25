@@ -53,6 +53,19 @@ Base class for a controller. Controllers take in sensor readings and choose the 
 
 namespace amfc_control
 {
+    /**   @brief
+    *  enum for bladder types
+    *
+    */
+    enum class DOF_MOTION_ENUM: std::uint16_t {
+        ROLL_POS=0,
+        ROLL_NEG=1,
+        PITCH_POS=2,
+        PITCH_NEG=3,
+        Z_POS=4,
+        Z_NEG=5,
+    };
+
     /*
     * The neural network accounts for the parametric uncertainties and we do not needd
     * a baseline controller for now
@@ -67,6 +80,14 @@ namespace amfc_control
         */        
         bool with_net_;
 
+        /** @brief
+        *
+        * name used in saving ref and actual to disk
+        *
+        */        
+        std::string filename_;
+
+        DOF_MOTION_ENUM dof_motion_type_;
         /* @brief
         *
         *   paths used to store ref and saved paths
@@ -309,7 +330,6 @@ namespace amfc_control
         * since the predictor takes delayed control signals and pose messages
         * as input
         */
-
         Eigen::VectorXd guessControl;
 
         /* @brief
@@ -329,9 +349,8 @@ namespace amfc_control
         * implements the signum of the Lambda matrix
         */
         template <typename T> 
-        int sgn(T val) 
-        {
-            return (T(0) < val) - (val < T(0));
+        int sgn(T val)         {
+            return (T(0) >  val) - (val > T(0));
         }
 
         /* @brief
@@ -355,10 +374,8 @@ namespace amfc_control
             Lambda *= 1;  
             OUT("Lambda: " << Lambda);
             //generate the signum of the Lambda matrix in O(12) time
-            for(int i = 0; i < Lambda.rows(); ++i)  
-            {
-                for(int j = 0; j < Lambda.cols(); ++j)  
-                {
+            for(int i = 0; i < Lambda.rows(); ++i)  {
+                for(int j = 0; j < Lambda.cols(); ++j)    {
                     sgnLambda(i, j) = sgn(Lambda(i, j));
                 }
             }       
@@ -384,24 +401,14 @@ namespace amfc_control
             pose_info.resize(3);
 
             //gamma scaling factor for adaptive gains
-            // k =  1e-6; //1e-12/8;
-            k =  1e-9; //1e-12/8;
+            k =  1e-1; //1e-12/8;
 
             Gamma_y *= k;// * Gamma_y.diagonal();
             Gamma_r *= k;// * Gamma_r.diagonal();
 
-            // control law that will be used in first iteration
-            guessControl.resize(6);
-            guessControl.setRandom(6,1);
-
             // initialize Kr_hat and Ky_hat to dummy values for sigma modification
             Kr_hat.setZero(n,m);
             Ky_hat.setZero(n,m);
-
-            // network penalizing constant
-            alpha.resize(6);
-            // TODO: Why these values? Is this value still necessary for Dakota valves?
-            alpha << 0.1, 1e-1,1,1e-1,1e-1,1e-1;  
         }
 
     public:
@@ -443,10 +450,7 @@ namespace amfc_control
         //         nn_controller::predictor_params::Request  &req,
         //         nn_controller::predictor_params::Response  &res);
         void getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info);
-        ros::Time getTime();
-        //subscribe to the weights and biases params
-        virtual void weights_sub(const std_msgs::Float64MultiArray::ConstPtr& weights_sub);  
-        virtual void bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params);       
+        ros::Time getTime();      
         virtual void pose_subscriber(const geometry_msgs::Pose& headPose);
     };
 }

@@ -26,8 +26,7 @@ Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool prin
 	initMatrices();	
 	sigma_y = 0.01;
 	sigma_r = 0.01;
-	std::string filename;
-	ros::param::get("/nn_controller/Utils/filename", filename);
+	// BladderTypeEnum bladder_type_;
 	ros::param::get("/nn_controller/Control/with_net", with_net_);
 	pathfinder::getROSPackagePath("nn_controller", nn_controller_path_);
 	control_pub_ = n_.advertise<ensenso::ValveControl>("/mannequine_head/u_valves", 100);
@@ -66,40 +65,6 @@ void Controller::net_control_subscriber(const ensenso::ValveControl& net_control
 				   net_control_law.right_bladder_pos, net_control_law.right_bladder_neg, 
 				   net_control_law.base_bladder_pos, net_control_law.base_bladder_neg;
 	this->net_control = net_control;				   
-}
-
-void Controller::bias_sub(const std_msgs::Float64MultiArray::ConstPtr& bias_params){
-	std::vector<double> model_params = bias_params->data;
-	Eigen::VectorXd modelBiases;
-	modelBiases.resize(6);
-
-	std::lock_guard<std::mutex> biases_lock(biases_mutex);
-	for(auto i = 0; i < 6; ++i){
-		modelBiases(i) = model_params[i];
-	}
-
-	this->modelBiases  = modelBiases;
-	updateBiases	   = true;
-}
-
-//net weights subscriber from sample.lua in RAL/farnn
-void Controller::weights_sub(const std_msgs::Float64MultiArray::ConstPtr& ref_model_params)
-{
-	std::vector<double> model_params = ref_model_params->data;
-
-	//retrieve the pre-trained weights and biases 
-	Eigen::Matrix<double, 6, 6> modelWeights;
-	std::lock_guard<std::mutex> weights_lock(weights_mutex);
-	int k = 0;
-	for(auto i = 0; i < 6; ++i){
-		for(auto j = 0; j < 6; ++j){
-			modelWeights(i,j) = model_params[k];
-			++k;
-		}
-	}
-
-	this->modelWeights = modelWeights;
-	updateWeights = true;
 }
 
 void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info)
@@ -162,25 +127,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		updatePred = false;
 		pred = this->pred;
 	}
-
-	// Get model biases and weights in real time
-	// get weights
-	Eigen::Matrix<double, 6, 6> modelWeights;  // has 36 members
-	if(updateWeights){
-		std::lock_guard<std::mutex> weights_lock (weights_mutex);
-		modelWeights = this->modelWeights;
-		updateWeights = false;
-	}
-
-	//get biases
-	Eigen::VectorXd modelBiases;
-	modelBiases.resize(6);
-	if(updateBiases)	{
-		std::lock_guard<std::mutex> biases_lock (biases_mutex);
-		modelBiases = this->modelBiases;
-		updateBiases = false;
-	}
-
 	/*
 	* Calculate Control Law
 	*/
@@ -192,6 +138,8 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		u_control = (Ky_hat.transpose() * pose_info) + 
 					(Kr_hat.transpose() * ref_); 	
 	}
+	// u_control(0) /= 322;
+	// u_control(1) /= 322;
 	/*
 	Here are the rules that govern the bladders
 	l_i --> Roll+	r_i -->Roll-
@@ -202,11 +150,13 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	DOF     |  Control Law
 	------------------------------------------------------------
 	Roll+   |  if f_{li} = u_{+}:
-			|	f_{ri} = 0, f_{lo} = 0 or u_{o+}
-			| 	f_{ro} = u_{o+} or 0
+			|	f_{ri} = 0,
+			|   f_{lo} = |u_{lo}|
+			| 	f_{ro} = |u_{ro}|
 	------------------------------------------------------------
 	Roll-   | if f_{ri} = u_{+}:
-			|  	f_{li} = 0; f_{ro} = 0  or u_{o+}
+			|  	f_{li} = 0; 
+			|   f_{ro} = 0  or u_{o+}
 	------------------------------------------------------------
 	Pitch+  | if f_{bi} = u_{+}
 			|    f_{bo} = u_{o+} and f_{li} =f_{ri} = u_{head+}
@@ -219,23 +169,76 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	------------------------------------------------------------
 	Z-      | f_{bo} = u_{-}
 			| f_{bi} = 0 or f_{bo}
-
 	*/
+	// // saturate control signals
+	// for(auto i = 0; i < 6; ++i){
+	// 	if(u_control[i] < 0)
+	// 		u_control[i] = 0;
+	// 	else if (u_control[i] > 1)
+	// 		u_control[i] = 1;
+	// 	else
+	// 		u_control[i] = u_control[i];
+	// }
+	// changed the order here because I rearranged hardware two days before cam ready
+	u_valves_.left_bladder_pos  = u_control(0);
+	u_valves_.left_bladder_neg  = u_control(1);
+	u_valves_.right_bladder_pos = u_control(2);
+	u_valves_.right_bladder_neg = u_control(3);
+	u_valves_.base_bladder_pos  = u_control(4);
+	u_valves_.base_bladder_neg  = u_control(5);		
 
-	u_control(0) /= 322;
-	u_control(1) /= 322;
-	std::lock_guard<std::mutex> lock(mutex);
-	{
-		this->u_control = u_control;
+	// bool roll_pos, roll_neg, pitch_pos, pitch_neg, z_pos, z_neg;
+	// if(ros::param::get("/nn_controller/DOF/ROLL_POS", roll_pos))
+	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
+	// if(ros::param::get("/nn_controller/DOF/ROLL_NEG", roll_neg))
+	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_NEG;
+	// if(ros::param::get("/nn_controller/DOF/PITCH_POS", pitch_pos))
+	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_POS;
+	// if(ros::param::get("/nn_controller/DOF/PITCH_NEG", pitch_neg))
+	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_NEG;
+	// if(ros::param::get("/nn_controller/DOF/Z_POS", z_pos))
+	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::Z_POS;
+	// if(ros::param::get("/nn_controller/DOF/Z_NEG", z_neg))
+	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::Z_NEG;
+	// // this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
+
+	switch (this->dof_motion_type_){
+		case DOF_MOTION_ENUM::ROLL_POS:  // controlled principlally by left inlet torque
+			u_valves_.right_bladder_pos = 0; //std::fabs(u_valves_.right_bladder_pos);  // right inlet has to be zero
+			u_valves_.right_bladder_neg = std::fabs(u_valves_.right_bladder_neg); // right outlet has to be positive
+			u_valves_.left_bladder_neg  = 0; //std::fabs(u_valves_.left_bladder_neg); // left outlet has to be positive
+			break;
+
+		case DOF_MOTION_ENUM::ROLL_NEG:  // controlled principally by right inlet torque
+			u_valves_.left_bladder_pos = 0; // dampen the negative torque
+			u_valves_.left_bladder_neg = std::fabs(u_valves_.left_bladder_neg); // dampen the negative torque
+			u_valves_.right_bladder_neg = 0;  // we should not excite right outlet bladder
+			break;
+
+		case DOF_MOTION_ENUM::PITCH_POS:  // this is controlled principally by the base bladder inlet
+			u_valves_.base_bladder_neg = 0;  // we should not excite base outlet bladder
+			break;
+
+		case DOF_MOTION_ENUM::PITCH_NEG:	// this is controlled principally by the base bladder outlet
+			u_valves_.base_bladder_pos = 0;  // we should not excite base outlet bladder
+			break;
+
+		case DOF_MOTION_ENUM::Z_POS:   // this is controlled principally by the base bladder
+			u_valves_.base_bladder_neg = 0;  // we should not excite base outlet bladder
+			break;
+
+		case DOF_MOTION_ENUM::Z_NEG: // this is controlled principally by the base bladder outlet
+			u_valves_.base_bladder_pos = 0;  // we should not excite base outlet bladder
+			break;
 	}
-
-	resetController = true;
-
-	ss << nn_controller_path_.c_str() << filename;
-	std::string ref_pose_file = ss.str();
 
 	if(save) {
 		std::ofstream file_handle;
+
+		ros::param::get("/nn_controller/Utils/filename", filename_);
+		ss << nn_controller_path_.c_str() << filename_;
+		std::string ref_pose_file = ss.str();
+
 		file_handle.open(ref_pose_file, /*std::fstream::in |*/ std::ofstream::out | std::ofstream::app);
 
 		file_handle  << ref_(0) <<"\t" <<ref_(1) << "\t" << ref_(2) << "\t" <<
@@ -244,25 +247,14 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		file_handle.close();
 	}
 
-	// changed the order here because I rearranged hardware two days before cam ready
-	u_valves_.left_bladder_pos  = u_control(0);
-	u_valves_.left_bladder_neg  = u_control(1);
-	u_valves_.right_bladder_pos = u_control(2);
-	u_valves_.right_bladder_neg = u_control(3);
-	u_valves_.base_bladder_pos  = u_control(4);
-	u_valves_.base_bladder_neg  = u_control(5);
-
 	control_pub_.publish(u_valves_);
-	// convert from eigen to headpose
-	vectorToHeadPose(std::move(pose_info), pose_);
-	// fallback since rosrio is messing up
-	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), 
-	        	  u_valves_, ref_, pose_);
+	vectorToHeadPose(std::move(pose_info), pose_);	// convert from eigen to headpose
+	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), u_valves_, ref_, pose_);
 
 	if(print)	{	
 		OUT("\nref_: " 			<< ref_.transpose());
-		OUT("ym (z, pitch, roll): " 		 << ym.transpose());
-		OUT("y  (z, pitch, roll): " 		 << pose_info.transpose());
+		OUT("y  (z, roll, pitch): " 		 << pose_info.transpose());
+		OUT("ym (z, roll, pitch): " 		 << ym.transpose());
 		OUT("e  (y-ym): " << tracking_error.transpose());
 		OUT("pred (z, z, pitch, pitch, roll, roll): " << pred.transpose());
 		OUT("net_control: " << net_control.transpose());
@@ -280,22 +272,11 @@ void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Po
     eig2Pose.orientation.y = pose_info(2);
 }
 
-// void help()
-// {
-// 	OUT("Add the 3DOF desired trajectory separated by a single space");
-// 	OUT("Like so: rosrun nn_controller nn_controller <z> <pitch> <yaw>" << 
-// 			 "\n[<print> <useSigma> <save>]");
-// 	OUT("where the last three arguments are optional");
-// 	OUT("to print, use \"1\" in place of <print> etc");
-// }
-
 int main(int argc, char** argv)
 { 
 	ros::init(argc, argv, "controller_node", ros::init_options::AnonymousName);
 	ros::NodeHandle n;
 	bool print, useSigma, save, useVicon(true);
-
-	// help();
 
 	Eigen::Vector3d ref;
 	ref.resize(3);
@@ -316,8 +297,6 @@ int main(int argc, char** argv)
 
 	Controller c(n, ref, print, useSigma, save);
 
-    ros::Subscriber sub_weights = n.subscribe("/mannequine_pred/net_weights", 1000, &Controller::weights_sub, &c );
-    ros::Subscriber sub_bias  = n.subscribe("/mannequine_pred/net_biases", 100, &Controller::bias_sub, &c);
 	ros::Subscriber sub_pose = n.subscribe("/mannequine_head/pose", 100, &Controller::pose_subscriber, &c);	
 	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::net_control_subscriber, &c);
 	ros::spin();

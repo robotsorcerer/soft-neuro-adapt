@@ -248,7 +248,7 @@ class Net(Listener):
             if self.args.adaptLR and ((epoch % 100) == 0):
                 lr = 1./epoch 
                 self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
-            if val_loss.data[0] < 0.02:
+            if val_loss.data[0] < 5e-3:
                 print("achieved nice convergence")
                 break
 

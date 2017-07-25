@@ -24,7 +24,6 @@ thread REQUIRED)
 add_message_files(
   FILES
   predictor.msg
-  #valve_control.msg
 )
 
 ## Generate services in the 'srv' folder
