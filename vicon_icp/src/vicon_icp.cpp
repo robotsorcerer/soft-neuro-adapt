@@ -147,12 +147,10 @@ private:
         ++count;
     }
 
-    void remove_mean(std::vector<geometry_msgs::Point> && vec, Vector3d&& mu)
-    {
+    void remove_mean(std::vector<geometry_msgs::Point> && vec, Vector3d&& mu)    {
         double mu_x = 0, mu_y = 0, mu_z = 0;
         // std::cout << "mu_x: " << mu_x << " mu_y: " << mu_y << " mu_z: " << mu_z << std::endl;
-        for(auto i = 0; i < num_points; ++i)
-        {
+        for(auto i = 0; i < num_points; ++i)        {
             mu_x += vec[i].x;
             mu_y += vec[i].y;
             mu_z += vec[i].z;
@@ -164,8 +162,7 @@ private:
 
         mu << mu_x, mu_y, mu_z;
 
-        for(auto i = 0; i < num_points; ++i)
-        {
+        for(auto i = 0; i < num_points; ++i)        {
             vec[i].x -= mu_x;
             vec[i].y -= mu_y;
             vec[i].z -= mu_z;
@@ -244,6 +241,7 @@ private:
                 //     ROS_INFO_STREAM("first_face_vec: " << elem.transpose());
                 //compute the cross covariance matrix of the points sets P and X
                 sigma_px.resize(3, 3); // sigma_px will be 3x3 after the multiplication below
+
                 sigma_px =  first_face_vec[0] * face_vec[0].transpose() +
                             first_face_vec[1] * face_vec[1].transpose() +
                             first_face_vec[2] * face_vec[2].transpose() +
@@ -254,19 +252,20 @@ private:
                 // A will be 3x3 skew symmetric
                 A_Mat.resize(3, 3);
                 A_Mat = sigma_px - sigma_px.transpose(); 
+                // ROS_INFO_STREAM("\nA_Mat: \n" << A_Mat);
 
                 //collect cyclic components of skew symmetric matrix
                 Delta << A_Mat(1,2), A_Mat(2, 0), A_Mat(0, 1); // will be of size 3x1
+                // ROS_INFO_STREAM("\nDelta: \n" << Delta.transpose());
 
                 temp.resize(3, 3);  // will be 3x3
                 temp = sigma_px + sigma_px.transpose() - (sigma_px.trace() * I3);
-                // ROS_INFO_STREAM("\ntemp: \n" << sigma_px + sigma_px.transpose());
+                // ROS_INFO_STREAM("\ntemp: \n" << temp);
 
                 // Form the symmetric 4x4 Q matrix
-                Q(0, 0) =  sigma_px.trace();      Q(0, 1) = A_Mat(1,2);         Q(0, 2) = A_Mat(2, 0);   Q(0, 3) = A_Mat(0, 1);
-                Q(1, 0) =  A_Mat(1,2);            Q(1, 1) = temp(0, 0);         Q(1, 2) = temp(0, 1);    Q(1, 3) = temp(0, 2);
-                Q(2, 0) =  A_Mat(2,0);            Q(2, 1) = temp(1, 0);         Q(2, 2) = temp(1, 1);    Q(2, 3) = temp(1, 2);
-                Q(3, 0) =  A_Mat(0,1);            Q(3, 1) = temp(2, 0);         Q(3, 2) = temp(2, 1);    Q(3, 3) = temp(2, 2);
+                Q(0, 0) =  sigma_px.trace();                  Q.block<1, 3>(0, 1) = Delta.transpose().eval(); //top row, last three entries
+                Q.block<3, 1>(1, 0) = Delta;                  Q.bottomRightCorner<3, 3>() = temp;
+                // ROS_INFO_STREAM("\nQ: \n" << Q);
 
                 // we now find the maximum eigen value of the matrix Q
                 EigenSolver<Matrix4d> eig(Q);
@@ -276,7 +275,7 @@ private:
                 EigenSolver< Matrix4d >::EigenvalueType eigVals = eig.eigenvalues();
                 EigenSolver< Matrix4d >::EigenvectorsType eigVecs = eig.eigenvectors();
 
-                // ROS_INFO_STREAM("eigVals: " << eigVals);
+                // ROS_INFO_STREAM("eigVals: " << eigVals[0].real() << ", " << eigVals[1].real() << ", " << eigVals[2].real() << ", " << eigVals[3].real());
                 findQuaternion(std::move(eigVals), std::move(eigVecs));
             }
         }
@@ -301,55 +300,67 @@ private:
         }
         // find the eigen vector with the largest eigen value, This would be the optimal rotation quaternion
         auto optimalEigVec = eigVecs.col(magicIdx);
-        // ROS_INFO_STREAM("optimal eig vec: " << optimalEigVec);
+        // ROS_INFO_STREAM("\neigVec: \n" << eigVecs);
+        // ROS_INFO("optimEigVec: %.4f, %.4f, %.4f, %.4f ", optimalEigVec[0].real(), optimalEigVec[1].real(), optimalEigVec[2].real(), optimalEigVec[3].real());
         // Form optimal rotation quaternion components
         double q0 = optimalEigVec[0].real();
         double q1 = optimalEigVec[1].real();
         double q2 = optimalEigVec[2].real();
         double q3 = optimalEigVec[3].real();
 
-        tf::Quaternion quart(q0, q1, q2, q3);
-        tf::Matrix3x3 Rot(quart);
-        Rot.getRPY(roll, pitch, yaw);
-        tf::matrixTFToEigen (Rot, rotation_matrix);
+        // tf::Quaternion quart(q0, q1, q2, q3);
+        // tf::Matrix3x3 Rot(quart);
+        // Rot.getRPY(roll, pitch, yaw);
+        // tf::matrixTFToEigen (Rot, rotation_matrix);
 
+        // calculate rotation matrix
+        rotation_matrix.resize(3, 3);
+        rotation_matrix(0, 0) = std::pow(q0, 2) + std::pow(q1, 2) - std::pow(q2, 2) - std::pow(q3, 2);
+        rotation_matrix(0, 1) = 2 * (q1*q2 - q0*q3);
+        rotation_matrix(0, 2) = 2 * (q1*q3 + q0*q2);
+        rotation_matrix(1, 0) = 2 * (q1*q2 + q0*q3);
+        rotation_matrix(1, 1) = std::pow(q0, 2) + std::pow(q2, 2) - std::pow(q1, 2) - std::pow(q3, 2);
+        rotation_matrix(1, 2) = 2 * (q2*q3 - q0*q1);
+        rotation_matrix(2, 0) = 2 * (q1*q3 - q0*q2);
+        rotation_matrix(2, 1) = 2 * (q2*q3 + q0*q1);
+        rotation_matrix(2, 2) = std::pow(q0, 2) + std::pow(q3, 2) - std::pow(q1, 2) - std::pow(q2, 2);
+
+        // from https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gac3d90b12b21e1aaa2a9de9b0e45e6b7c
+        // in Vector3f ea = mat.eulerAngles(2, 0, 2), for instance
+        // "2" represents the z axis and "0" the x axis, etc
+        // This corresponds to the right-multiply conventions (with right hand side frames).
+        // The returned angles are in the ranges [0:pi]x[-pi:pi]x[-pi:pi].
+        Eigen::Vector3d rpy = rotation_matrix.eulerAngles(0, -1, 2);
+        roll    = rpy(0);
+        pitch   = rpy(2);
+        yaw     = rpy(1);
+        // ROS_INFO("roll , pitch, yaw (rad): %.4f, %.4f, %.4f ", roll, pitch, yaw);
         // OUT("\nrotation matrix tf3x3: \n" << rotation_matrix);
         // convert rads to degrees
         rad2deg(std::move(roll));
         rad2deg(std::move(pitch));
         rad2deg(std::move(yaw));
+        // ROS_INFO("roll , pitch, yaw (deg): %.4f, %.4f, %.4f ", roll, pitch, yaw);
 
-        Vector3d optimal_trans = this->mu_p - /*rotation_matrix **/ this->mu_x;
+        Vector3d optimal_trans = this->mu_p - rotation_matrix * this->mu_x;
         pose_info.position.x = optimal_trans(0); 
         pose_info.position.y = optimal_trans(1);
         pose_info.position.z = optimal_trans(2); 
         // ROS_INFO_STREAM("optimal trans check: " << this->mu_x - rotation_matrix * this->mu_p);
 
-        pose_info.orientation.x = roll-50;
-        pose_info.orientation.y = pitch+36;
+        pose_info.orientation.x = roll;
+        pose_info.orientation.y = pitch;
         pose_info.orientation.z = yaw;
         pose_info.orientation.w = 1;
 
         // publish the head pose
         pose_pub.publish(pose_info);
         if(print_){            
-            printf("z: %.3f | roll: %.3f | pitch: %.3f \n", pose_info.position.z, \
-                                                            pose_info.orientation.x, pose_info.orientation.y);
+            ROS_INFO("z: %.3f | roll: %.3f | pitch: %.3f | yaw: %.3f \n", pose_info.position.z, \
+                                                            pose_info.orientation.x, pose_info.orientation.y, pose_info.orientation.z);
         }
         ros::Rate looper(30);
         looper.sleep();
-
-        // // calculate rotation matrix
-        // rotation_matrix.resize(3, 3);
-        // rotation_matrix(0, 0) = std::pow(q0, 2) + std::pow(q1, 2) - std::pow(q2, 2) - std::pow(q3, 2);
-        // rotation_matrix(0, 1) = 2 * (q1*q2 - q0*q3);
-        // rotation_matrix(0, 2) = 2 * (q1*q3 + q0*q2);
-        // rotation_matrix(1, 0) = 2 * (q1*q2 + q0*q3);
-        // rotation_matrix(1, 1) = std::pow(q0, 2) + std::pow(q2, 2) - std::pow(q1, 2) - std::pow(q3, 2);
-        // rotation_matrix(1, 2) = 2 * (q2*q3 - q0*q1);
-        // rotation_matrix(2, 0) = 2 * (q1*q3 - q0*q2);
-        // rotation_matrix(2, 1) = 2 * (q2*q3 + q0*q1);
-        // rotation_matrix(2, 2) = std::pow(q0, 2) + std::pow(q3, 2) - std::pow(q1, 2) - std::pow(q2, 2);
 
         // ROS_INFO_STREAM("\nrotation matrix\n" << rotation_matrix);
 

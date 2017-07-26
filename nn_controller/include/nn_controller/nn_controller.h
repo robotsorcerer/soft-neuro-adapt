@@ -350,7 +350,7 @@ namespace amfc_control
         */
         template <typename T> 
         int sgn(T val)         {
-            return (T(0) >  val) - (val > T(0));
+            return (T(0) <  val) - (val < T(0));
         }
 
         /* @brief
@@ -386,7 +386,7 @@ namespace amfc_control
             expAmk.setIdentity(n, n);  // from ym = (expAm*k ) * Bm r
             expAmk_tau.setIdentity(n,n);
 
-            modelBiases.resize(6);
+            modelBiases.resize(m);
 
             P *= -1705./2668*1000; //-11503./180; //
             Am *= -1334./1705;
@@ -398,7 +398,7 @@ namespace amfc_control
             B(1,2) = 1; B(1, 3) = -1;
             B(2,4) = 1; B(2, 5) = -1;
 
-            pose_info.resize(3);
+            pose_info.resize(n);
 
             //gamma scaling factor for adaptive gains
             k =  1e-1; //1e-12/8;

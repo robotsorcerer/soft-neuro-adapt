@@ -3,7 +3,7 @@ Reference:
     pitch: 30.5851
     roll: 25.56
 Control:
-    with_net: false   
+    with_net: true   
 Utils:
     print: true
     save: true

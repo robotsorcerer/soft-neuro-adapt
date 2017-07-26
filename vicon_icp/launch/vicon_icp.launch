@@ -7,7 +7,7 @@
 
 	<arg name="subject_name"    value="Superdude"  />
 	<arg name="segment_name"    default="head" />
-	<arg name="respawn" default="true" />
+	<arg name="respawn" default="false" />
 	<!-- Native Gram-Schmidt: use vicon_listener-->
 	<arg name="icp"   default="true" />
 	<arg name="direction_cosines" default="false" />

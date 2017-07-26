@@ -62,15 +62,18 @@ void Controller::net_control_subscriber(const ensenso::ValveControl& net_control
 	net_control.resize(6);
 
 	net_control << net_control_law.left_bladder_pos, net_control_law.left_bladder_neg,
-				   net_control_law.right_bladder_pos, net_control_law.right_bladder_neg, 
-				   net_control_law.base_bladder_pos, net_control_law.base_bladder_neg;
+				   net_control_law.base_bladder_pos, net_control_law.base_bladder_neg,
+				   net_control_law.right_bladder_pos, net_control_law.right_bladder_neg;
+	updatePred = true;
+	this->net_control.resize(6);
 	this->net_control = net_control;				   
 }
 
 void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info)
 {
-	pose_info << headPose.position.z,// 1,  		//roll to zero
-				 headPose.orientation.x, headPose.orientation.y; //headPose.yaw;   //setting roll to zero
+	pose_info << headPose.orientation.x, // roll = [left and right]
+				 headPose.position.z, 	// base  = [base actuator]	
+				 headPose.orientation.y; // pitch = [right actuator]
 	
 	this->pose_info = pose_info;
 	//set ref's non-controlled states to measurement
@@ -84,24 +87,19 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
     //       -0              -0    -0.782405
 	// Bm = [1 0 0; 0 1 0; 0 0 1]
 	// ref_ = [z, roll, pitch ] given by user
-	Am.resize(3,3); 	Bm.resize(3,3); 	ym.resize(3); 	ym_dot.resize(3); tracking_error.resize(3);
-	if(counter == 0){
-		ym = pose_info;
-	}
-	ym_dot = Am * ym + Bm * ref_;
-
+	Am.resize(n, n); 	Bm.resize(n, m); 	ym.resize(n); 	ym_dot.resize(n); tracking_error.resize(n);
 	if(counter == 0){
 		ym = pose_info;		
+		ym_dot = Am * ym + Bm * ref_;
 		prev_ym.push_back(ym);
 	}
 	else{
 		ym_dot = Am * prev_ym.back() + Bm * ref_;
 		ym = prev_ym.back() + 0.01 * ym_dot;
 	}
-	prev_ym.push_back(ym);
 	//compute tracking error, e = y - y_m
 	tracking_error = pose_info - ym;
-	// //use boost ode solver
+	//use boost ode solver
 	runge_kutta_dopri5<state,double,state,double,vector_space_algebra> stepper;
 	Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
 	Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
@@ -130,14 +128,16 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	/*
 	* Calculate Control Law
 	*/
-	if(with_net_){
-		u_control = (Ky_hat.transpose() * pose_info) + 
-					(Kr_hat.transpose() * ref_) + this->net_control; 
-	}
-	else{
-		u_control = (Ky_hat.transpose() * pose_info) + 
-					(Kr_hat.transpose() * ref_); 	
-	}
+	// ROS_INFO_STREAM("u_control: " << net_control);
+	// if(with_net_){
+	// 	u_control = (Ky_hat.transpose() * pose_info) + 
+	// 				(Kr_hat.transpose() * ref_) + this->net_control; 
+	// }
+	// else{
+	// 	u_control = (Ky_hat.transpose() * pose_info) + 
+	// 				(Kr_hat.transpose() * ref_); 	
+	// }
+	u_control = this->net_control;
 	// u_control(0) /= 322;
 	// u_control(1) /= 322;
 	/*
@@ -170,37 +170,36 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	Z-      | f_{bo} = u_{-}
 			| f_{bi} = 0 or f_{bo}
 	*/
-	// // saturate control signals
-	// for(auto i = 0; i < 6; ++i){
-	// 	if(u_control[i] < 0)
-	// 		u_control[i] = 0;
-	// 	else if (u_control[i] > 1)
-	// 		u_control[i] = 1;
-	// 	else
-	// 		u_control[i] = u_control[i];
-	// }
-	// changed the order here because I rearranged hardware two days before cam ready
+	// saturate control signals
+	for(auto i = 0; i < 6; ++i){
+		if(u_control[i] < 0)
+			u_control[i] = 0;
+		else if (u_control[i] > 1)
+			u_control[i] = 1;
+		else
+			u_control[i] = u_control[i];
+	}
 	u_valves_.left_bladder_pos  = u_control(0);
 	u_valves_.left_bladder_neg  = u_control(1);
-	u_valves_.right_bladder_pos = u_control(2);
-	u_valves_.right_bladder_neg = u_control(3);
-	u_valves_.base_bladder_pos  = u_control(4);
-	u_valves_.base_bladder_neg  = u_control(5);		
-
-	// bool roll_pos, roll_neg, pitch_pos, pitch_neg, z_pos, z_neg;
-	// if(ros::param::get("/nn_controller/DOF/ROLL_POS", roll_pos))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
-	// if(ros::param::get("/nn_controller/DOF/ROLL_NEG", roll_neg))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_NEG;
-	// if(ros::param::get("/nn_controller/DOF/PITCH_POS", pitch_pos))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_POS;
-	// if(ros::param::get("/nn_controller/DOF/PITCH_NEG", pitch_neg))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_NEG;
-	// if(ros::param::get("/nn_controller/DOF/Z_POS", z_pos))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::Z_POS;
-	// if(ros::param::get("/nn_controller/DOF/Z_NEG", z_neg))
-	// 	this->dof_motion_type_ = DOF_MOTION_ENUM::Z_NEG;
-	// // this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
+	u_valves_.base_bladder_pos  = u_control(2);
+	u_valves_.base_bladder_neg  = u_control(3);	
+	u_valves_.right_bladder_pos = u_control(4);
+	u_valves_.right_bladder_neg = u_control(5);	
+/*
+	bool roll_pos, roll_neg, pitch_pos, pitch_neg, z_pos, z_neg;
+	if(ros::param::get("/nn_controller/DOF/ROLL_POS", roll_pos))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
+	if(ros::param::get("/nn_controller/DOF/ROLL_NEG", roll_neg))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_NEG;
+	if(ros::param::get("/nn_controller/DOF/PITCH_POS", pitch_pos))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_POS;
+	if(ros::param::get("/nn_controller/DOF/PITCH_NEG", pitch_neg))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_NEG;
+	if(ros::param::get("/nn_controller/DOF/Z_POS", z_pos))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::Z_POS;
+	if(ros::param::get("/nn_controller/DOF/Z_NEG", z_neg))
+		this->dof_motion_type_ = DOF_MOTION_ENUM::Z_NEG;
+	// this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
 
 	switch (this->dof_motion_type_){
 		case DOF_MOTION_ENUM::ROLL_POS:  // controlled principlally by left inlet torque
@@ -230,7 +229,7 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		case DOF_MOTION_ENUM::Z_NEG: // this is controlled principally by the base bladder outlet
 			u_valves_.base_bladder_pos = 0;  // we should not excite base outlet bladder
 			break;
-	}
+	}*/
 
 	if(save) {
 		std::ofstream file_handle;
@@ -238,8 +237,8 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		ros::param::get("/nn_controller/Utils/filename", filename_);
 		ss << nn_controller_path_.c_str() << filename_;
 		std::string ref_pose_file = ss.str();
-
-		file_handle.open(ref_pose_file, /*std::fstream::in |*/ std::ofstream::out | std::ofstream::app);
+		OUT("ref_pose_file: " << ref_pose_file);
+		file_handle.open(ref_pose_file, std::fstream::in | std::ofstream::out | std::ofstream::app);
 
 		file_handle  << ref_(0) <<"\t" <<ref_(1) << "\t" << ref_(2) << "\t" <<
 					pose_info(0) <<"\t" <<pose_info(1) << "\t" << pose_info(2) << "\n"; 

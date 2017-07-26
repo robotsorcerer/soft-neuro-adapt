@@ -21,6 +21,6 @@ BasePose:
 
 Utils:
   save: false
-  print: false
+  print: true
   use_hard_coded: true
 
