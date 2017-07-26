@@ -330,12 +330,11 @@ private:
         // "2" represents the z axis and "0" the x axis, etc
         // This corresponds to the right-multiply conventions (with right hand side frames).
         // The returned angles are in the ranges [0:pi]x[-pi:pi]x[-pi:pi].
-        Eigen::Vector3d rpy = rotation_matrix.eulerAngles(0, -1, 2);
-        roll    = rpy(0);
-        pitch   = rpy(2);
-        yaw     = rpy(1);
-        // ROS_INFO("roll , pitch, yaw (rad): %.4f, %.4f, %.4f ", roll, pitch, yaw);
-        // OUT("\nrotation matrix tf3x3: \n" << rotation_matrix);
+        Eigen::Vector3d rpy = rotation_matrix.eulerAngles(0, 1, 2);
+        roll    = rpy(0);   // roll is about axis x
+        pitch   = rpy(2);   // pitch is about axis z
+        yaw     = rpy(1);   // yaw about axis y
+        
         // convert rads to degrees
         rad2deg(std::move(roll));
         rad2deg(std::move(pitch));

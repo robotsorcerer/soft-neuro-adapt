@@ -298,7 +298,7 @@ namespace amfc_control
         *
         */                    
         bool updatePoseInfo, print, updateController, updateWeights, 
-             updateBiases, resetController, updateNetLoss, updatePred,
+             updateBiases, resetController, updateNetLoss, update_net_law,
              save;
 
         /* @brief 
@@ -342,7 +342,7 @@ namespace amfc_control
         */
         std::vector<Eigen::Vector3d> prev_ym;
 
-        // std::vector<Eigen::VectorXd> prev_Ky_hat, prev_Kr_hat;
+        std::vector<Eigen::Matrix<double, 3, 6> > prev_Ky_hat_, prev_Kr_hat_;
 
         /* @brief
         *
@@ -407,8 +407,8 @@ namespace amfc_control
             Gamma_r *= k;// * Gamma_r.diagonal();
 
             // initialize Kr_hat and Ky_hat to dummy values for sigma modification
-            Kr_hat.setZero(n,m);
-            Ky_hat.setZero(n,m);
+            Kr_hat.setOnes(n,m);  //Kr_hat.setZero(n,m);
+            Ky_hat.setOnes(n,m); // Ky_hat.setZero(n,m);
         }
 
     public:
@@ -423,9 +423,9 @@ namespace amfc_control
         void getRefTraj();
 
         /*compute control law
-        * Ky_hat_dot will be 6x3, 
+        * Ky_hat_dot will be 3x6, 
         * pose_info will be 3x1
-        * Kr_hat_dot will be 6x3
+        * Kr_hat_dot will be 3x6
         * ref_ will be 3x1
         * modelWights is \theta & will be 3x3
         * phi(x) will be lagged params 3x1

@@ -3,10 +3,10 @@ Reference:
     pitch: 30.5851
     roll: 25.56
 Control:
-    with_net: true   
+    with_net: false   
 Utils:
     print: true
-    save: true
+    save: false
     filename: /ref_pose.csv
 # DoF being controlled
 DOF:

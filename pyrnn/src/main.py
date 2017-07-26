@@ -39,8 +39,7 @@ sys.path.insert(1, "ros")
 
 #custom utility functions
 try:
-    # from utils.data_parser import loadSavedMatFile
-    from data_parser import split_data
+    from data_parser import split_data, loadSavedCSVFile
     from ros_comm import Listener
 except ImportError: pass
 
@@ -300,6 +299,9 @@ class Net(Listener):
         print("saving model file as: ", model_filename)
         torch.save(self.net.state_dict(), self.args.models_dir + '/' + model_filename) if self.args.save else None
 
+    def train_offline(self):
+        pass
+
     def train(self):
         #plot params
         plt.ioff()
@@ -478,6 +480,7 @@ def main():
     parser.add_argument('--lastLayer', type=str, default='linear')
     parser.add_argument('--save', type=str, default='results')
     parser.add_argument('--test', action='store_true', default=False)
+    parser.add_argument('--offline_train', action='store_true', default=False)
     parser.add_argument('--identify', action='store_true', default=False)
     parser.add_argument('--model', type=str,default= 'lstm_net_07-21-17_16::09.pkl')
     parser.add_argument('--qpenalty', type=float, default=1.0)
@@ -499,6 +502,10 @@ def main():
     if args.sim:
         trainX, trainY, testX, testY = split_data("data/data.mat")
         train_in, train_out, test_in, train_out = split_data("data/data.mat")
+
+    if args.offline_train:
+        train = loadSavedCSVFile("data/training_data.csv")
+        train.head()
 
 
     rospy.init_node('pose_control_listener', anonymous=True)

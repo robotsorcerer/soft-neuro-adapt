@@ -1,6 +1,8 @@
 import torch
 from torch.autograd import Variable
 import scipy.io as sio
+import pandas as pd
+import csv
 
 def loadSavedMatFile(x):
 	data = sio.loadmat(x)
@@ -18,6 +20,11 @@ def loadSavedMatFile(x):
 	yaw   	  = Variable(torch.from_numpy(data['yaw']))
 
 	return 	base_in, base_out, left_in, left_out, right_in, right_out, x, y, z, pitch, yaw
+
+def loadSavedCSVFile(x):
+	train_data = pd.read_csv(x, sep="\t")
+	
+	return train_data
 
 def split_data(x):
 	base_in, base_out, left_in, left_out, right_in, right_out, x, y, z, pitch, yaw = loadSavedMatFile(x)

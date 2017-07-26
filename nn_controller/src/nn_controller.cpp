@@ -64,7 +64,7 @@ void Controller::net_control_subscriber(const ensenso::ValveControl& net_control
 	net_control << net_control_law.left_bladder_pos, net_control_law.left_bladder_neg,
 				   net_control_law.base_bladder_pos, net_control_law.base_bladder_neg,
 				   net_control_law.right_bladder_pos, net_control_law.right_bladder_neg;
-	updatePred = true;
+	update_net_law = true;
 	this->net_control.resize(6);
 	this->net_control = net_control;				   
 }
@@ -87,19 +87,44 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
     //       -0              -0    -0.782405
 	// Bm = [1 0 0; 0 1 0; 0 0 1]
 	// ref_ = [z, roll, pitch ] given by user
-	Am.resize(n, n); 	Bm.resize(n, m); 	ym.resize(n); 	ym_dot.resize(n); tracking_error.resize(n);
 	if(counter == 0){
-		ym = pose_info;		
-		ym_dot = Am * ym + Bm * ref_;
+		ym = pose_info;		// will be 3x1; pose_info is also 3x1
+		ym_dot = Am * ym + Bm * ref_;	// will be 3x1
 		prev_ym.push_back(ym);
+
+		tracking_error = pose_info - ym; 	// will be 3x1
+
+		// //Ky_hat
+		// Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
+		// Ky_hat = Ky_hat + 0.01 * Ky_hat_dot;
+		// prev_Ky_hat_.push_back(Ky_hat); 
+
+		// // Kr_hat
+		// Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
+		// Kr_hat = Kr_hat + 0.01 * Kr_hat_dot;
+		// prev_Kr_hat_.push_back(Kr_hat);
 	}
 	else{
-		ym_dot = Am * prev_ym.back() + Bm * ref_;
-		ym = prev_ym.back() + 0.01 * ym_dot;
+		// find ym
+		ym_dot = Am * prev_ym.back() + Bm * ref_;  // will be 3x1
+		ym = prev_ym.back() + 0.01 * ym_dot;		// will be 3x1
+		prev_ym.push_back(ym);    // don't leve the linked list empty
+
+		tracking_error = pose_info - ym;			// will be 3x1
+
+		// // find Ky_hat 
+		// Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
+		// Ky_hat = prev_Ky_hat_.back() + 0.01 * Ky_hat_dot;
+		// prev_Ky_hat_.push_back(Ky_hat);
+
+		// // find Kr_hat
+		// Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
+		// Kr_hat = prev_Kr_hat_.back() + 0.01 * Kr_hat_dot;
+		// prev_Kr_hat_.push_back(Kr_hat);
 	}
-	//compute tracking error, e = y - y_m
-	tracking_error = pose_info - ym;
-	//use boost ode solver
+	// tracking_error = pose_info - ym;
+
+	//use boost ode solver to compute Ky_hat and Kr_hat:: lot more stable than trapezoidal rule
 	runge_kutta_dopri5<state,double,state,double,vector_space_algebra> stepper;
 	Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
 	Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
@@ -113,33 +138,25 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		dxdt = x;
 	}, Kr_hat_dot, counter, Kr_hat, 0.01);
 
-	Eigen::VectorXd pred;
-	pred.resize(6);
-	if(!updatePred)	{
-		pred << pose_info(0), pose_info(0), // note the scaling since two valves do one job in equal but opposite directions
-				pose_info(1), pose_info(1),
-				pose_info(2), pose_info(2);
-	}
-	else	{
+	Eigen::VectorXd net_control;
+	net_control.resize(m);
+	if(update_net_law)	{
 		std::lock_guard<std::mutex> net_pred_locker(pred_mutex);
-		updatePred = false;
-		pred = this->pred;
+		update_net_law = false;
+		net_control = this->net_control;
 	}
 	/*
 	* Calculate Control Law
 	*/
-	// ROS_INFO_STREAM("u_control: " << net_control);
-	// if(with_net_){
-	// 	u_control = (Ky_hat.transpose() * pose_info) + 
-	// 				(Kr_hat.transpose() * ref_) + this->net_control; 
-	// }
-	// else{
-	// 	u_control = (Ky_hat.transpose() * pose_info) + 
-	// 				(Kr_hat.transpose() * ref_); 	
-	// }
-	u_control = this->net_control;
-	// u_control(0) /= 322;
-	// u_control(1) /= 322;
+	if(with_net_){
+		u_control = (Ky_hat.transpose() * pose_info) + 
+					(Kr_hat.transpose() * ref_) + this->net_control; 
+	}
+	else{
+		u_control = (Ky_hat.transpose() * pose_info) + 
+					(Kr_hat.transpose() * ref_); 	
+	}
+	// u_control = this->net_control;
 	/*
 	Here are the rules that govern the bladders
 	l_i --> Roll+	r_i -->Roll-
@@ -170,15 +187,15 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	Z-      | f_{bo} = u_{-}
 			| f_{bi} = 0 or f_{bo}
 	*/
-	// saturate control signals
-	for(auto i = 0; i < 6; ++i){
-		if(u_control[i] < 0)
-			u_control[i] = 0;
-		else if (u_control[i] > 1)
-			u_control[i] = 1;
-		else
-			u_control[i] = u_control[i];
-	}
+	// // saturate control signals
+	// for(auto i = 0; i < 6; ++i){
+	// 	if(u_control[i] < 0)
+	// 		u_control[i] = 0;
+	// 	else if (u_control[i] > 1)
+	// 		u_control[i] = 1;
+	// 	else
+	// 		u_control[i] = u_control[i];
+	// }
 	u_valves_.left_bladder_pos  = u_control(0);
 	u_valves_.left_bladder_neg  = u_control(1);
 	u_valves_.base_bladder_pos  = u_control(2);
@@ -237,7 +254,6 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		ros::param::get("/nn_controller/Utils/filename", filename_);
 		ss << nn_controller_path_.c_str() << filename_;
 		std::string ref_pose_file = ss.str();
-		OUT("ref_pose_file: " << ref_pose_file);
 		file_handle.open(ref_pose_file, std::fstream::in | std::ofstream::out | std::ofstream::app);
 
 		file_handle  << ref_(0) <<"\t" <<ref_(1) << "\t" << ref_(2) << "\t" <<
@@ -248,12 +264,14 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 	control_pub_.publish(u_valves_);
 	vectorToHeadPose(std::move(pose_info), pose_);	// convert from eigen to headpose
-	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), u_valves_, ref_, pose_);
+	// // udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), u_valves_, ref_, pose_);
+	// pose is  [roll, z, pitch]
+	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), pose_);
 
 	if(print)	{	
 		OUT("\nref_: " 			<< ref_.transpose());
-		OUT("y  (z, roll, pitch): " 		 << pose_info.transpose());
-		OUT("ym (z, roll, pitch): " 		 << ym.transpose());
+		OUT("y  (roll, z,  pitch): " 		 << pose_.orientation.x << " " << pose_.position.z << " " << pose_.orientation.y);
+		OUT("ym (roll, z,  pitch): " 		 << ym.transpose());
 		OUT("e  (y-ym): " << tracking_error.transpose());
 		OUT("pred (z, z, pitch, pitch, roll, roll): " << pred.transpose());
 		OUT("net_control: " << net_control.transpose());
@@ -266,9 +284,9 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Pose& eig2Pose)
 {
-    eig2Pose.position.z = pose_info(0);
-    eig2Pose.orientation.x = pose_info(1);
-    eig2Pose.orientation.y = pose_info(2);
+    eig2Pose.orientation.x = pose_info(0); // roll
+    eig2Pose.position.z = pose_info(1);	// z
+    eig2Pose.orientation.y = pose_info(2);	// pitch
 }
 
 int main(int argc, char** argv)
