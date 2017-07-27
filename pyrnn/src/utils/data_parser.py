@@ -24,9 +24,20 @@ def loadSavedMatFile(x):
 	return 	base_in, base_out, left_in, left_out, right_in, right_out, x, y, z, pitch, yaw
 
 def loadSavedCSVFile(x):
-	ro, li, bi, bo, li, ro = [], [], [], [], [], []
+	ro, li, bi, bo, li, ri = ([] for i in range(6))
+	roll, z, pitch = ([] for i in range(3))
 	with gzip.GzipFile(x) as f:
 		reader = csv.reader(f.readlines())
+		ro.append(reader[0])
+		li.append(reader[1])
+		bi.append(reader[2])
+		bo.append(reader[3])
+		lo.append(reader[4])
+		ri.append(reader[5])
+		roll.append(reader[7])
+		z.append(reader[8])
+		pitch.append(reader[9])
+	return ro, li, bi, bo, li, ri, roll, z, pitch 
 
 
 

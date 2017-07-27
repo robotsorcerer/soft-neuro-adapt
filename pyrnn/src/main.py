@@ -124,9 +124,9 @@ class Net(Listener):
     def exportsToTensor(self, pose, controls):
         seqLength, outputSize = 5, 6
         inputs = torch.Tensor([[
-                                 controls.get('li', 0), controls.get('lo', 0), 
-                                 controls.get('bi', 0), controls.get('bo', 0), 
-                                 controls.get('ri', 0), controls.get('ro', 0), 
+                                 controls.get('li', 0), controls.get('lo', 0),
+                                 controls.get('bi', 0), controls.get('bo', 0),
+                                 controls.get('ri', 0), controls.get('ro', 0),
                                  pose.get('roll', 0), pose.get('z', 0), pose.get('pitch', 0)
                              ]])
         inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
@@ -134,8 +134,8 @@ class Net(Listener):
         #will be [torch.FloatTensor of size 1x3]
         targets = (torch.Tensor([[
                                  pose.get('roll', 0), pose.get('roll', 0),
-                                 pose.get('z', 0), pose.get('z', 0), 
-                                 pose.get('pitch', 0), pose.get('pitch', 0), 
+                                 pose.get('z', 0), pose.get('z', 0),
+                                 pose.get('pitch', 0), pose.get('pitch', 0),
                              ]])).expand(seqLength, 1, outputSize)
         targets = Variable(targets)
 
@@ -184,9 +184,9 @@ class Net(Listener):
             pose = self.get_pose()
 
             inputs = torch.Tensor([[
-                                     excitation_input(), excitation_input(), 
-                                     excitation_input(), excitation_input(), 
-                                     excitation_input(), excitation_input(), 
+                                     excitation_input(), excitation_input(),
+                                     excitation_input(), excitation_input(),
+                                     excitation_input(), excitation_input(),
                                      pose.get('roll', 0), pose.get('z', 0), pose.get('pitch', 0)
                                  ]])
             inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
@@ -194,8 +194,8 @@ class Net(Listener):
             #will be [torch.FloatTensor of size 1x3]
             targets = (torch.Tensor([[
                                      pose.get('roll', 0), pose.get('roll', 0),
-                                     pose.get('z', 0), pose.get('z', 0), 
-                                     pose.get('pitch', 0), pose.get('pitch', 0), 
+                                     pose.get('z', 0), pose.get('z', 0),
+                                     pose.get('pitch', 0), pose.get('pitch', 0),
                                  ]])).expand(seqLength, 1, outputSize)
             targets = Variable(targets)
             return inputs, targets
@@ -253,13 +253,13 @@ class Net(Listener):
 
             # message =   str(control_msg.left_bladder_pos)  + ", " + str(control_msg.left_bladder_neg ) + ", " + \
             #             str(control_msg.right_bladder_pos) + ", " + str(control_msg.right_bladder_neg) + ", " + \
-            #             str(control_msg.base_bladder_pos) +  ", " + str(control_msg.base_bladder_neg) + ", " 
+            #             str(control_msg.base_bladder_pos) +  ", " + str(control_msg.base_bladder_neg) + ", "
             pose = self.get_pose()
             print(pose)
             message =   str(pose['roll'])  + ", " + str(pose['z']) + ", " + \
-                        str(pose['pitch']) 
+                        str(pose['pitch'])
             print('message: ', message)
-            
+
             sock.sendto(message, (UDP_IP, UDP_PORT))
 
             # publish the weights
@@ -269,7 +269,7 @@ class Net(Listener):
 
             # save train and val loss
             fields = ['epoch', 'train_loss/val_loss']
-            trainF = open(os.path.join(self.save, 'train_csv'), 'a') 
+            trainF = open(os.path.join(self.save, 'train_csv'), 'a')
             trainW = csv.writer(trainF)
             trainW.writerow([epoch, loss.data[0], val_loss.data[0]])
             trainF.flush()
@@ -284,9 +284,9 @@ class Net(Listener):
 
             if (epoch % 5) == 0:
                 print('Epoch: {}  | \ttrain loss: {:.4f}  | \tval loss: {:.4f}'.format(
-                    epoch, loss.data[0], val_loss.data[0]))            
+                    epoch, loss.data[0], val_loss.data[0]))
             if self.args.adaptLR and ((epoch % 100) == 0):
-                lr = 1./epoch 
+                lr = 1./epoch
                 self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
             # if val_loss.data[0] < 5e-3:
             #     print("achieved nice convergence")
@@ -361,7 +361,7 @@ class Net(Listener):
 
             # save train and val loss
             fields = ['epoch', 'train_loss/val_loss']
-            trainF = open(os.path.join(self.save, 'train_csv'), 'a') 
+            trainF = open(os.path.join(self.save, 'train_csv'), 'a')
             trainW = csv.writer(trainF)
             trainW.writerow([epoch, loss.data[0], val_loss.data[0]])
             trainF.flush()
@@ -376,9 +376,9 @@ class Net(Listener):
 
             if (epoch % 5) == 0:
                 print('Epoch: {}  | \ttrain loss: {:.4f}  | \tval loss: {:.4f}'.format(
-                    epoch, loss.data[0], val_loss.data[0]))            
+                    epoch, loss.data[0], val_loss.data[0]))
             if self.args.adaptLR and ((epoch % 100) == 0):
-                lr = 1./epoch 
+                lr = 1./epoch
                 self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
             if val_loss.data[0] < 5e-3:
                 print("achieved nice convergence")
@@ -454,9 +454,9 @@ class Net(Listener):
                 plt.grid(True)
 
             print('Epoch: {}  | \ttest loss: {:.4f} '.format(
-                epoch, loss.data[0]))            
+                epoch, loss.data[0]))
             if self.args.adaptLR and ((epoch % 100) == 0):
-                lr = 1./epoch 
+                lr = 1./epoch
                 self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
 
             if rospy.is_shutdown():
@@ -480,7 +480,7 @@ def main():
     parser.add_argument('--lastLayer', type=str, default='linear')
     parser.add_argument('--save', type=str, default='results')
     parser.add_argument('--test', action='store_true', default=False)
-    parser.add_argument('--offline_train', action='store_true', default=False)
+    parser.add_argument('--offline', action='store_true', default=False)
     parser.add_argument('--identify', action='store_true', default=False)
     parser.add_argument('--model', type=str,default= 'lstm_net_07-21-17_16::09.pkl')
     parser.add_argument('--qpenalty', type=float, default=1.0)
@@ -503,21 +503,22 @@ def main():
         trainX, trainY, testX, testY = split_data("data/data.mat")
         train_in, train_out, test_in, train_out = split_data("data/data.mat")
 
-    if args.offline_train:
-        train = loadSavedCSVFile("data/training_data.csv")
+    if args.offline:
+        ro, li, bi, bo, li, ri, roll, z, pitch  = loadSavedCSVFile("data/training_data_latenight.csv.gz")
         train.head()
+
 
 
     rospy.init_node('pose_control_listener', anonymous=True)
     rate = rospy.Rate(5e-3)
     try:
-        if not rospy.is_shutdown():     
-            network = Net(args)    
+        if not rospy.is_shutdown():
+            network = Net(args)
 
             if args.identify:
-                network.identify_model()                
+                network.identify_model()
             # if not args.test:
-            #     network.train()  
+            #     network.train()
             if args.test:
                 network.test()
             rate.sleep()
@@ -525,4 +526,4 @@ def main():
         print("shutting down ros")
 
 if __name__ == '__main__':
-    main()     
+    main()
