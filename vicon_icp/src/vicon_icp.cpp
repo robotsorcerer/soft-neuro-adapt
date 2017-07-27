@@ -334,12 +334,37 @@ private:
         roll    = rpy(0);   // roll is about axis x
         pitch   = rpy(2);   // pitch is about axis z
         yaw     = rpy(1);   // yaw about axis y
-        
+
+        // see this: http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
+        // theta =rot about x== roll
+        // psi = rot about y == pitch
+        // phi = rot about z == yaw
+        // double roll2, pitch2, yaw2;
+        // if (rotation_matrix(2,0) != 1.0 || rotation_matrix(2,0) != -1.0){
+        //     roll = -std::asin( rotation_matrix(2,0) );
+        //     pitch = std::atan2( rotation_matrix(2,1)/std::cos(roll), rotation_matrix(2,2)/std::cos(roll) );
+        //     yaw   = std::atan2( rotation_matrix(1,0)/std::cos(roll), rotation_matrix(0,0)/std::cos(roll) );
+
+        //     roll2  = M_PI - roll;
+        //     pitch2 = std::atan2( rotation_matrix(2,1)/std::cos(roll2), rotation_matrix(2,2)/std::cos(roll2) );
+        //     yaw2   = std::atan2( rotation_matrix(1,0)/std::cos(roll2), rotation_matrix(0,0)/std::cos(roll2) );
+        // }
+        // else{
+        //     yaw = 0;
+        //     if (rotation_matrix(2,0) == -1.0){                
+        //         roll = M_PI/2.0;
+        //         pitch = yaw + std::atan2(rotation_matrix(0,1), rotation_matrix(0,2));
+        //     }
+        //     else{
+        //         roll = -M_PI/2.0;
+        //         pitch = -yaw + std::atan2(-rotation_matrix(0,1), -rotation_matrix(0,2));
+        //     }
+        // }
         // convert rads to degrees
         rad2deg(std::move(roll));
         rad2deg(std::move(pitch));
         rad2deg(std::move(yaw));
-        // ROS_INFO("roll , pitch, yaw (deg): %.4f, %.4f, %.4f ", roll, pitch, yaw);
+        // ROS_INFO("[(roll, roll2), (pitch, pitch2): , (yaw, yaw2)]: [(%.4f, %.4f), (%.4f, %.4f), (%.4f, %.4f)]", roll, roll2, pitch,pitch2, yaw, yaw2);
 
         Vector3d optimal_trans = this->mu_p - rotation_matrix * this->mu_x;
         pose_info.position.x = optimal_trans(0); 

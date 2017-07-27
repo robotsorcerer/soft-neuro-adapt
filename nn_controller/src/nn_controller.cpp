@@ -43,6 +43,14 @@ Controller::~Controller()
 {
 }
 
+
+void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Pose& eig2Pose)
+{
+    eig2Pose.orientation.x = pose_info(0); // roll
+    eig2Pose.position.z = pose_info(1);	// z
+    eig2Pose.orientation.y = pose_info(2);	// pitch
+}
+
 ros::Time Controller::getTime() {
 	return ros::Time::now();
 }
@@ -68,6 +76,7 @@ void Controller::net_control_subscriber(const ensenso::ValveControl& net_control
 	this->net_control.resize(6);
 	this->net_control = net_control;				   
 }
+
 
 void Controller::getPoseInfo(const geometry_msgs::Pose& headPose, Eigen::VectorXd pose_info)
 {
@@ -276,17 +285,10 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 		OUT("pred (z, z, pitch, pitch, roll, roll): " << pred.transpose());
 		OUT("net_control: " << net_control.transpose());
 		OUT("Control Law: " << u_control.transpose());
-		ROS_INFO_STREAM("\nKr_hat^T: \n" << Kr_hat.transpose());
-		ROS_INFO_STREAM("\nKy_hat^T: \n" << Ky_hat.transpose());
+		// ROS_INFO_STREAM("\nKr_hat^T: \n" << Kr_hat.transpose());
+		// ROS_INFO_STREAM("\nKy_hat^T: \n" << Ky_hat.transpose());
 	}
 	++counter;
-}
-
-void Controller::vectorToHeadPose(Eigen::VectorXd&& pose_info, geometry_msgs::Pose& eig2Pose)
-{
-    eig2Pose.orientation.x = pose_info(0); // roll
-    eig2Pose.position.z = pose_info(1);	// z
-    eig2Pose.orientation.y = pose_info(2);	// pitch
 }
 
 int main(int argc, char** argv)

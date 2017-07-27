@@ -2,6 +2,8 @@ import torch
 from torch.autograd import Variable
 import scipy.io as sio
 import pandas as pd
+import gzip
+import bz2
 import csv
 
 def loadSavedMatFile(x):
@@ -22,14 +24,18 @@ def loadSavedMatFile(x):
 	return 	base_in, base_out, left_in, left_out, right_in, right_out, x, y, z, pitch, yaw
 
 def loadSavedCSVFile(x):
-	train_data = pd.read_csv(x, sep="\t")
-	
+	ro, li, bi, bo, li, ro = [], [], [], [], [], []
+	with gzip.GzipFile(x) as f:
+		reader = csv.reader(f.readlines())
+
+
+
 	return train_data
 
 def split_data(x):
 	base_in, base_out, left_in, left_out, right_in, right_out, x, y, z, pitch, yaw = loadSavedMatFile(x)
-	inputs = torch.cat((base_in, base_out, left_in, 
-						left_out, right_in, right_out, 
+	inputs = torch.cat((base_in, base_out, left_in,
+						left_out, right_in, right_out,
 						z, pitch, yaw), 1)
 	outputs = torch.cat((z, pitch, yaw), 1)
 
