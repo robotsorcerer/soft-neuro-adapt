@@ -30,29 +30,26 @@ class LSTMModel(nn.Module):
     QP Layer:
         nz = 6, neq = 0, nineq = 12, QPenalty = 0.1
     '''
-    def __init__(self, args, nz, neq, nineq, Qpenalty, inputSize, nHidden,
-                 batchSize, noutputs=3, numLayers=2):
+    def __init__(self, args, inputSize, nHidden,
+                 batchSize, noutputs, numLayers):
 
         super(LSTMModel, self).__init__()
-        '''
-        inputSize = 9, nHidden = [9,6,6], batchSize = 1
-        '''
 
         # QP Parameters
-        nx = nz     #cause inequality is double sided (see my notes)
-        self.neq = neq
-        self.nineq = nineq
-        self.nz = nz
+        # nx = nz     #cause inequality is double sided (see my notes)
+        # self.neq = neq
+        # self.nineq = nineq
+        # self.nz = nz
         self.nHidden = nHidden
 
         self.args = args
 
-        self.Q = Variable(Qpenalty*torch.eye(nx))
-        self.p = Variable(torch.zeros(nx))
+        # self.Q = Variable(Qpenalty*torch.eye(nx))
+        # self.p = Variable(torch.zeros(nx))
 
-        if args.toGPU:
-            self.Q = self.Q.cuda()
-            self.p = self.p.cuda()
+        # if args.toGPU:
+        #     self.Q = self.Q.cuda()
+        #     self.p = self.p.cuda()
         """
         # G will be a matrix defined so:
         G = [ 1  0 0 0 0 0]
@@ -69,17 +66,17 @@ class LSTMModel(nn.Module):
             [ 0 0 0 0 0 -1]
 
         """
-        G = torch.eye(nineq, nx);         G = G.cuda() if args.toGPU else G
+        # G = torch.eye(nineq, nx);         G = G.cuda() if args.toGPU else G
 
-        for i in range(nz):
-            G[i][i] *= -1
-        self.G = Variable(G)
+        # for i in range(nz):
+        #     G[i][i] *= -1
+        # self.G = Variable(G)
 
-        self.h = torch.ones(nineq);       self.h = self.h.cuda() if args.toGPU else self.h
-        self.h = Variable(self.h)
+        # self.h = torch.ones(nineq);       self.h = self.h.cuda() if args.toGPU else self.h
+        # self.h = Variable(self.h)
 
-        e = torch.Tensor();               e = e.cuda() if args.toGPU else e
-        self.e = Variable(e)
+        # e = torch.Tensor();               e = e.cuda() if args.toGPU else e
+        # self.e = Variable(e)
 
         def qp_layer(x):
             '''
@@ -112,9 +109,10 @@ class LSTMModel(nn.Module):
         self.noutputs   = noutputs
 
         #define recurrent and linear layers
-        self.lstm1  = nn.LSTM(inputSize,nHidden[0], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
+        self.lstm1  = nn.LSTM(inputSize, nHidden[0], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
         self.lstm2  = nn.LSTM(nHidden[0],nHidden[1], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
         self.lstm3  = nn.LSTM(nHidden[1],nHidden[2], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
+
         if args.lastLayer=='linear':
             self.fc     = nn.Linear(nHidden[2], noutputs)
             self.criterion  = nn.MSELoss(size_average=False)
@@ -126,8 +124,20 @@ class LSTMModel(nn.Module):
             os._exit()
 
     def forward(self, x):
-        nBatch = x.size(0)
+        
+        # Set initial states 
+        h0 = Variable(torch.zeros(self.num_layers, self.batchSize, self.nHidden[0]).cuda()) 
+        c0 = Variable(torch.zeros(self.num_layers, self.batchSize, self.nHidden[0]).cuda())
+
+        h1 = Variable(torch.zeros(self.num_layers, self.batchSize, self.nHidden[1]).cuda()) 
+        c1 = Variable(torch.zeros(self.num_layers, self.batchSize, self.nHidden[1]).cuda())
+
+        h2 = Variable(torch.zeros(self.num_layers, self.batchSize, self.nHidden[2]).cuda()) 
+        c2 = Variable(torch.zeros(self.num_layers, self.batchSize, self.nHidden[2]).cuda())
+
         # Forward propagate RNN layer 1
+        # we could do this out, _ = self.lstm1(x, (h0, c0)) but James Bradbury tells me it'd be incorrect
+        # out, _ = self.lstm1(x, (h0, c0))
         out, _ = self.lstm1(x)
 
         # Forward propagate RNN layer 2
@@ -136,8 +146,9 @@ class LSTMModel(nn.Module):
         # Forward propagate RNN layer 2
         out, _ = self.lstm3(out)
 
-        # Decode hidden state of last time step        
-        out = self.fc(out[:, -1, :])
+        # Decode hidden batch of last time step     
+        # out = self.fc(out[:, -1, :]) 
+        out = self.fc(out[-1, :, :])   
 
         #Now add QP Layer
         # out = out.view(nBatch, -1)

@@ -28,6 +28,7 @@ import numpy.random as npr
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.utils.data as data
 from torch.autograd import Variable
 
 try: import setGPU
@@ -39,7 +40,7 @@ sys.path.insert(1, "ros")
 
 #custom utility functions
 try:
-    from data_parser import split_data, loadSavedCSVFile
+    from data_parser import split_mat_data, split_csv_data
     from ros_comm import Listener
 except ImportError: pass
 
@@ -75,21 +76,13 @@ class Net(Listener):
         self.args = args
 
         #Global Hyperparams
-        noutputs, batchSize = 6, args.batchSize
-        numLayers, inputSize, sequence_length = 1, 9, 9
-        nFeatures, nCls, nHidden = 6, 3, list(map(int, args.hiddenSize))
+        noutputs, batchSize = 3, args.batchSize
+        numLayers, inputSize, sequence_length = 1, 9, 36
+        nFeatures, nCls = 6, 3
+        nHidden = [18, 6, 3] #list(map(int, args.hiddenSize))
 
         # QP Hyperparameters
-        '''
-        6 valves = nz = 6
-        no equality contraints neq = 0
-        due to double sided inequliaties and introduction of
-        slack variables, nineq = 12
-        QPenalty is arbitrarily chosen. Ideally, set to 1
-        '''
-        nz, neq, nineq, QPenalty = 6, 0, 12, args.qpenalty
-        self.net = model.LSTMModel(args, nz, neq, nineq, QPenalty,
-                              inputSize, nHidden, batchSize, noutputs, numLayers)
+        self.net = model.LSTMModel(args, inputSize, nHidden, batchSize, noutputs, numLayers)
 
         if args.test:
             self.net.load_state_dict(torch.load('models/' + args.model))
@@ -105,7 +98,7 @@ class Net(Listener):
 
         # GPU object mover
         self.net = self.net.cuda() if args.toGPU else self.net
-        self.optimizer = optim.SGD(self.net.parameters(), lr=self.args.rnnLR)
+        self.optimizer = optim.Adam(self.net.parameters(), lr=self.args.rnnLR)
         self.scheduler = es.EarlyStop(self.optimizer, 'min')
         self.filename = 'train_data.txt'    # filename of training data
         npr.seed(1)
@@ -115,7 +108,8 @@ class Net(Listener):
         if self.args.save is None:
             t = os.path.join(os.getcwd(), save)
         if os.path.isdir(save):
-            shutil.move(save, save + ".old" + '_' +  datetime.strftime(datetime.now(), '%m-%d-%y_%H-%M')  )
+            shutil.rmtree(save)
+            # shutil.move(save, save + ".old" + '_' +  datetime.strftime(datetime.now(), '%m-%d-%y_%H-%M')  )
         os.makedirs(save)
 
         self.save = save
@@ -160,147 +154,115 @@ class Net(Listener):
 
         return val_loss
 
+    def validate_offline(self, idx):
+        inputs, targets = self.val_inputs, self.val_targets
+
+        inputs = inputs.cuda() if self.args.toGPU else None
+        targets = targets.cuda() if self.args.toGPU else None
+
+        # Forward
+        self.optimizer.zero_grad()
+        outputs = self.net(inputs)
+
+        # Backward
+        val_loss    = self.net.criterion(outputs, targets)
+        val_loss.backward()
+
+        # Optimize
+        self.optimizer.step()
+
+        return val_loss
+
     def tensorToMultiArray(self, tensor, string):
-        msg = Float64MultiArray()  # note this. Float64Multi is a class. It needs be instantiated as a bound instance
+        msg = Float64MultiArray()  
         msg.data = tensor.resize_(torch.numel(tensor))
         for i in range(tensor.dim()):
             dim_desc = MultiDim
             dim_desc.size = tensor.size(i)
             dim_desc.stride = tensor.stride(i)
             dim_desc.label = string
-    #         msg.layout.dim.append(dim_desc)
+            # msg.layout.dim.append(dim_desc)
         return msg
 
-    def identify_model(self):
-        def toRad(rad):
-            return (rad * math.pi)/180.0
+    def offline_train(self, train):          
+        #Global Hyperparams  
+        seqLength   = 5
+        numLayers   = 1
+        outputSize  = train['out'].size(-1)
+        inputSize   = train['in'].size(-1)
+        print('inputs size: ', inputSize)
+        print('outputs size: ', outputSize)
+        batchSize   = 50
+        nHidden     = [int(outputSize/2), 6, outputSize] 
 
-        def excitation_input():
-            x = npr.randint(0, 90, dtype='int64') # make input between 0 and 1
-            x = toRad(x)  # convert input to radians
-            return np.sin(x)
+        net = model.LSTMModel(self.args, inputSize, nHidden, batchSize, outputSize, numLayers)
+        net = net.cuda() if self.args.toGPU else net
+        optimizer = optim.Adam(net.parameters(), lr=self.args.rnnLR)
+        criterion  = nn.MSELoss(size_average=False)
 
-        def get_ident_input():
-            pose = self.get_pose()
+        train_dataset = data.TensorDataset(train['in'].data, train['out'].data)
+        train_loader  = data.DataLoader(train_dataset, batch_size=batchSize, shuffle=False)
 
-            inputs = torch.Tensor([[
-                                     excitation_input(), excitation_input(),
-                                     excitation_input(), excitation_input(),
-                                     excitation_input(), excitation_input(),
-                                     pose.get('roll', 0), pose.get('z', 0), pose.get('pitch', 0)
-                                 ]])
-            inputs = Variable((torch.unsqueeze(inputs, 1)).expand_as(torch.LongTensor(seqLength,1,9)))
+        for idx in count(1): 
 
-            #will be [torch.FloatTensor of size 1x3]
-            targets = (torch.Tensor([[
-                                     pose.get('roll', 0), pose.get('roll', 0),
-                                     pose.get('z', 0), pose.get('z', 0),
-                                     pose.get('pitch', 0), pose.get('pitch', 0),
-                                 ]])).expand(seqLength, 1, outputSize)
-            targets = Variable(targets)
-            return inputs, targets
+            loss = None # reset loss
+            for epoch, (inputs, targets) in enumerate(train_loader):
 
-        UDP_IP = "235.255.0.1"
-        UDP_PORT = 30001
-        sock = socket.socket(socket.AF_INET, # Internet
-                                 socket.SOCK_DGRAM) # UDP
+                inputs = Variable(inputs)
+                targets = Variable(targets)
 
-        seqLength, outputSize = 5, 6
+                if inputs.size(0) != batchSize:
+                    break
+                inputs_  = inputs.expand_as( torch.LongTensor(seqLength, batchSize, inputSize ))
 
-        for epoch in count(1): #range(num_epochs):
+                inputs_ = inputs_.cuda() if self.args.toGPU else None
+                targets_ = targets.cuda() if self.args.toGPU else None
 
-            self.listen()
-            inputs, targets = get_ident_input()
-            # print('inputs', inputs)
-            inputs = inputs.cuda() if self.args.toGPU else None
-            targets = targets.cuda() if self.args.toGPU else None
+                # Forward
+                optimizer.zero_grad()
+                outputs = net(inputs_)
+                # print('inputs size: ', type(inputs_))#.size())
+                # print('outputs size: ', outputs.size())
+                # print('targets size: ', targets_.size())
 
-            # Forward
-            self.optimizer.zero_grad()
-            outputs = self.net(inputs)
+                # Backward
+                loss    = criterion(outputs, targets_)
+                loss.backward()
 
-            # Backward
-            loss    = self.net.criterion(outputs, targets)
-            loss.backward()
+                # Optimize
+                optimizer.step()
 
-            # Optimize
-            self.optimizer.step()
+                # save train and val loss
+                fields = ['epoch', 'train_loss']
+                trainF = open(os.path.join(self.save, 'train_csv'), 'a')
+                trainW = csv.writer(trainF)
+                trainW.writerow([epoch, loss.data[0]])
+                trainF.flush()
 
-            # validate the loss
-            val_loss  = self.validate()
-            # Implement early stopping. Note that step should be called after validate()
-            self.scheduler.step(val_loss)
 
-            net_biases =  self.net.fc.bias.data.cpu()
-            net_weights = self.net.fc.weight.data.cpu()
-            # publish net weights and biases
-            biases_msg = self.tensorToMultiArray(net_biases, 'biases')
-            weights_msg = self.tensorToMultiArray(net_weights, 'weights')
+                if (epoch % 50) == 0:
+                    print('Epoch: {}  | \ttrain loss: {:.4f}  '.format(
+                        epoch, loss.data[0]))
 
-            # sample from the output of the trained network and update the control trajectories
-            idx = npr.randint(0, outputs.size(0))  # randomly pick a row index in the QP layer weights
-            control_action = outputs[idx,:].data  # convert Variable to data
-            # $ take the mean of all probabilities along the time dimenbsion
-            # control_action = outputs.mean(0).data.t()
-            # control_action = outputs.multinomial()
-            # print('control_action: ', control_action)
-            control_msg = ValveControl()   # Control Message to valves
-            control_msg.stamp = rospy.Time.now();       control_msg.seq = epoch
-            control_msg.left_bladder_pos = control_action[0]; control_msg.left_bladder_neg = control_action[1];
-            control_msg.base_bladder_pos = control_action[2]; control_msg.base_bladder_neg = control_action[3];
-            control_msg.right_bladder_pos = control_action[4]; control_msg.right_bladder_neg = control_action[5];
-            # print('control_law_msg: ', control_msg)
+                if self.args.adaptLR:
+                    if  ((epoch % 100) == 0):
+                        lr = 1./(epoch+self.args.rnnLR)
+                    optimizer = optim.Adam(net.parameters(), lr=lr)
 
-            # message =   str(control_msg.left_bladder_pos)  + ", " + str(control_msg.left_bladder_neg ) + ", " + \
-            #             str(control_msg.right_bladder_pos) + ", " + str(control_msg.right_bladder_neg) + ", " + \
-            #             str(control_msg.base_bladder_pos) +  ", " + str(control_msg.base_bladder_neg) + ", "
-            pose = self.get_pose()
-            print(pose)
-            message =   str(pose['roll'])  + ", " + str(pose['z']) + ", " + \
-                        str(pose['pitch'])
-            print('message: ', message)
+                if loss.data[0] < 2:
+                    print("achieved nice convergence")
 
-            sock.sendto(message, (UDP_IP, UDP_PORT))
+                    model_filename =  'lstm_net_' +  \
+                            datetime.strftime(datetime.now(), '%m-%d-%y_%H::%M') + '.pkl'
+                    print("saving model file as: ", model_filename)
+                    torch.save(net.state_dict(), self.args.models_dir + '/' + model_filename) if self.args.save else None
 
-            # publish the weights
-            self.biases_pub.publish(biases_msg)
-            self.weights_pub.publish(weights_msg)
-            self.net_control_law_pub.publish(control_msg)
+                    break        
+                if rospy.is_shutdown():
+                    os._exit()
+            if loss.data[0] < 2:
+                break            
 
-            # save train and val loss
-            fields = ['epoch', 'train_loss/val_loss']
-            trainF = open(os.path.join(self.save, 'train_csv'), 'a')
-            trainW = csv.writer(trainF)
-            trainW.writerow([epoch, loss.data[0], val_loss.data[0]])
-            trainF.flush()
-
-            # TODO: GUI Not correctly implemented
-            if self.args.display:# show some plots
-                plt.ion()
-                line1, = ax.plot(val_loss.data[0], 'b--', linewidth=2.5, label='validation loss')
-                line2, = ax.plot(loss.data[0], 'r--', linewidth=2.5, label="training loss")
-                plt.draw()
-                plt.grid(True)
-
-            if (epoch % 5) == 0:
-                print('Epoch: {}  | \ttrain loss: {:.4f}  | \tval loss: {:.4f}'.format(
-                    epoch, loss.data[0], val_loss.data[0]))
-            if self.args.adaptLR and ((epoch % 100) == 0):
-                lr = 1./epoch
-                self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
-            # if val_loss.data[0] < 5e-3:
-            #     print("achieved nice convergence")
-            #     break
-
-            if rospy.is_shutdown():
-                os._exit()
-        model_filename =  'lstm_net_' +  \
-                datetime.strftime(datetime.now(), '%m-%d-%y_%H::%M') + '.pkl'
-        print("saving model file as: ", model_filename)
-        torch.save(self.net.state_dict(), self.args.models_dir + '/' + model_filename) if self.args.save else None
-
-    def train_offline(self):
-        pass
 
     def train(self):
         #plot params
@@ -379,7 +341,7 @@ class Net(Listener):
                     epoch, loss.data[0], val_loss.data[0]))
             if self.args.adaptLR and ((epoch % 100) == 0):
                 lr = 1./epoch
-                self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
+                self.optimizer = optim.Adam(self.net.parameters(), lr=lr)
             if val_loss.data[0] < 5e-3:
                 print("achieved nice convergence")
                 break
@@ -457,7 +419,7 @@ class Net(Listener):
                 epoch, loss.data[0]))
             if self.args.adaptLR and ((epoch % 100) == 0):
                 lr = 1./epoch
-                self.optimizer = optim.SGD(self.net.parameters(), lr=lr)
+                self.optimizer = optim.Adam(self.net.parameters(), lr=lr)
 
             if rospy.is_shutdown():
                 os._exit()
@@ -489,7 +451,7 @@ def main():
     # parser.add_argument('--save', type=str, default='results')
     parser.add_argument('--rnnLR', type=float,default=5e-3)
     parser.add_argument('--Qpenalty', type=float, default=0.1)
-    parser.add_argument('--hiddenSize', type=list, nargs='+', default='966')
+    parser.add_argument('--hiddenSize', type=list, nargs='+', default='963')
     args = parser.parse_args()
     print(args) if args.verbose else None
     # time.sleep(50)
@@ -504,21 +466,24 @@ def main():
         train_in, train_out, test_in, train_out = split_data("data/data.mat")
 
     if args.offline:
-        ro, li, bi, bo, li, ri, roll, z, pitch  = loadSavedCSVFile("data/training_data_latenight.csv.gz")
-        train.head()
+        train, test  = split_csv_data("data/training_data.csv.gz")
 
+        # test_dataset = data.TensorDataset(test['in'], test['out'])
+        # test_loader  = data.DataLoader(test_dataset,
+        #                     batch_size=batchSize, shuffle=False)
 
 
     rospy.init_node('pose_control_listener', anonymous=True)
-    rate = rospy.Rate(5e-3)
+    rate = rospy.Rate(5)
     try:
         if not rospy.is_shutdown():
             network = Net(args)
 
             if args.identify:
                 network.identify_model()
-            # if not args.test:
-            #     network.train()
+            if args.offline:
+                network.offline_train(train)
+                # network.offline_test(test)
             if args.test:
                 network.test()
             rate.sleep()
