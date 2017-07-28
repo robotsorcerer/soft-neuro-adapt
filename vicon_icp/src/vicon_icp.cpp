@@ -332,7 +332,7 @@ private:
         // The returned angles are in the ranges [0:pi]x[-pi:pi]x[-pi:pi].
         Eigen::Vector3d rpy = rotation_matrix.eulerAngles(0, 1, 2);
         roll    = rpy(0);   // roll is about axis x
-        pitch   = rpy(2);   // pitch is about axis z
+        pitch   = rpy(1);   // pitch is about axis z
         yaw     = rpy(1);   // yaw about axis y
 
         // see this: http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
@@ -366,10 +366,10 @@ private:
         rad2deg(std::move(yaw));
         // ROS_INFO("[(roll, roll2), (pitch, pitch2): , (yaw, yaw2)]: [(%.4f, %.4f), (%.4f, %.4f), (%.4f, %.4f)]", roll, roll2, pitch,pitch2, yaw, yaw2);
 
-        Vector3d optimal_trans = this->mu_p - rotation_matrix * this->mu_x;
+        Vector3d optimal_trans = (this->mu_p - /*rotation_matrix **/ this->mu_x);
         pose_info.position.x = optimal_trans(0); 
         pose_info.position.y = optimal_trans(1);
-        pose_info.position.z = optimal_trans(2); 
+        pose_info.position.z = this->mu_p(2)-942; 
         // ROS_INFO_STREAM("optimal trans check: " << this->mu_x - rotation_matrix * this->mu_p);
 
         pose_info.orientation.x = roll;

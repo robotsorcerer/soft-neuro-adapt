@@ -40,9 +40,30 @@ class LSTMModel(nn.Module):
         # self.neq = neq
         # self.nineq = nineq
         # self.nz = nz
-        self.nHidden = nHidden
-
         self.args = args
+        # Backprop Through Time (Recurrent Layer) Params
+        self.noutputs   = noutputs
+        self.num_layers = numLayers
+        self.inputSize  = inputSize
+        self.nHidden    = nHidden
+        self.batchSize  = batchSize
+        self.noutputs   = noutputs
+
+        #define recurrent and linear layers
+        self.lstm1  = nn.LSTM(inputSize, nHidden[0], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
+        self.lstm2  = nn.LSTM(nHidden[0],nHidden[1], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
+        self.lstm3  = nn.LSTM(nHidden[1],nHidden[2], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
+
+        if args.lastLayer=='linear':
+            self.fc     = nn.Linear(nHidden[2], noutputs)
+            self.criterion  = nn.MSELoss(size_average=False)
+        elif args.lastLayer=='softmax':
+            self.fc     = F.softmax
+            self.criterion  = nn.CrossEntropyLoss()
+        else:
+            print('unknown network in last layer')
+            os._exit()
+
 
         # self.Q = Variable(Qpenalty*torch.eye(nx))
         # self.p = Variable(torch.zeros(nx))
@@ -99,29 +120,6 @@ class LSTMModel(nn.Module):
             x = QPFunction()(Q, p, G, h, e, e); x = x.cuda() if self.args.toGPU else x
             return x
         self.qp_layer = qp_layer
-
-        # Backprop Through Time (Recurrent Layer) Params
-        self.noutputs   = noutputs
-        self.num_layers = numLayers
-        self.inputSize  = inputSize
-        self.nHidden    = nHidden
-        self.batchSize  = batchSize
-        self.noutputs   = noutputs
-
-        #define recurrent and linear layers
-        self.lstm1  = nn.LSTM(inputSize, nHidden[0], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
-        self.lstm2  = nn.LSTM(nHidden[0],nHidden[1], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
-        self.lstm3  = nn.LSTM(nHidden[1],nHidden[2], num_layers=numLayers, bias=False, batch_first=False, dropout=0.3)
-
-        if args.lastLayer=='linear':
-            self.fc     = nn.Linear(nHidden[2], noutputs)
-            self.criterion  = nn.MSELoss(size_average=False)
-        elif args.lastLayer=='softmax':
-            self.fc     = F.softmax
-            self.criterion  = nn.CrossEntropyLoss()
-        else:
-            print('unknown network in last layer')
-            os._exit()
 
     def forward(self, x):
         

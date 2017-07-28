@@ -231,16 +231,15 @@ def split_csv_data(x):
 	# 					 ), 1)
 	
 	inputs = torch.cat((
-						li_tensor_3[:min_length], lo_tensor_3[:min_length], bi_tensor_3[:min_length], 
-						bo_tensor_3[:min_length], ri_tensor_3[:min_length], ro_tensor_3[:min_length],						
-						# li_tensor_2[:min_length], lo_tensor_2[:min_length], bi_tensor_2[:min_length], 
-						# bo_tensor_2[:min_length], ri_tensor_2[:min_length], ro_tensor_2[:min_length],
-						# li_tensor_1[:min_length], lo_tensor_1[:min_length], bi_tensor_1[:min_length], 
-						# bo_tensor_1[:min_length], ri_tensor_1[:min_length], ro_tensor_1[:min_length],
-						roll_tensor[:min_length], z_tensor[:min_length], pitch_tensor[:min_length],
+						li_tensor, lo_tensor, bi_tensor, 
+						bo_tensor, ri_tensor, ro_tensor,
+						roll_tensor, z_tensor, pitch_tensor,
 						 ), 1)
 
-	outputs = torch.cat((roll_tensor[:min_length], z_tensor[:min_length], pitch_tensor[:min_length]), 1)
+	# outputs = torch.cat((roll_tensor[:min_length], z_tensor[:min_length], pitch_tensor[:min_length]), 1)
+	outputs = torch.cat((
+						li_tensor, lo_tensor, bi_tensor, 
+						bo_tensor, ri_tensor, ro_tensor), 1)
 
 	# print(inputs.size(), outputs.size())
 	train['in'] = inputs[:train_size]

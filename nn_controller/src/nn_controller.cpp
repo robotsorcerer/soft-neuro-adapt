@@ -28,7 +28,6 @@ Controller::Controller(ros::NodeHandle nc, const Eigen::Vector3d& ref, bool prin
 	sigma_r = 0.01;
 	// BladderTypeEnum bladder_type_;
 	ros::param::get("/nn_controller/Control/with_net", with_net_);
-	pathfinder::getROSPackagePath("nn_controller", nn_controller_path_);
 	control_pub_ = n_.advertise<ensenso::ValveControl>("/mannequine_head/u_valves", 100);
 }
 
@@ -103,15 +102,11 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 
 		tracking_error = pose_info - ym; 	// will be 3x1
 
-		// //Ky_hat
-		// Ky_hat_dot = -Gamma_y * pose_info * tracking_error.transpose() * P * B  * sgnLambda;
-		// Ky_hat = Ky_hat + 0.01 * Ky_hat_dot;
-		// prev_Ky_hat_.push_back(Ky_hat); 
 
-		// // Kr_hat
-		// Kr_hat_dot = -Gamma_r * ref_      * tracking_error.transpose() * P * B  * sgnLambda;
-		// Kr_hat = Kr_hat + 0.01 * Kr_hat_dot;
-		// prev_Kr_hat_.push_back(Kr_hat);
+		ros::param::get("/nn_controller/Utils/filename", filename_);
+		pathfinder::getROSPackagePath("nn_controller", nn_controller_path_);
+		ss << nn_controller_path_.c_str() << filename_;
+		ref_pose_file_ = ss.str();
 	}
 	else{
 		// find ym
@@ -211,82 +206,31 @@ void Controller::ControllerParams(Eigen::VectorXd&& pose_info)
 	u_valves_.base_bladder_neg  = u_control(3);	
 	u_valves_.right_bladder_pos = u_control(4);
 	u_valves_.right_bladder_neg = u_control(5);	
-/*
-	bool roll_pos, roll_neg, pitch_pos, pitch_neg, z_pos, z_neg;
-	if(ros::param::get("/nn_controller/DOF/ROLL_POS", roll_pos))
-		this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
-	if(ros::param::get("/nn_controller/DOF/ROLL_NEG", roll_neg))
-		this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_NEG;
-	if(ros::param::get("/nn_controller/DOF/PITCH_POS", pitch_pos))
-		this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_POS;
-	if(ros::param::get("/nn_controller/DOF/PITCH_NEG", pitch_neg))
-		this->dof_motion_type_ = DOF_MOTION_ENUM::PITCH_NEG;
-	if(ros::param::get("/nn_controller/DOF/Z_POS", z_pos))
-		this->dof_motion_type_ = DOF_MOTION_ENUM::Z_POS;
-	if(ros::param::get("/nn_controller/DOF/Z_NEG", z_neg))
-		this->dof_motion_type_ = DOF_MOTION_ENUM::Z_NEG;
-	// this->dof_motion_type_ = DOF_MOTION_ENUM::ROLL_POS;
-
-	switch (this->dof_motion_type_){
-		case DOF_MOTION_ENUM::ROLL_POS:  // controlled principlally by left inlet torque
-			u_valves_.right_bladder_pos = 0; //std::fabs(u_valves_.right_bladder_pos);  // right inlet has to be zero
-			u_valves_.right_bladder_neg = std::fabs(u_valves_.right_bladder_neg); // right outlet has to be positive
-			u_valves_.left_bladder_neg  = 0; //std::fabs(u_valves_.left_bladder_neg); // left outlet has to be positive
-			break;
-
-		case DOF_MOTION_ENUM::ROLL_NEG:  // controlled principally by right inlet torque
-			u_valves_.left_bladder_pos = 0; // dampen the negative torque
-			u_valves_.left_bladder_neg = std::fabs(u_valves_.left_bladder_neg); // dampen the negative torque
-			u_valves_.right_bladder_neg = 0;  // we should not excite right outlet bladder
-			break;
-
-		case DOF_MOTION_ENUM::PITCH_POS:  // this is controlled principally by the base bladder inlet
-			u_valves_.base_bladder_neg = 0;  // we should not excite base outlet bladder
-			break;
-
-		case DOF_MOTION_ENUM::PITCH_NEG:	// this is controlled principally by the base bladder outlet
-			u_valves_.base_bladder_pos = 0;  // we should not excite base outlet bladder
-			break;
-
-		case DOF_MOTION_ENUM::Z_POS:   // this is controlled principally by the base bladder
-			u_valves_.base_bladder_neg = 0;  // we should not excite base outlet bladder
-			break;
-
-		case DOF_MOTION_ENUM::Z_NEG: // this is controlled principally by the base bladder outlet
-			u_valves_.base_bladder_pos = 0;  // we should not excite base outlet bladder
-			break;
-	}*/
 
 	if(save) {
 		std::ofstream file_handle;
-
-		ros::param::get("/nn_controller/Utils/filename", filename_);
-		ss << nn_controller_path_.c_str() << filename_;
-		std::string ref_pose_file = ss.str();
-		file_handle.open(ref_pose_file, std::fstream::in | std::ofstream::out | std::ofstream::app);
-
-		file_handle  << ref_(0) <<"\t" <<ref_(1) << "\t" << ref_(2) << "\t" <<
-					pose_info(0) <<"\t" <<pose_info(1) << "\t" << pose_info(2) << "\n"; 
-
+		file_handle.open(ref_pose_file_, std::ofstream::out | std::ofstream::app);
+		file_handle  << ref_(0) <<"\t" <<ref_(1) << "\t" << ref_(2) << "\t" << pose_info(0) <<"\t" <<pose_info(1) << "\t" << pose_info(2) << "\n"; 
 		file_handle.close();
 	}
-
+	ros::Rate sleeper(2);
+	sleeper.sleep();
 	control_pub_.publish(u_valves_);
 	vectorToHeadPose(std::move(pose_info), pose_);	// convert from eigen to headpose
-	// // udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), u_valves_, ref_, pose_);
+	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), u_valves_, ref_, pose_);
 	// pose is  [roll, z, pitch]
-	udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), pose_);
+	// udp::sender s(io_service, boost::asio::ip::address::from_string(multicast_address), pose_); // used for identification
 
 	if(print)	{	
 		OUT("\nref_: " 			<< ref_.transpose());
-		OUT("y  (roll, z,  pitch): " 		 << pose_.orientation.x << " " << pose_.position.z << " " << pose_.orientation.y);
+		OUT("y  (roll, z,  pitch): " 		 << pose_info.transpose());
 		OUT("ym (roll, z,  pitch): " 		 << ym.transpose());
 		OUT("e  (y-ym): " << tracking_error.transpose());
 		OUT("pred (z, z, pitch, pitch, roll, roll): " << pred.transpose());
 		OUT("net_control: " << net_control.transpose());
 		OUT("Control Law: " << u_control.transpose());
-		// ROS_INFO_STREAM("\nKr_hat^T: \n" << Kr_hat.transpose());
-		// ROS_INFO_STREAM("\nKy_hat^T: \n" << Ky_hat.transpose());
+		OUT("Kr_hat: \n" << Kr_hat);
+		OUT("Ky_hat: \n" << Ky_hat);
 	}
 	++counter;
 }
@@ -303,9 +247,9 @@ int main(int argc, char** argv)
 	try{		
 		//supply values from the cmd line or retrieve them 
 		//from the ros parameter server
-		n.getParam("/nn_controller/Reference/z", ref(0));    	//ref z
-		n.getParam("/nn_controller/Reference/pitch", ref(1));	//ref pitch
-		n.getParam("/nn_controller/Reference/roll", ref(2));	    //ref roll
+		n.getParam("/nn_controller/Reference/z", ref(1));    	//ref z
+		n.getParam("/nn_controller/Reference/pitch", ref(2));	//ref pitch
+		n.getParam("/nn_controller/Reference/roll", ref(0));	    //ref roll
 		n.getParam("/nn_controller/Utils/print", print);
 		n.getParam("/nn_controller/Utils/useSigma", useSigma);
 		save = n.getParam("/nn_controller/Utils/save", save);
@@ -320,7 +264,8 @@ int main(int argc, char** argv)
 	ros::Subscriber sub_pred = n.subscribe("/mannequine_pred/preds", 100, &Controller::net_control_subscriber, &c);
 	ros::spin();
 
-	ros::shutdown();
+	if(!ros::ok())
+		ros::shutdown();
 
 	return 0;
 }

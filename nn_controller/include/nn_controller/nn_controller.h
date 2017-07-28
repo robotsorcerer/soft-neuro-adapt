@@ -353,6 +353,13 @@ namespace amfc_control
             return (T(0) <  val) - (val < T(0));
         }
 
+        /** @brief
+        * filename that we store expt info in 
+        *
+        */
+
+        std::string ref_pose_file_; 
+
         /* @brief
         *
         *   Convenience function used to initialize static state and 
@@ -394,21 +401,29 @@ namespace amfc_control
             Bm = -Am;
 
             //initialize B so that we have the difference between voltages to each IAB
-            B(0,0) = 1; B(0, 1) = -1;
-            B(1,2) = 1; B(1, 3) = -1;
-            B(2,4) = 1; B(2, 5) = -1;
+            B(0,0) = 1; B(0, 1) = 1;
+            B(1,2) = 1; B(1, 3) = 1;
+            B(2,4) = 1; B(2, 5) = 1;
 
             pose_info.resize(n);
 
             //gamma scaling factor for adaptive gains
-            k =  1e-1; //1e-12/8;
+            k =  1e-12; //1e-12/8;
 
             Gamma_y *= k;// * Gamma_y.diagonal();
             Gamma_r *= k;// * Gamma_r.diagonal();
 
             // initialize Kr_hat and Ky_hat to dummy values for sigma modification
-            Kr_hat.setOnes(n,m);  //Kr_hat.setZero(n,m);
-            Ky_hat.setOnes(n,m); // Ky_hat.setZero(n,m);
+            // Kr_hat.setOnes(n,m);  //
+            // Ky_hat.setOnes(n,m); // 
+            Kr_hat.resize(n,m);                       Ky_hat.resize(n,m);
+            Kr_hat << 4.04836e-07, 4.04836e-07, 5.74756e-05, 5.74756e-05, 1.09659e-06, 1.09659e-06,
+                    1.64555e-07, 1.64555e-07, 2.33624e-05, 2.33624e-05, 4.45735e-07, 4.45735e-07,
+                    1.88294e-07, 1.88294e-07, 2.67326e-05, 2.67326e-05, 5.10037e-07, 5.10037e-07;
+
+            Ky_hat << 4.31251e-07, 4.31251e-07, 6.12258e-05, 6.12258e-05, 1.16814e-06, 1.16814e-06,
+                        3.91606e-06, 3.91606e-06, 0.000555974, 0.000555974, 1.06075e-05, 1.06075e-05,
+                        2.59864e-07, 2.59864e-07, 3.68935e-05, 3.68935e-05, 7.03899e-07, 7.03899e-07;    
         }
 
     public:
