@@ -1,3 +1,9 @@
 pyrnn/src/results.old*/**
-
-
+pyrnn/**/__init__.pyc
+icra/**/__init__.pyc
+pyrnn/**/__pycache__
+icra/**/__pycache__
+pyrnn/**/.ipynb_checkpoints
+icra/**/.ipynb_checkpoints
+pyrnn/**/*.ipynb
+icra/**/*.ipynb

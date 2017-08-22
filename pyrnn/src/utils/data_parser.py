@@ -39,12 +39,12 @@ def loadSavedCSVFile(x):
 	outputs = {'roll': list(),
 				'z': list(),
 				'pitch': list(),
-		   	}
+		   	}		
 
 	with gzip.GzipFile(x) as f:
 		reader = csv.reader(f.readlines(), delimiter="\t")
 		for row in reader:
-			inputs['ro'].append(float(row[0]))
+			inputs['ro'].append(float(row[0]))	
 			inputs['lo'].append(float(row[1]))
 			inputs['li'].append(float(row[2]))
 			inputs['ri'].append(float(row[3]))
@@ -56,7 +56,7 @@ def loadSavedCSVFile(x):
 	return inputs, outputs
 
 def split_csv_data(x):
-
+	
 	# dictionaries to return
 
 	train = {
@@ -66,13 +66,12 @@ def split_csv_data(x):
 
 	test = {
 		'in': None,
-		'out': None,
+		'out': None,	
 	}
 
-	# print(x)
 	in_dict, out_dict = loadSavedCSVFile(x)
 
-	li = in_dict['li'];		lo = in_dict['lo'];		bi = in_dict['bi']
+	li = in_dict['li'];		lo = in_dict['lo'];		bi = in_dict['bi']	
 	bo = in_dict['bo'];		ri = in_dict['ri'];		ro = in_dict['ro']
 
 	roll = out_dict['roll'];	z = out_dict['z'];	pitch = out_dict['pitch']
@@ -84,14 +83,14 @@ def split_csv_data(x):
 	'''
 	data_length = len(in_dict['ro'])
 
-	############################################################
+	############################################################ 
 	#find pair [u[t-3], y[t-3]]
 	delay = 3
 	###########################################################
 	# neglect last delayed obeservations and controls
 	idx_stop = data_length - delay
-	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop],
-			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop],
+	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop], 
+			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop], 
 			   roll[:idx_stop], z[:idx_stop], pitch[:idx_stop])	)
 	shuffle(temp)
 
@@ -112,14 +111,14 @@ def split_csv_data(x):
 	z_tensor_3		=  Variable(torch.Tensor(z_3).unsqueeze(0).t())
 	pitch_tensor_3	=  Variable(torch.Tensor(pitch_3).unsqueeze(0).t())
 
-	############################################################
+	############################################################ 
 	#find pair [u(t-2), y(t-2)]
 	delay = 2
 	###########################################################
 	# neglect last delayed obeservations and controls
 	idx_stop = data_length - delay
-	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop],
-			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop],
+	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop], 
+			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop], 
 			   roll[:idx_stop], z[:idx_stop], pitch[:idx_stop])	)
 	shuffle(temp)
 
@@ -140,14 +139,14 @@ def split_csv_data(x):
 	z_tensor_2		=  Variable(torch.Tensor(z_2).unsqueeze(0).t())
 	pitch_tensor_2	=  Variable(torch.Tensor(pitch_2).unsqueeze(0).t())
 
-	############################################################
+	############################################################ 
 	#find pair [u(t-1), y(t-1)]
 	delay = 1
 	###########################################################
 	# neglect last delayed obeservations and controls
 	idx_stop = data_length - delay
-	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop],
-			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop],
+	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop], 
+			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop], 
 			   roll[:idx_stop], z[:idx_stop], pitch[:idx_stop])	)
 	shuffle(temp)
 
@@ -168,14 +167,14 @@ def split_csv_data(x):
 	z_tensor_1		=  Variable(torch.Tensor(z_1).unsqueeze(0).t())
 	pitch_tensor_1	=  Variable(torch.Tensor(pitch_1).unsqueeze(0).t())
 
-	############################################################
+	############################################################ 
 	#find pair [u(t), y(t)]
 	delay = 0
 	###########################################################
 	# neglect last delayed obeservations and controls
 	idx_stop = data_length - delay
-	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop],
-			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop],
+	temp = list(zip(li[:idx_stop], lo[:idx_stop], bi[:idx_stop], 
+			   bo[:idx_stop], ri[:idx_stop], ro[:idx_stop], 
 			   roll[:idx_stop], z[:idx_stop], pitch[:idx_stop])	)
 	shuffle(temp)
 
@@ -214,32 +213,32 @@ def split_csv_data(x):
 
 	# inputs = torch.cat((
 	# 					# regress 1
-	# 					roll_tensor_1[:min_length], z_tensor_1[:min_length], pitch_tensor_1[:min_length],
-	# 					li_tensor_1[:min_length], lo_tensor_1[:min_length], bi_tensor_1[:min_length],
+	# 					roll_tensor_1[:min_length], z_tensor_1[:min_length], pitch_tensor_1[:min_length], 
+	# 					li_tensor_1[:min_length], lo_tensor_1[:min_length], bi_tensor_1[:min_length], 
 	# 					bo_tensor_1[:min_length], ri_tensor_1[:min_length], ro_tensor_1[:min_length],
 	# 					# regress no delay
-	# 					roll_tensor[:min_length], z_tensor[:min_length], pitch_tensor[:min_length],
-	# 					li_tensor[:min_length], lo_tensor[:min_length], bi_tensor[:min_length],
+	# 					roll_tensor[:min_length], z_tensor[:min_length], pitch_tensor[:min_length], 
+	# 					li_tensor[:min_length], lo_tensor[:min_length], bi_tensor[:min_length], 
 	# 					bo_tensor[:min_length], ri_tensor[:min_length], ro_tensor[:min_length],
 	# 					# regress 2
-	# 					roll_tensor_2[:min_length], z_tensor_2[:min_length], pitch_tensor_2[:min_length],
-	# 					li_tensor_2[:min_length], lo_tensor_2[:min_length], bi_tensor_2[:min_length],
+	# 					roll_tensor_2[:min_length], z_tensor_2[:min_length], pitch_tensor_2[:min_length],						
+	# 					li_tensor_2[:min_length], lo_tensor_2[:min_length], bi_tensor_2[:min_length], 
 	# 					bo_tensor_2[:min_length], ri_tensor_2[:min_length], ro_tensor_2[:min_length],
 	# 					# regress 3
 	# 					roll_tensor_3[:min_length], z_tensor_3[:min_length], pitch_tensor_3[:min_length],
-	# 					li_tensor_3[:min_length], lo_tensor_3[:min_length], bi_tensor_3[:min_length],
+	# 					li_tensor_3[:min_length], lo_tensor_3[:min_length], bi_tensor_3[:min_length], 
 	# 					bo_tensor_3[:min_length], ri_tensor_3[:min_length], ro_tensor_3[:min_length],
 	# 					 ), 1)
-
+	
 	inputs = torch.cat((
-						li_tensor, lo_tensor, bi_tensor,
+						li_tensor, lo_tensor, bi_tensor, 
 						bo_tensor, ri_tensor, ro_tensor,
 						roll_tensor, z_tensor, pitch_tensor,
 						 ), 1)
 
 	# outputs = torch.cat((roll_tensor[:min_length], z_tensor[:min_length], pitch_tensor[:min_length]), 1)
 	outputs = torch.cat((
-						li_tensor, lo_tensor, bi_tensor,
+						li_tensor, lo_tensor, bi_tensor, 
 						bo_tensor, ri_tensor, ro_tensor), 1)
 
 	# print(inputs.size(), outputs.size())
