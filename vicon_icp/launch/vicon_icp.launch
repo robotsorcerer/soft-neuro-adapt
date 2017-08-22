@@ -1,0 +1,38 @@
+<launch>
+
+	<arg name="publish_tf"        default="false" />
+	<arg name="machine"           default="localhost" />
+	<arg name="start_manager"     default="true" />
+	<arg name="use_machine"       default="true" />
+
+	<arg name="subject_name"    value="Superdude"  />
+	<arg name="segment_name"    default="head" />
+	<arg name="respawn" default="false" />
+	<!-- Native Gram-Schmidt: use vicon_listener-->
+	<arg name="icp"   default="true" />
+	<arg name="direction_cosines" default="false" />
+
+	<machine name="localhost" address="localhost" if="$(arg use_machine)"/>
+
+	<!-- if simulating, do not launch bridge nor listener -->
+	<node pkg="vicon_bridge" type="vicon_bridge" name="vicon" output="screen">
+		<param name="stream_mode" value="ClientPull" type="str" />
+		<param name="datastream_hostport" value="10.0.0.3:801" type="str" />
+		<param name="tf_ref_frame_id" value="/world" type="str" />
+		<param name="rate" type="int" value="30" />
+	</node>
+
+	<group if="$(arg icp)">
+		<node pkg="vicon_icp" type="vicon_icp" name="vicon_icp" output="screen"  args="$(arg subject_name) $(arg segment_name)" respawn="$(arg respawn)">
+			<rosparam command="load" file="$(find vicon_icp)/config/base_pose.yaml" />
+		</node>
+	</group>
+
+	<group if="$(arg direction_cosines)">
+		<node pkg="vicon_listener" type="direction_cosines" name="direction_cosines" output="screen">
+			<param name="save" value="$(arg save)" type="bool"/>
+			<param name="print" value="$(arg print)" type="bool"/>
+			<param name="sim" value="$(arg sim)" type="bool" />
+		</node>
+	</group>
+</launch>

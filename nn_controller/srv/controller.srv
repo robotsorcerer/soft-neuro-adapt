@@ -1,0 +1,8 @@
+#string get_error
+---
+float64 left_in
+float64 left_out
+float64 right_in
+float64 right_out
+float64 base_in
+float64 base_out

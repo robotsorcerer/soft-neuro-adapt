@@ -1,0 +1,3 @@
+[submodule "Vicon"]
+	path = Vicon
+	url = git@github.com:lakehanne/Vicon.git

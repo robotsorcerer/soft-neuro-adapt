@@ -1,0 +1,19 @@
+Reference:
+    roll: 98
+    z: 40   
+    pitch: 45.5678
+Control:
+    with_net: true   
+Utils:
+    print: true
+    save: true
+    filename: /ref_pose.csv
+# DoF being controlled
+DOF:
+# could be one of the following: 
+    roll_pos: true
+    roll_neg: false
+    pitch_pos: false
+    pitch_neg: false
+    z_pos: false
+    z_neg: false

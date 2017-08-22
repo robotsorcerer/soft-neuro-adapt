@@ -1,0 +1,21 @@
+BasePose:
+    Marker_Fore:
+      x: 1074.22851562
+      y: 8.19184875488
+      z: 968.517456055
+    Marker_Right:
+      x: 1022.63433838
+      y: 107.457176208
+      z: 948.422851562
+    Marker_Chin:
+      x: 1063.6862793
+      y: 195.816772461
+      z: 944.158203125
+    Marker_Left:
+      x: 1110.6998291
+      y: 107.423690796
+      z: 935.233947754
+Utils:
+  save: false
+  print: false
+  use_hard_coded: true

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+	<arg name="useVicon" value="true"/>
+		
+	<group if="$(arg useVicon)" >
+		<include file="$(find vicon_icp)/launch/vicon_icp.launch" />
+
+		<node pkg="nn_controller" type="nn_controller" name="nn_controller" output="screen" respawn="false">
+			<rosparam command="load" file="$(find nn_controller)/config/traj.yaml" />
+		</node>
+		
+		<!-- <node pkg="pyrnn" type="main.py" name="function_approximator" output="screen" respawn="false"></node> -->
+	</group>
+
+</launch>

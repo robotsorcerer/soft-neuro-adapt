@@ -1,0 +1,14 @@
+numpy>=1.12.1
+scipy>=0.19.0
+qpth>=0.0.5
+cvxpy>=0.4.9
+matplotlib>=2.0.0
+ipython>=5.3.0
+h5py>=2.7.0
+setproctitle>=1.1.10
+setGPU>=0.0.7
+tqdm>=4.11.2
+catkin_pkg>=0.3.1
+block>=0.0.4
+rospkg>=1.1.0
+netifaces>=0.10.5
