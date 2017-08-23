@@ -1,8 +1,9 @@
 """ This file defines linear regression with an arbitrary prior. """
 import numpy as np
 
-from gps.algorithm.dynamics.dynamics import Dynamics
-from gps.algorithm.algorithm_utils import gauss_fit_joint_prior
+from .dynamics import Dynamics
+from .dynamics_prior_gmm import DynamicsPriorGMM
+from .. utils.algorithm_utils import gauss_fit_joint_prior
 
 
 class DynamicsLRPrior(Dynamics):
@@ -12,8 +13,8 @@ class DynamicsLRPrior(Dynamics):
         self.Fm = None
         self.fv = None
         self.dyn_covar = None
-        self.prior = \
-                self._hyperparams['prior']['type'](self._hyperparams['prior'])
+        self.prior = DynamicsPriorGMM
+                #self._hyperparams['prior']['type'](self._hyperparams['prior'])
 
     def update_prior(self, samples):
         """ Update dynamics prior. """

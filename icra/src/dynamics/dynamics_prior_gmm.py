@@ -1,12 +1,10 @@
 """ This file defines the GMM prior for dynamics estimation. """
 import copy
 import logging
-
 import numpy as np
 
-from gps.algorithm.dynamics.config import DYN_PRIOR_GMM
-from gps.utility.gmm import GMM
-
+from utils import GMM
+from config import DYN_PRIOR_GMM
 
 LOGGER = logging.getLogger(__name__)
 
@@ -19,7 +17,7 @@ class DynamicsPriorGMM(object):
         training of Deep Visuomotor Policies", arXiv:1504.00702,
         Appendix A.3.
     """
-    def __init__(self, hyperparams):
+    def __init__(self):
         """
         Hyperparameters:
             min_samples_per_cluster: Minimum samples per cluster.
@@ -29,7 +27,7 @@ class DynamicsPriorGMM(object):
             strength: Adjusts the strength of the prior.
         """
         config = copy.deepcopy(DYN_PRIOR_GMM)
-        config.update(hyperparams)
+        # config.update(hyperparams)
         self._hyperparams = config
         self.X = None
         self.U = None
