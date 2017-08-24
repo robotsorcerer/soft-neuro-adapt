@@ -3,7 +3,7 @@ import numpy as np
 
 from .dynamics import Dynamics
 from .dynamics_prior_gmm import DynamicsPriorGMM
-from .. utils.algorithm_utils import gauss_fit_joint_prior
+from utils import gauss_fit_joint_prior
 
 
 class DynamicsLRPrior(Dynamics):
@@ -13,13 +13,14 @@ class DynamicsLRPrior(Dynamics):
         self.Fm = None
         self.fv = None
         self.dyn_covar = None
-        self.prior = DynamicsPriorGMM
-                #self._hyperparams['prior']['type'](self._hyperparams['prior'])
+        self.prior = DynamicsPriorGMM() #\
+                # self._hyperparams['prior']['type'](self._hyperparams['prior'])
+                #will be DynamicsPriorGMM()
 
-    def update_prior(self, samples):
+    def update_prior(self, X, U):
         """ Update dynamics prior. """
-        X = samples.get_X()
-        U = samples.get_U()
+        # X = samples.get_X()
+        # U = samples.get_U()
         self.prior.update(X, U)
 
     def get_prior(self):

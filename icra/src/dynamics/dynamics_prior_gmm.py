@@ -4,6 +4,8 @@ import logging
 import numpy as np
 
 from utils import GMM
+
+from icra import __file__ as icra_filepath
 from config import DYN_PRIOR_GMM
 
 LOGGER = logging.getLogger(__name__)

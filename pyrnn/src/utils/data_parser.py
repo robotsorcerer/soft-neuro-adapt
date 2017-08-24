@@ -40,8 +40,10 @@ def loadSavedCSVFile(x):
 				'pitch': list(),
 		   	}
 
-	with gzip.GzipFile(x) as f:
+	# with gzip.GzipFile(x) as f: #using this fails on laptop DELL
+	with gzip.open(x, mode='rt') as f:
 		reader = csv.reader(f.readlines(), delimiter="\t")
+		# print(type(reader.__attribute__()))
 		for row in reader:
 			inputs['ro'].append(float(row[0]))
 			inputs['lo'].append(float(row[1]))

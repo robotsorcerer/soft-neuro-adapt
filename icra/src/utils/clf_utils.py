@@ -2,7 +2,6 @@
 import numpy as np
 
 from .general_utils import BundleType
-# from gps.algorithm.policy.lin_gauss_policy import LinearGaussianPolicy
 
 
 class IterationData(BundleType):
@@ -63,7 +62,7 @@ class PolicyInfo(BundleType):
             'policy_prior': None,  # Current prior for policy linearization.
         }
         BundleType.__init__(self, variables)
-    # 
+    #
     # def traj_distr(self):
     #     """ Create a trajectory distribution object from policy info. """
     #     T, dU, dX = self.pol_K.shape
