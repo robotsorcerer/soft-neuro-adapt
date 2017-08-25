@@ -3,6 +3,7 @@ import logging
 
 import numpy as np
 import scipy.linalg
+from gmr_lib import emInitKmeans
 
 
 LOGGER = logging.getLogger(__name__)
@@ -123,6 +124,22 @@ class GMM(object):
         Do = data.shape[1]
 
         LOGGER.debug('Fitting GMM with %d clusters on %d points', K, N)
+        #  TODO: Replace this with kmeans++
+        # # Initialization.
+        # LOGGER.debug('Initializing GMM from KMeans++.')
+        # priors, mu, sigma = emInitKmeans(data.T, K)
+        # self.mu = mu
+        # self.sigma = sigma
+        # self.logmass = np.log(1.0 / K) * np.ones((K, 1))
+        # self.mass = (1.0 / K) * np.ones((K, 1))
+        # self.N = data.shape[0]
+        # N = self.N
+        #
+        # # Set initial cluster indices.
+        # if not self.init_sequential:
+        #     cidx = np.random.randint(0, K, size=(1, N))
+        # else:
+        #     raise NotImplementedError()
 
         if (not self.warmstart or self.sigma is None or
                 K != self.sigma.shape[0]):
@@ -151,6 +168,7 @@ class GMM(object):
                 self.sigma[i, :, :] = sigma + np.eye(Do) * 2e-6
 
         prevll = -float('inf')
+        # print('self.sigma: ', self.sigma.shape)
         for itr in range(max_iterations):
             # E-step: compute cluster probabilities.
             logobs = self.estep(data)

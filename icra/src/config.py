@@ -12,7 +12,7 @@ DYN_PRIOR_GMM = {
     'initial_condition': 4,
     'T': 8,
     'regularization': 1e-6,
-    'sample_size': 40,
+    'sample_size': 542,
 }
 
 DYNAMICS_PROPERTIES = {

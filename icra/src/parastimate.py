@@ -95,9 +95,15 @@ def populate_data():
 
 def main():
     parse = argparse.ArgumentParser(description="options from terminal")
-    parse.add_argument("--verbose", action='store_true')
-    parse.add_argument("--K", type=int, default=6, help="number of kmeans clusters")
+    parse.add_argument("-v", "--verbose", action='store_true')
+    parse.add_argument("-s", "--silent", action='store_true')
+    parse.add_argument("-K",  "--clusters", type=int, default=6, help="number of kmeans clusters")
     args = parse.parse_args()
+
+    if args.silent:
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+    else:
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
     cond_ = DYN_PRIOR_GMM['initial_condition']
     n_clusters = DYN_PRIOR_GMM['max_clusters']
@@ -105,7 +111,7 @@ def main():
 
     X_full, U_full = populate_data()
 
-
+    print('X full shape: {}, U full shape: {}'.format(X_full.shape, U_full.shape))
     def sample(chunk_size):
         npr.shuffle(X_full)
         npr.shuffle(U_full)
@@ -123,9 +129,19 @@ def main():
         # prior = DynamicsLRPrior(DYNAMICS_PROPERTIES)
         for m in range(cond_):
             X, U = sample(sample_size)
-            # update prior and fit dynamics
-            cur[m].traj_info.dynamics.update_prior(X, U) # this is update_Prior in dynamics_lr_prior
-            cur[m].traj_info.dynamics.fit(X, U)  # fit Gaussian posteriors
+            """
+             update prior and fit dynamics
+             update prior gets samples from the robot,
+             and computes the prior. We degine a temporal evolution
+             of the state dynamics by forming the vector of samples [x_t, u_t, x_{t+1}]
+
+             o we pick the number of clusters by starting with 2
+             and we increase K until the maximum likelihood estimate of the GMM converges
+              on a
+             #L20 dynamics_lr_prior
+            """
+            cur[m].traj_info.dynamics.update_prior(X, U)
+            cur[m].traj_info.dynamics.fit(X, U)  #L31 dynamics_lr_prior
 
             # Fit x0mu/x0sigma.
             x0 = X[:, 0, :]
@@ -135,9 +151,11 @@ def main():
                 np.maximum(np.var(x0, axis=0),
                            DYNAMICS_PROPERTIES['initial_state_var'])
             )
-
+            """
             print('xo shape: ', x0.shape, 'X_full_size: ', X_full.shape[0])
-            # now solve for gmm dynamics by computing the normal inverse wishart prior
+            print('x0mu: {}, x0sigma: {}'.format(x0mu, cur[m].traj_info.x0sigma))
+            now solve for gmm dynamics by computing the normal inverse wishart prior
+            """
             prior = cur[m].traj_info.dynamics.get_prior() # will be DynamicsPriorGMM
             if prior:
                 prior.X, prior.U  = X, U
@@ -146,7 +164,8 @@ def main():
                 cur[m].traj_info.x0sigma += \
                         Phi + (N*priorm) / (N+priorm) * \
                         np.outer(x0mu-mu0, x0mu-mu0) / (N+n0)
-
+            # Fit nonlinear model to normal inverse wishart prior
+            
     except KeyboardInterrupt:
         print("shutting down ros")
 

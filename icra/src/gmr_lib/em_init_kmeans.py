@@ -48,7 +48,7 @@ def emInitKmeans(data, nbStates):
 
     # allocate priors
     priors = np.zeros((nbStates))
-    sigma =  np.zeros((2,2, nbStates)) #[]
+    sigma =  np.zeros((data.shape[0],data.shape[0], nbStates)) #[]
     for i in range(nbStates):
       idtmp = np.where(data_id==i)[0]
       priors[i] = matlength(idtmp)
@@ -56,6 +56,7 @@ def emInitKmeans(data, nbStates):
                             (np.r_[data[:,idtmp], data[:,idtmp]]).T
                             )
     #   sigma.append(temp_sig)
+      print(temp_sig.shape, sigma.shape, data.shape)
       sigma[:,:,i] = temp_sig
       # Add a tiny variance to avoid numerical instability
       sigma[:,:,i] = sigma[:,:,i] + 1e-5*np.diag(
