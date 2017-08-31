@@ -153,20 +153,20 @@ class SpheroLoader(BundleType):
 
         return experiment_III
 
-    # def __call__(self):
-    #     exp_I = self.load_expt_I()
-    #     exp_I = BundleType.__init__(self, self.load_expt_I())
-    #
-    #     exp_II = self.load_expt_II()
-    #     exp_II = BundleType.__init__(self, exp_II)
-    #
-    #     exp_III = self.load_expt_III()
-    #     exp_III = BundleType.__init__(self, exp_III)
-    #
-    #     experiments = {'experiment_I': exp_I, 'experiment_II': exp_II, 'experiment_III': exp_III}
-    #
-    #     print(exp_I)
-    #     return experiments
+    def __call__(self):
+        exp_I = self.load_expt_I()
+        exp_I = BundleType.__init__(self, self.load_expt_I())
+
+        exp_II = self.load_expt_II()
+        exp_II = BundleType.__init__(self, exp_II)
+
+        exp_III = self.load_expt_III()
+        exp_III = BundleType.__init__(self, exp_III)
+
+        experiments = {'experiment_I': exp_I, 'experiment_II': exp_II, 'experiment_III': exp_III}
+
+        print(exp_I)
+        return experiments
 
 sphero_dicts = SpheroLoader()#.__call__()
 
@@ -175,4 +175,4 @@ sphero_dicts = SpheroLoader()#.__call__()
 # sphero_dicts#.__call__()
 
 print(sphero_dicts.__dict__.keys(), type(sphero_dicts))
-print(sphero_dicts.experiment['robot_I'])
+# print(sphero_dicts.experiment['robot_I'])
